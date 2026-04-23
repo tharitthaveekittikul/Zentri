@@ -13,6 +13,7 @@
 ## Scope Note
 
 This plan covers Phases 1 and 2 only. Subsequent phases each get their own plan:
+
 - Phase 3+4: Portfolio Core + Price Feeds
 - Phase 5: Dashboard Frontend
 - Phase 6: AI Pipeline
@@ -99,6 +100,7 @@ zentri/
 ## Task 1: Monorepo skeleton + .gitignore + .env.example
 
 **Files:**
+
 - Create: `.gitignore`
 - Create: `.env.example`
 - Create: `backend/pyproject.toml`
@@ -197,18 +199,12 @@ asyncio_mode = "auto"
 testpaths = ["tests"]
 ```
 
-- [ ] **Step 5: Commit**
-
-```bash
-git add .gitignore .env.example backend/pyproject.toml
-git commit -m "chore: initialize monorepo skeleton"
-```
-
 ---
 
 ## Task 2: Docker Compose — all services
 
 **Files:**
+
 - Create: `docker-compose.yml`
 - Create: `docker-compose.override.yml`
 - Create: `nginx/nginx.conf`
@@ -408,20 +404,15 @@ CMD ["node", "server.js"]
 ```bash
 docker compose config --quiet
 ```
+
 Expected: exits with code 0, no errors printed.
-
-- [ ] **Step 7: Commit**
-
-```bash
-git add docker-compose.yml docker-compose.override.yml nginx/ backend/Dockerfile frontend/Dockerfile
-git commit -m "build: add Docker Compose with all services and health checks"
-```
 
 ---
 
 ## Task 3: FastAPI base app + config + health check
 
 **Files:**
+
 - Create: `backend/app/core/config.py`
 - Create: `backend/app/core/database.py`
 - Create: `backend/app/api/health.py`
@@ -432,6 +423,7 @@ git commit -m "build: add Docker Compose with all services and health checks"
 - [ ] **Step 1: Write failing test for health endpoint**
 
 `backend/tests/test_health.py`:
+
 ```python
 import pytest
 from httpx import AsyncClient, ASGITransport
@@ -463,6 +455,7 @@ async def test_health_returns_version():
 ```bash
 cd backend && pytest tests/test_health.py -v
 ```
+
 Expected: `ModuleNotFoundError: No module named 'app'`
 
 - [ ] **Step 3: Write `backend/app/core/config.py`**
@@ -563,17 +556,12 @@ async def client():
 ```bash
 cd backend && pip install -e ".[dev]" && pytest tests/test_health.py -v
 ```
+
 Expected:
+
 ```
 PASSED tests/test_health.py::test_health_returns_200
 PASSED tests/test_health.py::test_health_returns_version
-```
-
-- [ ] **Step 9: Commit**
-
-```bash
-git add backend/app/ backend/tests/
-git commit -m "feat: add FastAPI base app with health check endpoint"
 ```
 
 ---
@@ -581,6 +569,7 @@ git commit -m "feat: add FastAPI base app with health check endpoint"
 ## Task 4: Alembic + initial DB schema (users table)
 
 **Files:**
+
 - Create: `backend/alembic.ini`
 - Create: `backend/alembic/env.py`
 - Create: `backend/alembic/versions/001_initial_schema.py`
@@ -761,26 +750,22 @@ docker compose up postgres -d
 # Wait for healthy, then run migration
 cd backend && alembic upgrade head
 ```
+
 Expected: `INFO  [alembic.runtime.migration] Running upgrade  -> 001, initial schema — users table`
-
-- [ ] **Step 7: Commit**
-
-```bash
-git add backend/alembic/ backend/app/models/
-git commit -m "build: add Alembic migrations with initial users table"
-```
 
 ---
 
 ## Task 5: Security utilities (JWT + bcrypt)
 
 **Files:**
+
 - Create: `backend/app/core/security.py`
 - Create: `backend/tests/test_security.py`
 
 - [ ] **Step 1: Write failing tests for security utilities**
 
 `backend/tests/test_security.py`:
+
 ```python
 import pytest
 from app.core.security import (
@@ -831,6 +816,7 @@ def test_decode_invalid_token_raises():
 ```bash
 cd backend && pytest tests/test_security.py -v
 ```
+
 Expected: `ImportError: cannot import name 'create_access_token' from 'app.core.security'`
 
 - [ ] **Step 3: Write `backend/app/core/security.py`**
@@ -891,20 +877,15 @@ def decode_token(token: str) -> dict:
 ```bash
 cd backend && pytest tests/test_security.py -v
 ```
+
 Expected: All 6 tests PASS.
-
-- [ ] **Step 5: Commit**
-
-```bash
-git add backend/app/core/security.py backend/tests/test_security.py
-git commit -m "feat: add JWT and bcrypt security utilities"
-```
 
 ---
 
 ## Task 6: Auth endpoints (setup, login, logout, refresh, me)
 
 **Files:**
+
 - Create: `backend/app/schemas/auth.py`
 - Create: `backend/app/services/auth.py`
 - Create: `backend/app/api/deps.py`
@@ -915,6 +896,7 @@ git commit -m "feat: add JWT and bcrypt security utilities"
 - [ ] **Step 1: Write failing auth tests**
 
 `backend/tests/test_auth.py`:
+
 ```python
 import pytest
 from httpx import AsyncClient, ASGITransport
@@ -1030,6 +1012,7 @@ async def test_me_without_token_returns_401(client):
 ```bash
 cd backend && pytest tests/test_auth.py -v
 ```
+
 Expected: Import errors / 404s.
 
 - [ ] **Step 3: Write `backend/app/schemas/auth.py`**
@@ -1282,6 +1265,7 @@ docker compose exec postgres psql -U postgres -c "CREATE DATABASE zentri_test;"
 # Run tests
 cd backend && pytest tests/test_auth.py -v
 ```
+
 Expected: All 6 auth tests PASS.
 
 - [ ] **Step 9: Run full test suite to ensure no regressions**
@@ -1289,27 +1273,24 @@ Expected: All 6 auth tests PASS.
 ```bash
 cd backend && pytest tests/ -v
 ```
+
 Expected: All tests PASS (health + security + auth).
-
-- [ ] **Step 10: Commit**
-
-```bash
-git add backend/app/schemas/ backend/app/services/ backend/app/api/ backend/tests/test_auth.py
-git commit -m "feat: add auth endpoints (setup, login, logout, refresh, me)"
-```
 
 ---
 
 ## Task 7: ARQ worker base
 
 **Files:**
+
 - Create: `backend/worker/main.py`
 - Create: `backend/worker/__init__.py`
 
 - [ ] **Step 1: Write `backend/worker/__init__.py`**
 
 ```python
+
 ```
+
 (empty)
 
 - [ ] **Step 2: Write `backend/worker/main.py`**
@@ -1344,20 +1325,15 @@ class WorkerSettings:
 ```bash
 docker compose up worker -d && sleep 3 && docker compose logs worker
 ```
+
 Expected: `Starting worker for functions: []` with no errors.
-
-- [ ] **Step 4: Commit**
-
-```bash
-git add backend/worker/
-git commit -m "chore: add ARQ worker base with empty job list"
-```
 
 ---
 
 ## Task 8: Next.js frontend base + shadcn/ui + Tailwind
 
 **Files:**
+
 - Create: `frontend/` (entire Next.js project)
 - Create: `frontend/store/privacy.ts`
 - Create: `frontend/lib/api.ts`
@@ -1369,6 +1345,7 @@ git commit -m "chore: add ARQ worker base with empty job list"
 cd frontend
 npx create-next-app@latest . --typescript --tailwind --app --no-src-dir --import-alias "@/*"
 ```
+
 Accept all defaults.
 
 - [ ] **Step 2: Install additional dependencies**
@@ -1385,6 +1362,7 @@ npm install lightweight-charts
 cd frontend
 npx shadcn@latest init
 ```
+
 Select: Default style, Zinc base color, CSS variables.
 
 - [ ] **Step 4: Install required shadcn components**
@@ -1411,8 +1389,8 @@ export const usePrivacyStore = create<PrivacyState>()(
       isPrivate: false,
       toggle: () => set((state) => ({ isPrivate: !state.isPrivate })),
     }),
-    { name: "zentri-privacy" }
-  )
+    { name: "zentri-privacy" },
+  ),
 );
 ```
 
@@ -1423,7 +1401,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 async function fetchWithAuth(
   path: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
 ): Promise<Response> {
   const token =
     typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
@@ -1443,7 +1421,8 @@ async function fetchWithAuth(
     // Try refresh
     const refreshed = await tryRefresh();
     if (refreshed) {
-      headers["Authorization"] = `Bearer ${localStorage.getItem("access_token")}`;
+      headers["Authorization"] =
+        `Bearer ${localStorage.getItem("access_token")}`;
       return fetch(`${API_BASE}${path}`, { ...options, headers });
     }
     // Redirect to login
@@ -1515,20 +1494,15 @@ export async function logout() {
 ```bash
 cd frontend && npm run build
 ```
+
 Expected: Build succeeds with no type errors.
-
-- [ ] **Step 9: Commit**
-
-```bash
-git add frontend/
-git commit -m "chore: setup Next.js 15 with shadcn/ui, Tailwind, TanStack, Zustand"
-```
 
 ---
 
 ## Task 9: Auth pages UI (Login + Setup Wizard)
 
 **Files:**
+
 - Create: `frontend/middleware.ts`
 - Create: `frontend/app/layout.tsx`
 - Create: `frontend/app/login/page.tsx`
@@ -1547,8 +1521,9 @@ const PUBLIC_PATHS = ["/login", "/setup"];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const token = request.cookies.get("access_token")?.value
-    ?? request.headers.get("authorization")?.replace("Bearer ", "");
+  const token =
+    request.cookies.get("access_token")?.value ??
+    request.headers.get("authorization")?.replace("Bearer ", "");
 
   if (PUBLIC_PATHS.some((p) => pathname.startsWith(p))) {
     return NextResponse.next();
@@ -1993,20 +1968,15 @@ export default function DashboardPage() {
 ```bash
 cd frontend && npm run build
 ```
+
 Expected: Build succeeds. No TypeScript errors.
-
-- [ ] **Step 10: Commit**
-
-```bash
-git add frontend/app/ frontend/components/ frontend/lib/ frontend/store/ frontend/middleware.ts
-git commit -m "feat: add login page, setup wizard, and protected layout with sidebar"
-```
 
 ---
 
 ## Task 10: Backup scripts + .env.example docs
 
 **Files:**
+
 - Create: `scripts/backup.sh`
 - Create: `scripts/restore.sh`
 
@@ -2074,13 +2044,6 @@ echo "✅ Restore complete. Restart services: docker compose restart backend wor
 chmod +x scripts/backup.sh scripts/restore.sh
 ```
 
-- [ ] **Step 4: Commit**
-
-```bash
-git add scripts/
-git commit -m "ops: add backup and restore scripts"
-```
-
 ---
 
 ## Task 11: End-to-end smoke test
@@ -2098,6 +2061,7 @@ docker compose up -d
 ```bash
 docker compose ps
 ```
+
 Expected: All services show `healthy` or `running`. No `Exit` status.
 
 - [ ] **Step 3: Test health endpoint**
@@ -2105,6 +2069,7 @@ Expected: All services show `healthy` or `running`. No `Exit` status.
 ```bash
 curl http://localhost/api/v1/health
 ```
+
 Expected: `{"status":"ok","version":"0.1.0"}`
 
 - [ ] **Step 4: Test setup flow**
@@ -2114,6 +2079,7 @@ curl -X POST http://localhost/api/v1/auth/setup \
   -H "Content-Type: application/json" \
   -d '{"username":"admin","password":"password123"}'
 ```
+
 Expected: `{"access_token":"eyJ...","refresh_token":"eyJ...","token_type":"bearer"}`
 
 - [ ] **Step 5: Test login flow**
@@ -2123,6 +2089,7 @@ curl -X POST http://localhost/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"username":"admin","password":"password123"}'
 ```
+
 Expected: tokens returned.
 
 - [ ] **Step 6: Open frontend in browser**
@@ -2136,14 +2103,8 @@ Log in with admin/password123 — should redirect to dashboard.
 ```bash
 cd backend && pytest tests/ -v --cov=app --cov-report=term-missing
 ```
+
 Expected: All tests pass. Coverage >80% for `app/core/security.py` and `app/api/auth.py`.
-
-- [ ] **Step 8: Final commit**
-
-```bash
-git add .
-git commit -m "chore: Phase 1+2 complete — Foundation + Auth"
-```
 
 ---
 
@@ -2151,27 +2112,27 @@ git commit -m "chore: Phase 1+2 complete — Foundation + Auth"
 
 ### Spec Coverage
 
-| Spec Requirement | Covered by Task |
-|-----------------|----------------|
-| Monorepo structure | Task 1 |
-| Docker Compose all services | Task 2 |
-| TimescaleDB + Alembic | Task 4 |
-| Docker health checks | Task 2 |
-| Backup/restore scripts | Task 10 |
-| Next.js + shadcn + Tailwind | Task 8 |
-| FastAPI base structure | Task 3 |
-| ARQ worker base | Task 7 |
-| .env.example (5 vars only) | Task 1 |
-| POST /auth/setup | Task 6 |
-| POST /auth/login | Task 6 |
-| POST /auth/logout | Task 6 |
-| POST /auth/refresh | Task 6 |
-| GET /auth/me | Task 6 |
+| Spec Requirement                  | Covered by Task                           |
+| --------------------------------- | ----------------------------------------- |
+| Monorepo structure                | Task 1                                    |
+| Docker Compose all services       | Task 2                                    |
+| TimescaleDB + Alembic             | Task 4                                    |
+| Docker health checks              | Task 2                                    |
+| Backup/restore scripts            | Task 10                                   |
+| Next.js + shadcn + Tailwind       | Task 8                                    |
+| FastAPI base structure            | Task 3                                    |
+| ARQ worker base                   | Task 7                                    |
+| .env.example (5 vars only)        | Task 1                                    |
+| POST /auth/setup                  | Task 6                                    |
+| POST /auth/login                  | Task 6                                    |
+| POST /auth/logout                 | Task 6                                    |
+| POST /auth/refresh                | Task 6                                    |
+| GET /auth/me                      | Task 6                                    |
 | JWT middleware + protected routes | Task 6 (deps.py) + Task 9 (middleware.ts) |
-| Setup wizard UI | Task 9 |
-| Login page UI | Task 9 |
-| Privacy mode toggle | Task 8 + Task 9 (TopNav) |
-| Sidebar navigation | Task 9 |
+| Setup wizard UI                   | Task 9                                    |
+| Login page UI                     | Task 9                                    |
+| Privacy mode toggle               | Task 8 + Task 9 (TopNav)                  |
+| Sidebar navigation                | Task 9                                    |
 
 ### No Gaps Found
 
