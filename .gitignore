@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+dist/
+*.egg-info/
+
+# Node
+node_modules/
+.next/
+out/
+
+# Env
+.env
+*.env.local
+
+# Data
+backups/
+*.tar.gz
+
+# IDE
+.idea/
+.vscode/
+*.swp
+# Added by code-review-graph
+.code-review-graph/
