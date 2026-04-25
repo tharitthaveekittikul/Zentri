@@ -6,7 +6,7 @@ from sqlalchemy.pool import NullPool
 from app.core.database import Base, get_db
 from app.main import app
 
-TEST_DB_URL = "postgresql+asyncpg://postgres:postgres@localhost:5432/zentri_test"
+TEST_DB_URL = "postgresql+asyncpg://postgres:zentri-password-paotharit@localhost:5432/zentri_test"
 
 
 @pytest.fixture
