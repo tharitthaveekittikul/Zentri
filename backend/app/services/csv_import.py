@@ -6,9 +6,12 @@ from decimal import Decimal, InvalidOperation
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.logging import get_logger
 from app.models.import_profile import ImportProfile
 from app.services import asset as asset_service
 from app.services import portfolio as portfolio_service
+
+logger = get_logger(__name__)
 
 
 def parse_csv_preview(content: bytes) -> dict:
@@ -29,6 +32,7 @@ async def confirm_import(
     save_profile: bool = False,
     broker_name: str | None = None,
 ) -> dict:
+    logger.info("CSV import started: rows=%d asset_type=%s broker=%s user=%s", len(rows), asset_type, broker_name, user_id)
     imported = 0
     skipped = 0
     errors = []
@@ -42,6 +46,7 @@ async def confirm_import(
             executed_at = datetime.fromisoformat(row["date"]).replace(tzinfo=timezone.utc)
             tx_type = row["type"].lower()
         except (InvalidOperation, ValueError) as e:
+            logger.warning("CSV row skipped: symbol=%s error=%s", row.get("symbol", "?"), e)
             errors.append(f"Row {symbol}: {e}")
             skipped += 1
             continue
@@ -79,4 +84,5 @@ async def confirm_import(
         db.add(profile)
         await db.commit()
 
+    logger.info("CSV import done: imported=%d skipped=%d errors=%d user=%s", imported, skipped, len(errors), user_id)
     return {"imported": imported, "skipped": skipped, "errors": errors}

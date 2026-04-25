@@ -4,7 +4,10 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.logging import get_logger
 from app.models.asset import Asset
+
+logger = get_logger(__name__)
 
 
 async def create_asset(
@@ -28,6 +31,7 @@ async def create_asset(
     db.add(asset)
     await db.commit()
     await db.refresh(asset)
+    logger.info("Asset created: symbol=%s type=%s user=%s id=%s", symbol.upper(), asset_type, user_id, asset.id)
     return asset
 
 

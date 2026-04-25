@@ -5,8 +5,11 @@ from decimal import Decimal
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.logging import get_logger
 from app.models.holding import Holding
 from app.models.transaction import Transaction
+
+logger = get_logger(__name__)
 
 
 async def add_holding(
@@ -29,6 +32,7 @@ async def add_holding(
     db.add(holding)
     await db.commit()
     await db.refresh(holding)
+    logger.info("Holding added: asset=%s qty=%s user=%s id=%s", asset_id, quantity, user_id, holding.id)
     return holding
 
 
@@ -45,6 +49,7 @@ async def get_holding(db: AsyncSession, user_id: uuid.UUID, holding_id: uuid.UUI
 
 
 async def delete_holding(db: AsyncSession, holding: Holding) -> None:
+    logger.info("Holding deleted: id=%s asset=%s user=%s", holding.id, holding.asset_id, holding.user_id)
     await db.delete(holding)
     await db.commit()
 
@@ -76,6 +81,7 @@ async def add_transaction(
     db.add(tx)
     await db.commit()
     await db.refresh(tx)
+    logger.info("Transaction added: type=%s asset=%s qty=%s price=%s source=%s user=%s id=%s", type_, asset_id, quantity, price, source, user_id, tx.id)
     return tx
 
 

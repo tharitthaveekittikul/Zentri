@@ -2,8 +2,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import assets, auth, health, platforms, portfolio, settings
+from app.core.logging import get_logger, setup_logging
+
+setup_logging()
+logger = get_logger(__name__)
 
 app = FastAPI(title="Zentri API", version="0.1.0")
+logger.info("Zentri API starting up")
 
 app.add_middleware(
     CORSMiddleware,

@@ -3,10 +3,15 @@ import subprocess
 from dataclasses import dataclass
 from typing import Any
 
+from app.core.logging import get_logger
+
+logger = get_logger(__name__)
+
 try:
     import psutil
     _HAS_PSUTIL = True
 except ImportError:
+    logger.warning("psutil not installed — RAM detection will fall back to sysctl")
     _HAS_PSUTIL = False
 
 
@@ -61,4 +66,6 @@ def detect_hardware() -> HardwareInfo:
         except Exception:
             ram_gb = 8.0
 
-    return HardwareInfo(cpu_brand=cpu_brand, ram_gb=ram_gb, is_apple_silicon=is_apple_silicon)
+    info = HardwareInfo(cpu_brand=cpu_brand, ram_gb=ram_gb, is_apple_silicon=is_apple_silicon)
+    logger.info("Hardware detected: cpu=%s ram_gb=%.1f apple_silicon=%s", cpu_brand, ram_gb, is_apple_silicon)
+    return info

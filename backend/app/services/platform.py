@@ -3,7 +3,10 @@ import uuid
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.logging import get_logger
 from app.models.platform import Platform
+
+logger = get_logger(__name__)
 
 
 async def create_platform(
@@ -19,6 +22,7 @@ async def create_platform(
     db.add(platform)
     await db.commit()
     await db.refresh(platform)
+    logger.info("Platform created: name=%s user=%s id=%s", name, user_id, platform.id)
     return platform
 
 
@@ -42,9 +46,11 @@ async def update_platform(
     platform.notes = notes
     await db.commit()
     await db.refresh(platform)
+    logger.info("Platform updated: id=%s name=%s", platform.id, name)
     return platform
 
 
 async def delete_platform(db: AsyncSession, platform: Platform) -> None:
+    logger.info("Platform deleted: id=%s name=%s", platform.id, platform.name)
     await db.delete(platform)
     await db.commit()
