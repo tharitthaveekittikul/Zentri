@@ -1,12 +1,15 @@
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import asc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user
 from app.core.database import get_db
+from app.models.price import Price
 from app.models.user import User
 from app.schemas.asset import AssetCreate, AssetResponse
+from app.schemas.price import PriceBar, PriceHistoryResponse
 from app.services import asset as asset_service
 
 router = APIRouter(prefix="/assets", tags=["assets"])
@@ -50,3 +53,24 @@ async def get_asset(
     if asset is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Asset not found")
     return asset
+
+
+@router.get("/{asset_id}/prices", response_model=PriceHistoryResponse)
+async def get_asset_price_history(
+    asset_id: uuid.UUID,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Return OHLCV price history for an asset."""
+    asset = await asset_service.get_asset(db, current_user.id, asset_id)
+    if not asset:
+        raise HTTPException(status_code=404, detail="Asset not found")
+
+    result = await db.execute(
+        select(Price)
+        .where(Price.asset_id == asset_id)
+        .order_by(asc(Price.timestamp))
+        .limit(500)
+    )
+    bars = list(result.scalars().all())
+    return PriceHistoryResponse(asset_id=asset_id, bars=bars)
