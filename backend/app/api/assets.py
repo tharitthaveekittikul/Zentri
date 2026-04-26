@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import asc, select
@@ -41,6 +42,31 @@ async def search_assets(
     db: AsyncSession = Depends(get_db),
 ):
     return await asset_service.search_assets(db, current_user.id, q)
+
+
+@router.get("/symbol/{symbol}/history", response_model=PriceHistoryResponse)
+async def get_asset_history_by_symbol(
+    symbol: str,
+    range: str = "1M",
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Return OHLCV price history for an asset looked up by symbol string."""
+    days = {"1W": 7, "1M": 30, "3M": 90, "1Y": 365}
+    start = datetime.now(timezone.utc) - timedelta(days=days.get(range, 30))
+
+    assets = await asset_service.search_assets(db, current_user.id, symbol)
+    asset = next((a for a in assets if a.symbol.upper() == symbol.upper()), None)
+    if not asset:
+        raise HTTPException(status_code=404, detail="Asset not found")
+
+    result = await db.execute(
+        select(Price)
+        .where(Price.asset_id == asset.id, Price.timestamp >= start)
+        .order_by(asc(Price.timestamp))
+    )
+    bars = list(result.scalars().all())
+    return PriceHistoryResponse(asset_id=asset.id, bars=bars)
 
 
 @router.get("/{asset_id}", response_model=AssetResponse)

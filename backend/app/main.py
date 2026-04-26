@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import assets, auth, health, pipeline, platforms, portfolio, settings
+from app.api import assets, auth, health, overview, pipeline, platforms, portfolio, settings
 from app.core.logging import get_logger, setup_logging
 
 setup_logging()
@@ -25,3 +25,4 @@ app.include_router(assets.router, prefix="/api/v1")
 app.include_router(platforms.router, prefix="/api/v1")
 app.include_router(portfolio.router, prefix="/api/v1")
 app.include_router(pipeline.router, prefix="/api/v1")
+app.include_router(overview.router, prefix="/api/v1")

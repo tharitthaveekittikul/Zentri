@@ -6,7 +6,9 @@ from sqlalchemy.pool import NullPool
 from app.core.database import Base, get_db
 from app.main import app
 
-TEST_DB_URL = "postgresql+asyncpg://postgres:zentri-password-paotharit@localhost:5432/zentri_test"
+import os
+_db_host = os.getenv("DB_TEST_HOST", "localhost")
+TEST_DB_URL = f"postgresql+asyncpg://postgres:zentri-password-paotharit@{_db_host}:5432/zentri_test"
 test_engine = create_async_engine(TEST_DB_URL, poolclass=NullPool)
 TestSession = async_sessionmaker(test_engine, expire_on_commit=False)
 

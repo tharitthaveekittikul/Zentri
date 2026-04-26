@@ -30,3 +30,23 @@ async def test_get_asset_detail(auth_client):
     response = await auth_client.get(f"/api/v1/assets/{asset_id}")
     assert response.status_code == 200
     assert response.json()["symbol"] == "MSFT"
+
+
+@pytest.mark.asyncio
+async def test_asset_history_by_symbol(auth_client):
+    # Create asset first
+    await auth_client.post("/api/v1/assets", json={
+        "symbol": "AAPL", "asset_type": "us_stock", "name": "Apple", "currency": "USD"
+    })
+    res = await auth_client.get("/api/v1/assets/symbol/AAPL/history?range=1M")
+    assert res.status_code == 200
+    data = res.json()
+    assert "asset_id" in data
+    assert "bars" in data
+    assert isinstance(data["bars"], list)
+
+
+@pytest.mark.asyncio
+async def test_asset_history_symbol_not_found(auth_client):
+    res = await auth_client.get("/api/v1/assets/symbol/UNKNOWN/history?range=1M")
+    assert res.status_code == 404
