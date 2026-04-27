@@ -4,6 +4,8 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from app.core.config import settings
 from app.core.logging import get_logger, setup_logging
+from worker.jobs.ingest_document import job_ingest_document
+from worker.jobs.run_analysis import job_run_analysis
 from worker.jobs.price_fetch import (
     job_fetch_benchmark_prices,
     job_fetch_price_gold,
@@ -35,6 +37,8 @@ class WorkerSettings:
         job_fetch_prices_crypto,
         job_fetch_price_gold,
         job_fetch_benchmark_prices,
+        job_ingest_document,
+        job_run_analysis,
     ]
     cron_jobs = [
         cron(job_fetch_prices_us, minute={0, 15, 30, 45}),

@@ -1,3 +1,6 @@
+import os
+import tempfile
+
 import pytest
 from httpx import AsyncClient, ASGITransport
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
@@ -6,11 +9,17 @@ from sqlalchemy.pool import NullPool
 from app.core.database import Base, get_db
 from app.main import app
 
-import os
 _db_host = os.getenv("DB_TEST_HOST", "localhost")
 TEST_DB_URL = f"postgresql+asyncpg://postgres:zentri-password-paotharit@{_db_host}:5432/zentri_test"
 test_engine = create_async_engine(TEST_DB_URL, poolclass=NullPool)
 TestSession = async_sessionmaker(test_engine, expire_on_commit=False)
+
+
+@pytest.fixture(autouse=True)
+def set_upload_dir(tmp_path):
+    os.environ["UPLOAD_DIR"] = str(tmp_path / "uploads")
+    yield
+    os.environ.pop("UPLOAD_DIR", None)
 
 
 @pytest.fixture(autouse=True)

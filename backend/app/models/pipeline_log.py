@@ -7,7 +7,11 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base
 
-JOB_TYPES = ("price_fetch_us", "price_fetch_crypto", "price_fetch_gold", "price_fetch_benchmark")
+JOB_TYPES = (
+    "price_fetch_us", "price_fetch_crypto",
+    "price_fetch_gold", "price_fetch_benchmark",
+    "ingest_document", "run_analysis",
+)
 JOB_STATUSES = ("queued", "running", "done", "failed")
 
 

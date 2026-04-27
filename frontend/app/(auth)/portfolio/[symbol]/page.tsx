@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PrivacyValue } from "@/components/ui/PrivacyValue";
 import { api } from "@/lib/api";
+import { VerdictCard } from "@/components/analysis/VerdictCard";
 
 const RANGES = ["1W", "1M", "3M", "1Y"] as const;
 type Range = (typeof RANGES)[number];
@@ -117,6 +118,8 @@ export default function AssetDetailPage() {
           <PriceChart bars={bars} />
         )}
       </div>
+
+      <VerdictCard symbol={symbol} />
 
       <div>
         <h2 className="text-sm font-medium text-muted-foreground mb-2">

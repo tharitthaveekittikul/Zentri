@@ -12,6 +12,9 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 30
     TZ: str = "UTC"
     PRICE_FETCH_INTERVAL: int = 15
+    CHROMA_HOST: str = "localhost"
+    CHROMA_PORT: int = 8000
+    OLLAMA_HOST: str = "http://host.docker.internal:11434"
 
 
 settings = Settings()

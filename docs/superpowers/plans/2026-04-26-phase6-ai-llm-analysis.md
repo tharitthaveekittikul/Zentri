@@ -1,6 +1,6 @@
 # Phase 6 — AI/LLM Analysis Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Add a full AI analysis stack — LLM provider abstraction, RAG pipeline over uploaded PDFs, BUY/SELL/HOLD verdict engine, and supporting frontend pages.
 
@@ -61,13 +61,13 @@
 - Modify: `backend/app/core/config.py`
 - Create: `backend/tests/test_encryption.py`
 
-- [ ] **Step 1: Install cryptography package**
+- [x] **Step 1: Install cryptography package**
 
 ```bash
 cd backend && uv pip install cryptography
 ```
 
-- [ ] **Step 2: Write failing test**
+- [x] **Step 2: Write failing test**
 
 Create `backend/tests/test_encryption.py`:
 
@@ -97,7 +97,7 @@ def test_same_plaintext_produces_different_ciphertexts():
     assert decrypt(a) == decrypt(b) == "same-key"
 ```
 
-- [ ] **Step 3: Run test to verify it fails**
+- [x] **Step 3: Run test to verify it fails**
 
 ```bash
 cd backend && python -m pytest tests/test_encryption.py -v
@@ -105,7 +105,7 @@ cd backend && python -m pytest tests/test_encryption.py -v
 
 Expected: `ImportError` or `ModuleNotFoundError` on `app.core.encryption`.
 
-- [ ] **Step 4: Write implementation**
+- [x] **Step 4: Write implementation**
 
 Create `backend/app/core/encryption.py`:
 
@@ -137,7 +137,7 @@ def decrypt(token: str) -> str:
     return aesgcm.decrypt(nonce, ciphertext, None).decode()
 ```
 
-- [ ] **Step 5: Add config fields**
+- [x] **Step 5: Add config fields**
 
 Edit `backend/app/core/config.py` — add three new fields to `Settings`:
 
@@ -147,7 +147,7 @@ CHROMA_PORT: int = 8000
 OLLAMA_HOST: str = "http://host.docker.internal:11434"
 ```
 
-- [ ] **Step 6: Run tests to verify they pass**
+- [x] **Step 6: Run tests to verify they pass**
 
 ```bash
 cd backend && python -m pytest tests/test_encryption.py -v
@@ -168,7 +168,7 @@ Expected: 3 tests PASS.
 - Modify: `backend/app/models/pipeline_log.py`
 - Create: `backend/alembic/versions/004_phase6_ai_schema.py`
 
-- [ ] **Step 1: Create LLMSettings model**
+- [x] **Step 1: Create LLMSettings model**
 
 Create `backend/app/models/llm_settings.py`:
 
@@ -196,7 +196,7 @@ class LLMSettings(Base):
     )
 ```
 
-- [ ] **Step 2: Create Document model**
+- [x] **Step 2: Create Document model**
 
 Create `backend/app/models/document.py`:
 
@@ -227,7 +227,7 @@ class Document(Base):
     )
 ```
 
-- [ ] **Step 3: Create AIAnalysis model**
+- [x] **Step 3: Create AIAnalysis model**
 
 Create `backend/app/models/ai_analysis.py`:
 
@@ -262,7 +262,7 @@ class AIAnalysis(Base):
     )
 ```
 
-- [ ] **Step 4: Create LLMConversation model**
+- [x] **Step 4: Create LLMConversation model**
 
 Create `backend/app/models/llm_conversation.py`:
 
@@ -286,7 +286,7 @@ class LLMConversation(Base):
     message_order: Mapped[int] = mapped_column(Integer, nullable=False)
 ```
 
-- [ ] **Step 5: Extend JOB_TYPES in pipeline_log.py**
+- [x] **Step 5: Extend JOB_TYPES in pipeline_log.py**
 
 Edit `backend/app/models/pipeline_log.py` — update the `JOB_TYPES` tuple:
 
@@ -298,7 +298,7 @@ JOB_TYPES = (
 )
 ```
 
-- [ ] **Step 6: Write Alembic migration 004**
+- [x] **Step 6: Write Alembic migration 004**
 
 Create `backend/alembic/versions/004_phase6_ai_schema.py`:
 
@@ -380,7 +380,7 @@ def downgrade() -> None:
     op.drop_table("llm_settings")
 ```
 
-- [ ] **Step 7: Run migration**
+- [x] **Step 7: Run migration**
 
 ```bash
 cd backend && alembic upgrade head
@@ -397,7 +397,7 @@ Expected: `Running upgrade 003 -> 004, phase 6 AI/LLM analysis schema`
 - Modify: `backend/app/api/settings.py`
 - Create: `backend/tests/test_llm_settings.py`
 
-- [ ] **Step 1: Write failing tests**
+- [x] **Step 1: Write failing tests**
 
 Create `backend/tests/test_llm_settings.py`:
 
@@ -459,7 +459,7 @@ async def test_only_one_provider_active_at_a_time(auth_client: AsyncClient):
     assert active[0]["provider"] == "openai"
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 ```bash
 cd backend && python -m pytest tests/test_llm_settings.py -v
@@ -467,7 +467,7 @@ cd backend && python -m pytest tests/test_llm_settings.py -v
 
 Expected: 404 errors (endpoints don't exist yet).
 
-- [ ] **Step 3: Add LLM endpoints to settings.py**
+- [x] **Step 3: Add LLM endpoints to settings.py**
 
 Replace full content of `backend/app/api/settings.py`:
 
@@ -582,7 +582,7 @@ async def test_llm_connection(
         raise HTTPException(status_code=400, detail=str(e))
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 ```bash
 cd backend && python -m pytest tests/test_llm_settings.py -v
@@ -599,13 +599,13 @@ Expected: 4 tests PASS.
 - Create: `backend/app/services/llm_service.py`
 - Create: `backend/tests/test_llm_service.py`
 
-- [ ] **Step 1: Install provider SDKs**
+- [x] **Step 1: Install provider SDKs**
 
 ```bash
 cd backend && uv pip install anthropic openai google-generativeai httpx
 ```
 
-- [ ] **Step 2: Write failing tests**
+- [x] **Step 2: Write failing tests**
 
 Create `backend/tests/test_llm_service.py`:
 
@@ -681,7 +681,7 @@ async def test_claude_provider_complete():
     assert result.cost_usd > 0
 ```
 
-- [ ] **Step 3: Run tests to verify they fail**
+- [x] **Step 3: Run tests to verify they fail**
 
 ```bash
 cd backend && python -m pytest tests/test_llm_service.py -v
@@ -689,7 +689,7 @@ cd backend && python -m pytest tests/test_llm_service.py -v
 
 Expected: `ImportError` on `app.services.llm_service`.
 
-- [ ] **Step 4: Write implementation**
+- [x] **Step 4: Write implementation**
 
 Create `backend/app/services/llm_service.py`:
 
@@ -836,7 +836,7 @@ async def get_llm_provider(db) -> LLMProvider:
         raise ValueError(f"Unknown LLM provider: {row.provider}")
 ```
 
-- [ ] **Step 5: Run tests to verify they pass**
+- [x] **Step 5: Run tests to verify they pass**
 
 ```bash
 cd backend && python -m pytest tests/test_llm_service.py -v
@@ -854,13 +854,13 @@ Expected: 4 tests PASS.
 - Create: `backend/app/services/rag_service.py`
 - Create: `backend/tests/test_rag_service.py`
 
-- [ ] **Step 1: Install chromadb and sentence-transformers**
+- [x] **Step 1: Install chromadb and sentence-transformers**
 
 ```bash
 cd backend && uv pip install chromadb sentence-transformers pymupdf
 ```
 
-- [ ] **Step 2: Add chromadb to docker-compose.yml**
+- [x] **Step 2: Add chromadb to docker-compose.yml**
 
 In `docker-compose.yml`, add the `chromadb` service under `services:` and add `chroma_data` under `volumes:`:
 
@@ -893,7 +893,7 @@ CHROMA_PORT=8000
 OLLAMA_HOST=http://host.docker.internal:11434
 ```
 
-- [ ] **Step 3: Write failing tests**
+- [x] **Step 3: Write failing tests**
 
 Create `backend/tests/test_rag_service.py`:
 
@@ -952,7 +952,7 @@ def test_get_or_create_collection_normalises_symbol():
     mock_client.get_or_create_collection.assert_called_once_with(name="btc_usdt")
 ```
 
-- [ ] **Step 4: Run tests to verify they fail**
+- [x] **Step 4: Run tests to verify they fail**
 
 ```bash
 cd backend && python -m pytest tests/test_rag_service.py -v
@@ -960,7 +960,7 @@ cd backend && python -m pytest tests/test_rag_service.py -v
 
 Expected: `ImportError` on `app.services.rag_service`.
 
-- [ ] **Step 5: Write RAG service implementation**
+- [x] **Step 5: Write RAG service implementation**
 
 Create `backend/app/services/rag_service.py`:
 
@@ -1006,7 +1006,7 @@ def search(collection: Collection, query: str, n_results: int = 5) -> list[str]:
     return docs
 ```
 
-- [ ] **Step 6: Run tests to verify they pass**
+- [x] **Step 6: Run tests to verify they pass**
 
 ```bash
 cd backend && python -m pytest tests/test_rag_service.py -v
@@ -1014,7 +1014,7 @@ cd backend && python -m pytest tests/test_rag_service.py -v
 
 Expected: 5 tests PASS.
 
-- [ ] **Step 7: Start ChromaDB locally for manual verification**
+- [x] **Step 7: Start ChromaDB locally for manual verification**
 
 ```bash
 docker compose up chromadb -d
@@ -1035,7 +1035,7 @@ Expected: `{"nanosecond heartbeat": <timestamp>}`
 - Modify: `backend/worker/main.py`
 - Create: `backend/tests/test_documents.py`
 
-- [ ] **Step 1: Write failing tests**
+- [x] **Step 1: Write failing tests**
 
 Create `backend/tests/test_documents.py`:
 
@@ -1097,7 +1097,7 @@ async def test_delete_document(auth_client: AsyncClient):
     assert list_resp.json() == []
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 ```bash
 cd backend && python -m pytest tests/test_documents.py -v
@@ -1105,7 +1105,7 @@ cd backend && python -m pytest tests/test_documents.py -v
 
 Expected: 404 on `/api/v1/documents`.
 
-- [ ] **Step 3: Create documents API**
+- [x] **Step 3: Create documents API**
 
 Create `backend/app/api/documents.py`:
 
@@ -1254,7 +1254,7 @@ async def reingest_document(
     return {"ok": True, "job_id": job.job_id if job else None}
 ```
 
-- [ ] **Step 4: Register documents router in main.py**
+- [x] **Step 4: Register documents router in main.py**
 
 Edit `backend/app/main.py`:
 
@@ -1265,7 +1265,7 @@ from app.api import assets, auth, documents, health, overview, pipeline, platfor
 app.include_router(documents.router, prefix="/api/v1")
 ```
 
-- [ ] **Step 5: Create ingest_document ARQ job**
+- [x] **Step 5: Create ingest_document ARQ job**
 
 Create `backend/worker/jobs/ingest_document.py`:
 
@@ -1347,7 +1347,7 @@ async def job_ingest_document(ctx: dict, document_id: str) -> dict:
             raise
 ```
 
-- [ ] **Step 6: Register job in worker/main.py**
+- [x] **Step 6: Register job in worker/main.py**
 
 Edit `backend/worker/main.py`:
 
@@ -1363,7 +1363,7 @@ functions = [
 ]
 ```
 
-- [ ] **Step 7: Run tests to verify they pass**
+- [x] **Step 7: Run tests to verify they pass**
 
 ```bash
 cd backend && python -m pytest tests/test_documents.py -v
@@ -1383,7 +1383,7 @@ Expected: 4 tests PASS.
 - Modify: `backend/app/main.py`
 - Create: `backend/tests/test_analysis.py`
 
-- [ ] **Step 1: Write failing tests**
+- [x] **Step 1: Write failing tests**
 
 Create `backend/tests/test_analysis.py`:
 
@@ -1431,7 +1431,7 @@ async def test_trigger_analysis_returns_202(auth_client: AsyncClient):
     assert "job_id" in resp.json()
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 ```bash
 cd backend && python -m pytest tests/test_analysis.py -v
@@ -1439,7 +1439,7 @@ cd backend && python -m pytest tests/test_analysis.py -v
 
 Expected: 404 on `/api/v1/analysis/...`.
 
-- [ ] **Step 3: Create run_analysis ARQ job**
+- [x] **Step 3: Create run_analysis ARQ job**
 
 Create `backend/worker/jobs/run_analysis.py`:
 
@@ -1589,7 +1589,7 @@ def _parse_verdict(text: str) -> dict | None:
         return None
 ````
 
-- [ ] **Step 4: Create analysis API**
+- [x] **Step 4: Create analysis API**
 
 Create `backend/app/api/analysis.py`:
 
@@ -1709,7 +1709,7 @@ def _serialize(a: AIAnalysis) -> dict:
     }
 ```
 
-- [ ] **Step 5: Register analysis router and job**
+- [x] **Step 5: Register analysis router and job**
 
 Edit `backend/app/main.py`:
 
@@ -1734,7 +1734,7 @@ functions = [
 ]
 ```
 
-- [ ] **Step 6: Run tests to verify they pass**
+- [x] **Step 6: Run tests to verify they pass**
 
 ```bash
 cd backend && python -m pytest tests/test_analysis.py -v
@@ -1751,7 +1751,7 @@ Expected: 3 tests PASS.
 - Create: `frontend/components/analysis/VerdictCard.tsx`
 - Modify: `frontend/app/(auth)/portfolio/[symbol]/page.tsx`
 
-- [ ] **Step 1: Create VerdictCard component**
+- [x] **Step 1: Create VerdictCard component**
 
 Create `frontend/components/analysis/VerdictCard.tsx`:
 
@@ -1965,7 +1965,7 @@ export function VerdictCard({ symbol, privacyMode = false }: VerdictCardProps) {
 }
 ```
 
-- [ ] **Step 2: Add VerdictCard to asset detail page**
+- [x] **Step 2: Add VerdictCard to asset detail page**
 
 Edit `frontend/app/(auth)/portfolio/[symbol]/page.tsx` — import and render `VerdictCard`. Find the section where the price chart is rendered and add the card below it:
 
@@ -1978,7 +1978,7 @@ import { VerdictCard } from "@/components/analysis/VerdictCard";
 
 Where `privacyMode` is whatever state/context variable the page already uses for the privacy toggle.
 
-- [ ] **Step 3: Verify in browser**
+- [x] **Step 3: Verify in browser**
 
 ```bash
 cd frontend && npm run dev
@@ -1994,7 +1994,7 @@ Open `http://localhost:3000` → navigate to any asset detail page → confirm V
 
 - Create: `frontend/app/(auth)/documents/page.tsx`
 
-- [ ] **Step 1: Create page**
+- [x] **Step 1: Create page**
 
 Create `frontend/app/(auth)/documents/page.tsx`:
 
@@ -2234,7 +2234,7 @@ export default function DocumentsPage() {
 }
 ```
 
-- [ ] **Step 2: Verify in browser**
+- [x] **Step 2: Verify in browser**
 
 ```bash
 cd frontend && npm run dev
@@ -2250,7 +2250,7 @@ Navigate to `http://localhost:3000/documents` → confirm empty state renders, U
 
 - Create: `frontend/app/(auth)/ai-usage/page.tsx`
 
-- [ ] **Step 1: Add usage endpoint to analysis router**
+- [x] **Step 1: Add usage endpoint to analysis router**
 
 Edit `backend/app/api/analysis.py` — add two new routes at the bottom:
 
@@ -2301,7 +2301,7 @@ async def get_usage_logs(
     return [_serialize(a) for a in result.scalars().all()]
 ```
 
-- [ ] **Step 2: Create AI usage page**
+- [x] **Step 2: Create AI usage page**
 
 Create `frontend/app/(auth)/ai-usage/page.tsx`:
 
@@ -2564,7 +2564,7 @@ export default function AIUsagePage() {
 }
 ```
 
-- [ ] **Step 3: Verify in browser**
+- [x] **Step 3: Verify in browser**
 
 ```bash
 cd frontend && npm run dev
