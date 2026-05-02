@@ -56,5 +56,7 @@ export const api = {
     fetchWithAuth(path, { method: "POST", body: JSON.stringify(body) }),
   put: (path: string, body: unknown) =>
     fetchWithAuth(path, { method: "PUT", body: JSON.stringify(body) }),
+  patch: (path: string, body: unknown) =>
+    fetchWithAuth(path, { method: "PATCH", body: JSON.stringify(body) }),
   delete: (path: string) => fetchWithAuth(path, { method: "DELETE" }),
 };

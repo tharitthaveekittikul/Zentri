@@ -26,3 +26,5 @@ backups/
 .code-review-graph/
 
 .DS_Store
+
+/Data

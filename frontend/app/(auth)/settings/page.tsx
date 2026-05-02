@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { PlatformsManager } from "@/components/settings/PlatformsManager";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AISettings } from "@/components/settings/AISettings";
 
 interface HardwareRecommendation {
   can_run_local_llm: boolean;
@@ -34,47 +36,60 @@ export default function SettingsPage() {
     <div className="space-y-6 max-w-2xl">
       <h1 className="text-2xl font-bold">Settings</h1>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Hardware</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {hardware ? (
-            <div className="space-y-2 text-sm">
-              <p>
-                <strong>CPU:</strong> {hardware.cpu_brand}
-              </p>
-              <p>
-                <strong>RAM:</strong> {hardware.ram_gb} GB
-              </p>
-              <p>
-                <strong>Apple Silicon:</strong>{" "}
-                {hardware.is_apple_silicon ? "Yes" : "No"}
-              </p>
-              <div className="border rounded p-3 mt-2 space-y-1">
-                <p>
-                  <strong>Recommended model:</strong>{" "}
-                  {hardware.recommendation.recommended_model}
-                </p>
-                <p className="text-muted-foreground">
-                  {hardware.recommendation.note}
-                </p>
-                {hardware.recommendation.can_run_local_llm && (
-                  <code className="block bg-muted p-2 rounded text-xs mt-1">
-                    {hardware.recommendation.setup_command}
-                  </code>
-                )}
-              </div>
-            </div>
-          ) : (
-            <p className="text-sm text-muted-foreground">
-              Loading hardware info...
-            </p>
-          )}
-        </CardContent>
-      </Card>
+      <Tabs defaultValue="general">
+        <TabsList>
+          <TabsTrigger value="general">General</TabsTrigger>
+          <TabsTrigger value="ai">AI & LLM</TabsTrigger>
+        </TabsList>
 
-      <PlatformsManager />
+        <TabsContent value="general" className="space-y-6 mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Hardware</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {hardware ? (
+                <div className="space-y-2 text-sm">
+                  <p>
+                    <strong>CPU:</strong> {hardware.cpu_brand}
+                  </p>
+                  <p>
+                    <strong>RAM:</strong> {hardware.ram_gb} GB
+                  </p>
+                  <p>
+                    <strong>Apple Silicon:</strong>{" "}
+                    {hardware.is_apple_silicon ? "Yes" : "No"}
+                  </p>
+                  <div className="border rounded p-3 mt-2 space-y-1">
+                    <p>
+                      <strong>Recommended model:</strong>{" "}
+                      {hardware.recommendation.recommended_model}
+                    </p>
+                    <p className="text-muted-foreground">
+                      {hardware.recommendation.note}
+                    </p>
+                    {hardware.recommendation.can_run_local_llm && (
+                      <code className="block bg-muted p-2 rounded text-xs mt-1">
+                        {hardware.recommendation.setup_command}
+                      </code>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  Loading hardware info...
+                </p>
+              )}
+            </CardContent>
+          </Card>
+
+          <PlatformsManager />
+        </TabsContent>
+
+        <TabsContent value="ai" className="mt-4">
+          <AISettings />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

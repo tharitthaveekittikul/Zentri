@@ -63,3 +63,19 @@ async def test_performance_invalid_range_defaults(auth_client):
     assert res.status_code == 200
     data = res.json()
     assert "portfolio" in data
+
+
+@pytest.mark.asyncio
+async def test_allocation_includes_cash(auth_client):
+    # Create cash asset with balance
+    asset = await auth_client.post("/api/v1/assets", json={
+        "symbol": "KBANK_SAVINGS", "asset_type": "cash", "name": "KBANK", "currency": "THB"
+    })
+    aid = asset.json()["id"]
+    await auth_client.post("/api/v1/cash-balances", json={
+        "asset_id": aid, "balance": 100000.0, "snapshot_date": "2026-04-01"
+    })
+    resp = await auth_client.get("/api/v1/overview/allocation")
+    assert resp.status_code == 200
+    types = [row["asset_type"] for row in resp.json()]
+    assert "cash" in types

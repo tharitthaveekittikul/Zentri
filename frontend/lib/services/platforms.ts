@@ -27,3 +27,9 @@ export async function createPlatform(body: {
 export async function deletePlatform(id: string): Promise<void> {
   await api.delete(`/api/v1/platforms/${id}`);
 }
+
+export async function renamePlatform(id: string, name: string): Promise<Platform> {
+  const res = await api.patch(`/api/v1/platforms/${id}`, { name });
+  if (!res.ok) throw new Error("Failed to rename platform");
+  return res.json();
+}

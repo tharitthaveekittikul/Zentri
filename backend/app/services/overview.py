@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logging import get_logger
 from app.models.asset import Asset
+from app.models.cash_balance import CashBalance
 from app.models.holding import Holding
 from app.models.price import Price
 
@@ -88,6 +89,22 @@ async def get_allocation(db: AsyncSession, user_id: uuid.UUID) -> list[dict]:
             continue
         asset_type = asset.asset_type
         by_type[asset_type] = by_type.get(asset_type, Decimal("0")) + h.quantity * latest.close
+
+    # Add cash balances — latest snapshot per cash asset
+    cash_assets = list((await db.execute(
+        select(Asset).where(Asset.user_id == user_id, Asset.asset_type == "cash")
+    )).scalars().all())
+
+    for ca in cash_assets:
+        snap_result = await db.execute(
+            select(CashBalance)
+            .where(CashBalance.asset_id == ca.id, CashBalance.user_id == user_id)
+            .order_by(CashBalance.snapshot_date.desc())
+            .limit(1)
+        )
+        snap = snap_result.scalar_one_or_none()
+        if snap:
+            by_type["cash"] = by_type.get("cash", Decimal("0")) + Decimal(str(snap.balance))
 
     total = sum(by_type.values()) or Decimal("1")
     logger.info("Allocation: user=%s types=%s", user_id, list(by_type.keys()))

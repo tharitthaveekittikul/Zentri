@@ -54,3 +54,19 @@ async def delete_platform(db: AsyncSession, platform: Platform) -> None:
     logger.info("Platform deleted: id=%s name=%s", platform.id, platform.name)
     await db.delete(platform)
     await db.commit()
+
+
+async def rename_platform(
+    db: AsyncSession, user_id: uuid.UUID, platform_id: uuid.UUID, new_name: str
+) -> Platform | None:
+    result = await db.execute(
+        select(Platform).where(Platform.id == platform_id, Platform.user_id == user_id)
+    )
+    platform = result.scalar_one_or_none()
+    if platform is None:
+        return None
+    platform.name = new_name
+    await db.commit()
+    await db.refresh(platform)
+    logger.info("rename_platform id=%s user=%s new_name=%s", platform_id, user_id, new_name)
+    return platform

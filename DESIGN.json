@@ -1,0 +1,242 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-05-01T22:32:42Z",
+  "title": "Design System: Zentri",
+  "extensions": {
+    "colorMeta": {
+      "warm-canvas": {
+        "role": "neutral",
+        "displayName": "Warm Canvas",
+        "canonical": "oklch(0.98 0.008 75)",
+        "tonalRamp": [
+          "oklch(0.15 0.008 75)",
+          "oklch(0.28 0.008 75)",
+          "oklch(0.42 0.008 75)",
+          "oklch(0.56 0.008 75)",
+          "oklch(0.70 0.008 75)",
+          "oklch(0.83 0.008 75)",
+          "oklch(0.92 0.008 75)",
+          "oklch(0.98 0.008 75)"
+        ]
+      },
+      "card-surface": {
+        "role": "neutral",
+        "displayName": "Card Surface",
+        "canonical": "oklch(0.995 0.005 75)",
+        "tonalRamp": [
+          "oklch(0.12 0.005 75)",
+          "oklch(0.25 0.005 75)",
+          "oklch(0.40 0.005 75)",
+          "oklch(0.55 0.005 75)",
+          "oklch(0.70 0.005 75)",
+          "oklch(0.84 0.005 75)",
+          "oklch(0.93 0.005 75)",
+          "oklch(0.995 0.005 75)"
+        ]
+      },
+      "ink-dark": {
+        "role": "neutral",
+        "displayName": "Ink Dark",
+        "canonical": "oklch(0.15 0.008 60)",
+        "tonalRamp": [
+          "oklch(0.15 0.008 60)",
+          "oklch(0.25 0.008 60)",
+          "oklch(0.35 0.008 60)",
+          "oklch(0.48 0.008 60)",
+          "oklch(0.62 0.008 60)",
+          "oklch(0.75 0.008 60)",
+          "oklch(0.86 0.008 60)",
+          "oklch(0.94 0.008 60)"
+        ]
+      },
+      "advisor-amber": {
+        "role": "primary",
+        "displayName": "Advisor Amber",
+        "canonical": "oklch(0.62 0.12 58)",
+        "tonalRamp": [
+          "oklch(0.12 0.08 58)",
+          "oklch(0.22 0.10 58)",
+          "oklch(0.32 0.12 58)",
+          "oklch(0.42 0.12 58)",
+          "oklch(0.52 0.12 58)",
+          "oklch(0.62 0.12 58)",
+          "oklch(0.76 0.08 58)",
+          "oklch(0.90 0.04 58)"
+        ]
+      },
+      "warm-muted": {
+        "role": "neutral",
+        "displayName": "Warm Muted",
+        "canonical": "oklch(0.95 0.007 75)",
+        "tonalRamp": [
+          "oklch(0.18 0.007 75)",
+          "oklch(0.30 0.007 75)",
+          "oklch(0.45 0.007 75)",
+          "oklch(0.60 0.007 75)",
+          "oklch(0.73 0.007 75)",
+          "oklch(0.84 0.007 75)",
+          "oklch(0.92 0.007 75)",
+          "oklch(0.95 0.007 75)"
+        ]
+      },
+      "quiet-text": {
+        "role": "neutral",
+        "displayName": "Quiet Text",
+        "canonical": "oklch(0.53 0.008 65)",
+        "tonalRamp": [
+          "oklch(0.13 0.008 65)",
+          "oklch(0.23 0.008 65)",
+          "oklch(0.33 0.008 65)",
+          "oklch(0.43 0.008 65)",
+          "oklch(0.53 0.008 65)",
+          "oklch(0.66 0.008 65)",
+          "oklch(0.80 0.008 65)",
+          "oklch(0.92 0.008 65)"
+        ]
+      },
+      "warm-border": {
+        "role": "neutral",
+        "displayName": "Warm Border",
+        "canonical": "oklch(0.90 0.007 75)",
+        "tonalRamp": [
+          "oklch(0.14 0.007 75)",
+          "oklch(0.27 0.007 75)",
+          "oklch(0.42 0.007 75)",
+          "oklch(0.57 0.007 75)",
+          "oklch(0.70 0.007 75)",
+          "oklch(0.82 0.007 75)",
+          "oklch(0.90 0.007 75)",
+          "oklch(0.96 0.007 75)"
+        ]
+      },
+      "alert-red": {
+        "role": "tertiary",
+        "displayName": "Alert Red",
+        "canonical": "oklch(0.577 0.245 27.325)",
+        "tonalRamp": [
+          "oklch(0.20 0.18 27)",
+          "oklch(0.30 0.20 27)",
+          "oklch(0.40 0.22 27)",
+          "oklch(0.50 0.24 27)",
+          "oklch(0.577 0.245 27)",
+          "oklch(0.68 0.20 27)",
+          "oklch(0.80 0.12 27)",
+          "oklch(0.92 0.05 27)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Page titles and major section headers only." },
+      "headline": { "displayName": "Headline", "purpose": "Card headings, modal titles." },
+      "title": { "displayName": "Title", "purpose": "Section titles within cards, table column groups." },
+      "body": { "displayName": "Body", "purpose": "All prose content. Max line length 65–72ch." },
+      "label": { "displayName": "Label", "purpose": "Form labels, table headers, nav items, badge text." },
+      "mono": { "displayName": "Mono/Data", "purpose": "All numeric financial data: prices, quantities, percentages, tickers, dates." }
+    },
+    "shadows": [],
+    "motion": [
+      { "name": "ease-out-standard", "value": "cubic-bezier(0, 0, 0.2, 1)", "purpose": "Elements entering or expanding." },
+      { "name": "ease-standard", "value": "cubic-bezier(0.4, 0, 0.2, 1)", "purpose": "State transitions: hover, focus, active." },
+      { "name": "duration-fast", "value": "150ms", "purpose": "Hover and active state changes." },
+      { "name": "duration-base", "value": "200ms", "purpose": "Focus rings, panel transitions." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Single primary action per view. Advisor Amber fill.",
+      "html": "<button class=\"ds-btn-primary\">Confirm Action</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 32px; padding: 0 10px; font-size: 0.875rem; font-weight: 500; font-family: Geist, system-ui, sans-serif; background-color: oklch(0.62 0.12 58); color: oklch(0.99 0.004 75); border: 1px solid transparent; border-radius: 0.625rem; cursor: pointer; white-space: nowrap; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1), transform 100ms ease-out; outline: none; } .ds-btn-primary:hover { background-color: oklch(0.56 0.11 58); } .ds-btn-primary:focus-visible { border-color: oklch(0.62 0.12 58); box-shadow: 0 0 0 3px oklch(0.62 0.12 58 / 25%); } .ds-btn-primary:active { transform: translateY(1px); } .ds-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Default secondary action. Transparent fill, quiet-text color.",
+      "html": "<button class=\"ds-btn-ghost\">Cancel</button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 32px; padding: 0 10px; font-size: 0.875rem; font-weight: 500; font-family: Geist, system-ui, sans-serif; background-color: transparent; color: oklch(0.53 0.008 65); border: 1px solid transparent; border-radius: 0.625rem; cursor: pointer; white-space: nowrap; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1); outline: none; } .ds-btn-ghost:hover { background-color: oklch(0.95 0.007 75); color: oklch(0.15 0.008 60); } .ds-btn-ghost:focus-visible { border-color: oklch(0.90 0.007 75); box-shadow: 0 0 0 3px oklch(0.708 0 0 / 30%); } .ds-btn-ghost:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Secondary action with visible border presence.",
+      "html": "<button class=\"ds-btn-outline\">Export</button>",
+      "css": ".ds-btn-outline { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 32px; padding: 0 10px; font-size: 0.875rem; font-weight: 500; font-family: Geist, system-ui, sans-serif; background-color: oklch(0.98 0.008 75); color: oklch(0.15 0.008 60); border: 1px solid oklch(0.90 0.007 75); border-radius: 0.625rem; cursor: pointer; white-space: nowrap; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1); outline: none; } .ds-btn-outline:hover { background-color: oklch(0.95 0.007 75); } .ds-btn-outline:focus-visible { border-color: oklch(0.62 0.12 58); box-shadow: 0 0 0 3px oklch(0.62 0.12 58 / 20%); } .ds-btn-outline:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card-default",
+      "description": "Primary content container. Flat tonal surface with 1px ring boundary.",
+      "html": "<div class=\"ds-card\"><div class=\"ds-card-header\"><div class=\"ds-card-title\">Portfolio Overview</div><div class=\"ds-card-desc\">Holdings across all asset classes</div></div><div class=\"ds-card-content\"><p style=\"margin:0;color:oklch(0.53 0.008 65);font-size:0.875rem;\">Content goes here.</p></div></div>",
+      "css": ".ds-card { display: flex; flex-direction: column; gap: 16px; overflow: hidden; border-radius: 0.875rem; background-color: oklch(0.995 0.005 75); padding: 16px 0; font-family: Geist, system-ui, sans-serif; font-size: 0.875rem; color: oklch(0.15 0.008 60); box-shadow: inset 0 0 0 1px oklch(0.15 0.008 60 / 10%); } .ds-card-header { padding: 0 16px; display: grid; gap: 4px; } .ds-card-title { font-size: 1rem; font-weight: 500; line-height: 1.4; } .ds-card-desc { font-size: 0.875rem; color: oklch(0.53 0.008 65); } .ds-card-content { padding: 0 16px; }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input-default",
+      "description": "Stroke-style input. Border visible at rest, amber on focus.",
+      "html": "<input class=\"ds-input\" placeholder=\"Enter ticker symbol…\" />",
+      "css": ".ds-input { display: flex; height: 32px; width: 100%; padding: 0 10px; font-size: 0.875rem; font-family: Geist, system-ui, sans-serif; background-color: oklch(0.98 0.008 75); color: oklch(0.15 0.008 60); border: 1px solid oklch(0.90 0.007 75); border-radius: 0.625rem; outline: none; transition: border-color 150ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-input::placeholder { color: oklch(0.65 0.006 65); } .ds-input:focus-visible { border-color: oklch(0.62 0.12 58); box-shadow: 0 0 0 3px oklch(0.62 0.12 58 / 20%); } .ds-input:disabled { opacity: 0.5; cursor: not-allowed; }"
+    },
+    {
+      "name": "Nav Item",
+      "kind": "nav",
+      "description": "Sidebar navigation link. Active state uses advisor-amber fill.",
+      "html": "<a class=\"ds-nav-item ds-nav-item--active\" href=\"#\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"3\" y=\"3\" width=\"7\" height=\"7\"/><rect x=\"14\" y=\"3\" width=\"7\" height=\"7\"/><rect x=\"3\" y=\"14\" width=\"7\" height=\"7\"/><rect x=\"14\" y=\"14\" width=\"7\" height=\"7\"/></svg>Overview</a>",
+      "css": ".ds-nav-item { display: flex; align-items: center; gap: 8px; padding: 0 12px; height: 36px; border-radius: 0.625rem; font-size: 0.875rem; font-family: Geist, system-ui, sans-serif; font-weight: 400; color: oklch(0.53 0.008 65); text-decoration: none; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1), color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-nav-item:hover { background-color: oklch(0.95 0.007 75); color: oklch(0.15 0.008 60); } .ds-nav-item--active { background-color: oklch(0.62 0.12 58); color: oklch(0.99 0.004 75); font-weight: 500; } .ds-nav-item--active:hover { background-color: oklch(0.56 0.11 58); }"
+    },
+    {
+      "name": "Signal Badge (HOLD)",
+      "kind": "chip",
+      "description": "LLM recommendation badge. Always carries text label — never color alone.",
+      "html": "<div style=\"display:flex;gap:8px;align-items:center;\"><span class=\"ds-badge ds-badge--buy\">BUY</span><span class=\"ds-badge ds-badge--hold\">HOLD</span><span class=\"ds-badge ds-badge--sell\">SELL</span></div>",
+      "css": ".ds-badge { display: inline-flex; align-items: center; justify-content: center; height: 20px; padding: 0 8px; font-size: 0.75rem; font-weight: 500; font-family: Geist, system-ui, sans-serif; letter-spacing: 0.01em; border-radius: 9999px; border: 1px solid transparent; white-space: nowrap; } .ds-badge--buy { background-color: oklch(0.93 0.06 142 / 20%); color: oklch(0.32 0.10 142); border-color: oklch(0.75 0.08 142 / 40%); } .ds-badge--hold { background-color: oklch(0.95 0.007 75); color: oklch(0.40 0.008 60); border-color: oklch(0.90 0.007 75); } .ds-badge--sell { background-color: oklch(0.577 0.245 27 / 10%); color: oklch(0.42 0.20 27); border-color: oklch(0.577 0.245 27 / 30%); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Trusted Advisor",
+    "overview": "Zentri's interface is a private financial advisor, not a trading platform. The design is composed, unhurried, and authoritative — not because it is austere, but because it has already done the work. The palette is warm cream and ink, with a single amber accent. Surfaces do not compete for attention; information hierarchy does the work that decoration refuses to do.\n\nThe system rejects urgency as an aesthetic. No gamified color pulses, no live-ticker animations designed to simulate momentum. Zentri synthesizes; it does not dump. The interface distinguishes raw data from interpreted insight through scale, weight, and spatial placement — never through color or visual noise alone.",
+    "keyCharacteristics": [
+      "Warm cream canvas, ink-dark typography, one amber accent on active and primary elements only",
+      "Flat tonal elevation: surfaces separated by a 1px ring at 10% foreground opacity, never by shadow",
+      "Geist Sans for UI copy; Geist Mono exclusively for financial data (prices, quantities, percentages)",
+      "BUY/SELL/HOLD signals always carry label and color — never color alone",
+      "System theme: both light and dark modes are equally considered"
+    ],
+    "rules": [
+      { "name": "The One Voice Rule", "body": "Advisor Amber appears on at most one active element per screen. Its rarity is the point. A screen saturated with amber has no advisor.", "section": "colors" },
+      { "name": "The Signal Rule", "body": "BUY, SELL, and HOLD are never encoded by color alone. Every signal badge carries its text label. Color reinforces; it does not replace.", "section": "colors" },
+      { "name": "The Mono Signal Rule", "body": "Any numeric value requiring precision — price, quantity, percentage, date — is rendered in Geist Mono. The typeface switch is a semantic affordance.", "section": "typography" },
+      { "name": "The Flat-by-Default Rule", "body": "Surfaces are flat at rest. No box-shadow appears unless a surface is genuinely lifted by user interaction. Use tonal fill or the 1px foreground ring instead.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do render all prices, quantities, and percentages in Geist Mono.",
+      "Do pair label and color on every BUY/SELL/HOLD signal — never color alone.",
+      "Do keep advisor-amber to one active element per view.",
+      "Do use the 1px inset ring (ring-1 ring-foreground/10) for card boundaries instead of shadows.",
+      "Do give sections room to breathe — cramped layouts undermine unhurried precision.",
+      "Do maintain WCAG AA contrast (4.5:1) on all body and label text."
+    ],
+    "donts": [
+      "Don't use gamified color pulses, confetti, or visual urgency signals.",
+      "Don't use purple/teal gradients, glass cards, floating hero sections, or generic startup template aesthetics.",
+      "Don't use Bloomberg-style data density: walls of monospaced grids, no whitespace.",
+      "Don't use dark neon, glowing outlines, or matrix-adjacent visuals.",
+      "Don't use border-left greater than 1px as a colored accent stripe on cards, alerts, or list items.",
+      "Don't use background-clip: text with gradients for any heading or metric value.",
+      "Don't nest cards.",
+      "Don't use box-shadows.",
+      "Don't introduce a second chromatic accent — Alert Red and Advisor Amber are the complete set."
+    ]
+  }
+}

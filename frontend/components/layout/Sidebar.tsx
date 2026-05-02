@@ -13,6 +13,7 @@ import {
   Activity,
   Bot,
   Settings,
+  Upload,
 } from "lucide-react";
 
 const navItems = [
@@ -23,6 +24,7 @@ const navItems = [
   { href: "/dividends", label: "Dividends", icon: CalendarDays },
   { href: "/documents", label: "Documents", icon: FileText },
   { href: "/pipeline", label: "Pipeline", icon: Activity },
+  { href: "/import", label: "Import", icon: Upload },
   { href: "/ai-usage", label: "AI Usage", icon: Bot },
   { href: "/settings", label: "Settings", icon: Settings },
 ];

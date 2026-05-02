@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   fetchHoldings,
@@ -62,8 +63,16 @@ export default function PortfolioPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Portfolio</h1>
-        <div className="flex gap-2">
+        <div className="flex items-center justify-between flex-1">
+          <h1 className="text-2xl font-bold">Portfolio</h1>
+          <Link
+            href="/import"
+            className="px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium"
+          >
+            Import
+          </Link>
+        </div>
+        <div className="flex gap-2 ml-4">
           <ImportDrawer onImported={refresh} />
           <AddHoldingDialog onAdded={refresh} />
         </div>

@@ -32,6 +32,12 @@ async def setup_db():
 
 
 @pytest.fixture
+async def db():
+    async with TestSession() as session:
+        yield session
+
+
+@pytest.fixture
 async def auth_client():
     async def override_get_db():
         async with TestSession() as session:

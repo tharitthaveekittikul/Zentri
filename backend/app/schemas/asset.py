@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 class AssetCreate(BaseModel):
     symbol: str
-    asset_type: Literal["us_stock", "thai_stock", "th_fund", "crypto", "gold"]
+    asset_type: Literal["us_stock", "thai_stock", "th_fund", "etf", "crypto", "gold", "cash"]
     name: str
     currency: str = "USD"
     metadata_: dict[str, Any] = {}

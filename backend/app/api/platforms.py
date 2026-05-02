@@ -6,8 +6,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.deps import get_current_user
 from app.core.database import get_db
 from app.models.user import User
+from pydantic import BaseModel
+
 from app.schemas.platform import PlatformCreate, PlatformResponse, PlatformUpdate
 from app.services import platform as platform_service
+
+
+class PlatformRenameRequest(BaseModel):
+    name: str
+
 
 router = APIRouter(prefix="/platforms", tags=["platforms"])
 
@@ -42,6 +49,19 @@ async def update_platform(
     if platform is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Platform not found")
     return await platform_service.update_platform(db, platform, body.name, body.asset_types_supported, body.notes)
+
+
+@router.patch("/{platform_id}", response_model=PlatformResponse)
+async def rename_platform_endpoint(
+    platform_id: uuid.UUID,
+    body: PlatformRenameRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    updated = await platform_service.rename_platform(db, current_user.id, platform_id, body.name)
+    if updated is None:
+        raise HTTPException(status_code=404, detail="Platform not found")
+    return updated
 
 
 @router.delete("/{platform_id}", status_code=204)

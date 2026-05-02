@@ -6,19 +6,22 @@ import {
   fetchPlatforms,
   createPlatform,
   deletePlatform,
+  renamePlatform,
 } from "@/lib/services/platforms";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Plus } from "lucide-react";
+import { Trash2, Plus, Pencil, Check, X } from "lucide-react";
 import { toast } from "sonner";
 
 export function PlatformsManager() {
   const qc = useQueryClient();
   const [name, setName] = useState("");
   const [types, setTypes] = useState("us_stock");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
 
   const { data: platforms = [] } = useQuery({
     queryKey: ["platforms"],
@@ -41,6 +44,17 @@ export function PlatformsManager() {
       toast.success("Platform added");
     },
     onError: () => toast.error("Failed to add platform"),
+  });
+
+  const renameMutation = useMutation({
+    mutationFn: ({ id, name }: { id: string; name: string }) =>
+      renamePlatform(id, name),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["platforms"] });
+      setEditingId(null);
+      toast.success("Platform renamed.");
+    },
+    onError: () => toast.error("Failed to rename platform."),
   });
 
   const deleteMutation = useMutation({
@@ -89,24 +103,78 @@ export function PlatformsManager() {
               key={p.id}
               className="flex items-center justify-between border rounded p-2"
             >
-              <div>
-                <span className="font-medium text-sm">{p.name}</span>
-                <div className="flex gap-1 mt-1 flex-wrap">
-                  {p.asset_types_supported.map((t) => (
-                    <Badge key={t} variant="secondary" className="text-xs">
-                      {t}
-                    </Badge>
-                  ))}
+              {editingId === p.id ? (
+                <div className="flex items-center gap-2 flex-1 mr-2">
+                  <Input
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    className="h-7 text-sm"
+                    autoFocus
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && editName.trim()) {
+                        renameMutation.mutate({ id: p.id, name: editName.trim() });
+                      } else if (e.key === "Escape") {
+                        setEditingId(null);
+                      }
+                    }}
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7"
+                    onClick={() => {
+                      if (editName.trim()) {
+                        renameMutation.mutate({ id: p.id, name: editName.trim() });
+                      }
+                    }}
+                    disabled={!editName.trim() || renameMutation.isPending}
+                  >
+                    <Check className="h-3.5 w-3.5 text-green-600" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7"
+                    onClick={() => setEditingId(null)}
+                  >
+                    <X className="h-3.5 w-3.5 text-muted-foreground" />
+                  </Button>
                 </div>
+              ) : (
+                <div>
+                  <span className="font-medium text-sm">{p.name}</span>
+                  <div className="flex gap-1 mt-1 flex-wrap">
+                    {p.asset_types_supported.map((t) => (
+                      <Badge key={t} variant="secondary" className="text-xs">
+                        {t}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <div className="flex items-center gap-1 shrink-0">
+                {editingId !== p.id && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      setEditingId(p.id);
+                      setEditName(p.name);
+                    }}
+                    disabled={deleteMutation.isPending}
+                  >
+                    <Pencil className="h-4 w-4 text-muted-foreground" />
+                  </Button>
+                )}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => deleteMutation.mutate(p.id)}
+                  disabled={deleteMutation.isPending || editingId === p.id}
+                >
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
               </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => deleteMutation.mutate(p.id)}
-                disabled={deleteMutation.isPending}
-              >
-                <Trash2 className="h-4 w-4 text-destructive" />
-              </Button>
             </div>
           ))}
           {platforms.length === 0 && (
