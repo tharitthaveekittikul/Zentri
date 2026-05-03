@@ -45,27 +45,31 @@ def test_compute_signature_stable():
 def test_apply_template_maps_fields():
     rows = [{"share_name": "PTT", "unit": 100, "net_amount": 3455, "trade_date": "2026-01-01", "type": "BUY"}]
     template = {
-        "field_map": {"share_name": "symbol", "unit": "units", "net_amount": "total_thb", "trade_date": "date"},
+        "field_map": {"share_name": "symbol", "net_amount": "gross_amount"},
         "asset_type_rules": [],
         "asset_type_fallback": "thai_stock",
-        "currency_default": "THB",
+        "defaults": {"currency": "THB"},
+        "value_transforms": {},
+        "derived_fields": {},
     }
     result = apply_template(rows, template)
     assert result[0]["symbol"] == "PTT"
-    assert result[0]["units"] == 100
+    assert result[0]["unit"] == 100
     assert result[0]["asset_type"] == "thai_stock"
     assert result[0]["currency"] == "THB"
 
 
 def test_apply_template_asset_type_rules():
-    rows = [{"symbol": "AAPL", "exchange": "XNAS", "unit": 1, "total_thb": 5000, "date": "2026-01-01", "type": "BUY"}]
+    rows = [{"symbol": "AAPL", "exchange": "XNAS", "unit": 1, "gross_thb": 5000, "trade_date": "2026-01-01", "type": "BUY"}]
     template = {
         "field_map": {},
         "asset_type_rules": [
             {"field": "exchange", "values": ["XNAS", "XNYS"], "asset_type": "us_stock"},
         ],
         "asset_type_fallback": "etf",
-        "currency_default": "USD",
+        "defaults": {"currency": "USD"},
+        "value_transforms": {},
+        "derived_fields": {},
     }
     result = apply_template(rows, template)
     assert result[0]["asset_type"] == "us_stock"

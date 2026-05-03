@@ -23,6 +23,9 @@ interface HardwareInfo {
 
 export default function SettingsPage() {
   const [hardware, setHardware] = useState<HardwareInfo | null>(null);
+  const CURRENCIES = ["THB", "USD", "EUR", "GBP", "JPY", "SGD"];
+  const [currencyPrimary, setCurrencyPrimary] = useState("THB");
+  const [currencySecondary, setCurrencySecondary] = useState("USD");
 
   useEffect(() => {
     api
@@ -31,6 +34,24 @@ export default function SettingsPage() {
       .then(setHardware)
       .catch(() => null);
   }, []);
+
+  useEffect(() => {
+    api
+      .get("/api/v1/settings/display")
+      .then((r) => r.json())
+      .then((d) => {
+        setCurrencyPrimary(d.currency_primary);
+        setCurrencySecondary(d.currency_secondary);
+      })
+      .catch(() => null);
+  }, []);
+
+  async function saveCurrencyPrefs() {
+    await api.patch("/api/v1/settings/display", {
+      currency_primary: currencyPrimary,
+      currency_secondary: currencySecondary,
+    });
+  }
 
   return (
     <div className="space-y-6 max-w-2xl">
@@ -84,6 +105,46 @@ export default function SettingsPage() {
           </Card>
 
           <PlatformsManager />
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Display</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex gap-4 items-end">
+                <div className="flex-1">
+                  <label className="text-sm font-medium mb-1 block">Primary Currency</label>
+                  <select
+                    className="w-full border rounded px-3 py-2 text-sm bg-background"
+                    value={currencyPrimary}
+                    onChange={(e) => setCurrencyPrimary(e.target.value)}
+                  >
+                    {CURRENCIES.map((c) => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex-1">
+                  <label className="text-sm font-medium mb-1 block">Secondary Currency</label>
+                  <select
+                    className="w-full border rounded px-3 py-2 text-sm bg-background"
+                    value={currencySecondary}
+                    onChange={(e) => setCurrencySecondary(e.target.value)}
+                  >
+                    {CURRENCIES.map((c) => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                </div>
+                <button
+                  onClick={saveCurrencyPrefs}
+                  className="px-4 py-2 bg-primary text-primary-foreground rounded text-sm"
+                >
+                  Save
+                </button>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="ai" className="mt-4">

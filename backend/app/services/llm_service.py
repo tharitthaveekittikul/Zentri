@@ -6,17 +6,19 @@ from app.core.logging import get_logger
 logger = get_logger(__name__)
 
 PRICING: dict[str, tuple[float, float]] = {
-    "claude-sonnet-4-6": (3.0, 15.0),
-    "claude-opus-4-7": (15.0, 75.0),
-    "claude-haiku-4-5-20251001": (0.8, 4.0),
-    "gpt-4o": (2.5, 10.0),
-    "gpt-4o-mini": (0.15, 0.6),
-    "gemini-1.5-pro": (1.25, 5.0),
-    "gemini-1.5-flash": (0.075, 0.3),
+    "claude-sonnet-4-6":         (3.0,   15.0),
+    "claude-opus-4-7":           (15.0,  75.0),
+    "claude-haiku-4-5-20251001": (0.8,   4.0),
+    "gpt-4o":                    (2.5,   10.0),
+    "gpt-4o-mini":               (0.15,  0.6),
+    "gemini-1.5-pro":            (1.25,  5.0),
+    "gemini-1.5-flash":          (0.075, 0.3),
+    "gemini-2.0-flash":          (0.1,   0.4),
+    "gemini-2.5-flash-lite":     (0.0,   0.0),
 }
 
 
-def _calc_cost(model: str, tokens_in: int, tokens_out: int) -> float:
+def calc_cost(model: str, tokens_in: int, tokens_out: int) -> float:
     if model not in PRICING:
         return 0.0
     in_rate, out_rate = PRICING[model]
@@ -70,7 +72,7 @@ class OpenAIProvider(LLMProvider):
         content = resp.choices[0].message.content
         tokens_in = resp.usage.prompt_tokens
         tokens_out = resp.usage.completion_tokens
-        cost = _calc_cost(self.model, tokens_in, tokens_out)
+        cost = calc_cost(self.model, tokens_in, tokens_out)
         logger.info("openai complete model=%s cost_usd=%.6f", self.model, cost)
         return LLMResponse(content=content, tokens_in=tokens_in, tokens_out=tokens_out, cost_usd=cost)
 
@@ -95,7 +97,7 @@ class ClaudeProvider(LLMProvider):
         content = resp.content[0].text
         tokens_in = resp.usage.input_tokens
         tokens_out = resp.usage.output_tokens
-        cost = _calc_cost(self.model, tokens_in, tokens_out)
+        cost = calc_cost(self.model, tokens_in, tokens_out)
         logger.info("claude complete model=%s cost_usd=%.6f", self.model, cost)
         return LLMResponse(content=content, tokens_in=tokens_in, tokens_out=tokens_out, cost_usd=cost)
 
@@ -112,8 +114,12 @@ class GeminiProvider(LLMProvider):
         prompt = "\n\n".join(f"{m['role'].upper()}: {m['content']}" for m in messages)
         response = await model.generate_content_async(prompt)
         content = response.text
-        logger.info("gemini complete model=%s", self.model)
-        return LLMResponse(content=content, tokens_in=0, tokens_out=0, cost_usd=0.0)
+        tokens_in = response.usage_metadata.prompt_token_count if response.usage_metadata else 0
+        tokens_out = response.usage_metadata.candidates_token_count if response.usage_metadata else 0
+        cost_usd = calc_cost(self.model, tokens_in, tokens_out)
+        logger.info("gemini complete model=%s tokens_in=%d tokens_out=%d cost_usd=%.6f",
+                    self.model, tokens_in, tokens_out, cost_usd)
+        return LLMResponse(content=content, tokens_in=tokens_in, tokens_out=tokens_out, cost_usd=cost_usd)
 
 
 async def get_llm_provider(db) -> LLMProvider:

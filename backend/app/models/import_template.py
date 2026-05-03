@@ -23,6 +23,9 @@ class ImportTemplate(Base):
     asset_type_rules: Mapped[list] = mapped_column(JSONB, nullable=False, default=list)
     asset_type_fallback: Mapped[str] = mapped_column(String(30), nullable=False)
     currency_default: Mapped[str] = mapped_column(String(10), nullable=False, default="THB")
+    value_transforms: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
+    derived_fields: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
+    defaults: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )

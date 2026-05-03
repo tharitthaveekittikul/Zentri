@@ -19,3 +19,5 @@ class User(Base):
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
     )
+    currency_primary: Mapped[str] = mapped_column(String(10), nullable=False, default="THB")
+    currency_secondary: Mapped[str] = mapped_column(String(10), nullable=False, default="USD")

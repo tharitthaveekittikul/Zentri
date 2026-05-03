@@ -10,6 +10,8 @@ from app.core.encryption import decrypt
 from app.core.logging import get_logger
 from app.models.feature_llm_config import FeatureLLMConfig
 from app.models.provider_config import ProviderConfig
+from app.services.exchange_rate import get_current_usd_thb
+from app.services.llm_service import LLMResponse, calc_cost
 from sqlalchemy import select
 
 logger = get_logger(__name__)
@@ -23,10 +25,13 @@ FEATURE_KEYS = (
 
 DEFAULT_SYSTEM_PROMPTS: dict[str, str] = {
     "import_template_generator": (
-        "You are a data normalization expert. Given a financial transaction file structure, "
-        "produce a JSON mapping template that maps source fields to the canonical schema. "
-        "Canonical fields: symbol, date, type, units, price, currency, total_thb, fee_thb, asset_type, notes. "
-        "Also produce asset_type_rules (list of {field, values/pattern, asset_type}) and asset_type_fallback. "
+        "You are a financial data normalization expert. Given a transaction file structure, "
+        "produce a JSON mapping template that translates source fields to the canonical schema.\n\n"
+        "Canonical fields: trade_date (datetime), type (BUY|SELL|DIVIDEND|REWARD|FEE|TRANSFER), "
+        "symbol (ticker or fund code), unit (decimal), price (decimal|null), currency (ISO code, default THB), "
+        "exchange (exchange name|null), gross_amount (decimal|null), fee (decimal|null), "
+        "gross_thb (decimal|null), fee_thb (decimal|null), exchange_rate (decimal|null), "
+        "asset_type (us_stock|thai_stock|th_fund|etf|crypto|gold|cash|null), platform (str|null), notes (str|null).\n\n"
         "Respond with valid JSON only. No explanation."
     ),
     "transaction_classifier": (
@@ -50,7 +55,15 @@ HUMAN_PROMPTS: dict[str, str] = {
         "File format: {file_format}\n"
         "Headers/keys: {headers}\n"
         "Sample rows (first 3):\n{sample_rows}\n\n"
-        "Return a JSON object with keys: file_format, json_path, field_map, asset_type_rules, asset_type_fallback, currency_default."
+        "Return a JSON object with exactly these keys:\n"
+        "- file_format: 'csv' or 'json'\n"
+        "- json_path: dotted path to transaction array (null for csv or top-level array)\n"
+        "- field_map: {{source_field: canonical_field}} direct field name mapping\n"
+        "- value_transforms: {{canonical_field: {{source_value: canonical_value}}}} e.g. {{\"type\": {{\"Buy Note\": \"BUY\"}}}}\n"
+        "- derived_fields: {{canonical_field: 'left_field / right_field'}} arithmetic from other canonical fields\n"
+        "- defaults: {{canonical_field: value}} fill when field is missing or null\n"
+        "- asset_type_rules: [{{\"field\": \"...\", \"values\": [...], \"asset_type\": \"...\"}}]\n"
+        "- asset_type_fallback: canonical asset_type string"
     ),
     "transaction_classifier": (
         "Symbol: {symbol}\nExchange: {exchange}\nCurrency: {currency}\n"
@@ -66,7 +79,7 @@ HUMAN_PROMPTS: dict[str, str] = {
 
 class LLMAdapter(ABC):
     @abstractmethod
-    async def complete(self, system: str, human: str, model: str) -> str: ...
+    async def complete(self, system: str, human: str, model: str) -> LLMResponse: ...
 
     @abstractmethod
     async def fetch_models(self) -> list[str]: ...
@@ -77,13 +90,17 @@ class AnthropicAdapter(LLMAdapter):
         import anthropic
         self._client = anthropic.AsyncAnthropic(api_key=api_key)
 
-    async def complete(self, system: str, human: str, model: str) -> str:
+    async def complete(self, system: str, human: str, model: str) -> LLMResponse:
         msg = await self._client.messages.create(
             model=model, max_tokens=2048,
             system=system,
             messages=[{"role": "user", "content": human}],
         )
-        return msg.content[0].text
+        tokens_in = msg.usage.input_tokens
+        tokens_out = msg.usage.output_tokens
+        cost_usd = calc_cost(model, tokens_in, tokens_out)
+        return LLMResponse(content=msg.content[0].text, tokens_in=tokens_in,
+                           tokens_out=tokens_out, cost_usd=cost_usd)
 
     async def fetch_models(self) -> list[str]:
         result = await self._client.models.list()
@@ -95,12 +112,16 @@ class OpenAIAdapter(LLMAdapter):
         from openai import AsyncOpenAI
         self._client = AsyncOpenAI(api_key=api_key, base_url=base_url)
 
-    async def complete(self, system: str, human: str, model: str) -> str:
+    async def complete(self, system: str, human: str, model: str) -> LLMResponse:
         resp = await self._client.chat.completions.create(
             model=model,
             messages=[{"role": "system", "content": system}, {"role": "user", "content": human}],
         )
-        return resp.choices[0].message.content or ""
+        tokens_in = resp.usage.prompt_tokens
+        tokens_out = resp.usage.completion_tokens
+        cost_usd = calc_cost(model, tokens_in, tokens_out)
+        return LLMResponse(content=resp.choices[0].message.content or "",
+                           tokens_in=tokens_in, tokens_out=tokens_out, cost_usd=cost_usd)
 
     async def fetch_models(self) -> list[str]:
         models = await self._client.models.list()
@@ -113,11 +134,15 @@ class GeminiAdapter(LLMAdapter):
         genai.configure(api_key=api_key)
         self._genai = genai
 
-    async def complete(self, system: str, human: str, model: str) -> str:
+    async def complete(self, system: str, human: str, model: str) -> LLMResponse:
         import asyncio
         m = self._genai.GenerativeModel(model_name=model, system_instruction=system)
-        resp = await asyncio.to_thread(m.generate_content, human)
-        return resp.text
+        response = await asyncio.to_thread(m.generate_content, human)
+        tokens_in = response.usage_metadata.prompt_token_count if response.usage_metadata else 0
+        tokens_out = response.usage_metadata.candidates_token_count if response.usage_metadata else 0
+        cost_usd = calc_cost(model, tokens_in, tokens_out)
+        return LLMResponse(content=response.text, tokens_in=tokens_in,
+                           tokens_out=tokens_out, cost_usd=cost_usd)
 
     async def fetch_models(self) -> list[str]:
         import asyncio
@@ -133,7 +158,7 @@ class OllamaAdapter(LLMAdapter):
     def __init__(self, host_url: str):
         self._host = host_url.rstrip("/")
 
-    async def complete(self, system: str, human: str, model: str) -> str:
+    async def complete(self, system: str, human: str, model: str) -> LLMResponse:
         async with httpx.AsyncClient(timeout=120) as c:
             resp = await c.post(f"{self._host}/api/chat", json={
                 "model": model, "stream": False,
@@ -143,7 +168,11 @@ class OllamaAdapter(LLMAdapter):
                 ],
             })
             resp.raise_for_status()
-            return resp.json()["message"]["content"]
+            data = resp.json()
+        tokens_in = data.get("prompt_eval_count", 0)
+        tokens_out = data.get("eval_count", 0)
+        return LLMResponse(content=data["message"]["content"],
+                           tokens_in=tokens_in, tokens_out=tokens_out, cost_usd=0.0)
 
     async def fetch_models(self) -> list[str]:
         async with httpx.AsyncClient(timeout=10) as c:
@@ -160,12 +189,17 @@ class OpenRouterAdapter(LLMAdapter):
             base_url="https://openrouter.ai/api/v1",
         )
 
-    async def complete(self, system: str, human: str, model: str) -> str:
+    async def complete(self, system: str, human: str, model: str) -> LLMResponse:
         resp = await self._client.chat.completions.create(
             model=model,
             messages=[{"role": "system", "content": system}, {"role": "user", "content": human}],
         )
-        return resp.choices[0].message.content or ""
+        usage = resp.usage
+        tokens_in = usage.prompt_tokens if usage else 0
+        tokens_out = usage.completion_tokens if usage else 0
+        cost_usd = calc_cost(model, tokens_in, tokens_out)
+        return LLMResponse(content=resp.choices[0].message.content or "",
+                           tokens_in=tokens_in, tokens_out=tokens_out, cost_usd=cost_usd)
 
     async def fetch_models(self) -> list[str]:
         async with httpx.AsyncClient(timeout=15) as c:
@@ -193,14 +227,40 @@ class LLMGateway:
         self._db = db
 
     async def complete(self, feature_key: str, user_id: uuid.UUID, variables: dict) -> str:
+        from app.models.llm_call_log import LLMCallLog
+
         config = await self._get_feature_config(feature_key, user_id)
         provider = await self._get_provider(config.provider_config_id)
         api_key = decrypt(provider.encrypted_api_key) if provider.encrypted_api_key else None
         adapter = _build_adapter(provider.provider, api_key, provider.host_url)
-        system = config.system_prompt
+        system = config.system_prompt or DEFAULT_SYSTEM_PROMPTS.get(feature_key, "")
         human = HUMAN_PROMPTS[feature_key].format(**variables)
         logger.info("LLM call: feature=%s provider=%s model=%s", feature_key, provider.provider, config.model)
-        return await adapter.complete(system, human, config.model)
+
+        response: LLMResponse = await adapter.complete(system, human, config.model)
+
+        usd_thb = await get_current_usd_thb(self._db)
+        cost_thb = float(response.cost_usd) * float(usd_thb) if usd_thb else 0.0
+
+        log = LLMCallLog(
+            user_id=user_id,
+            feature_key=feature_key,
+            provider=provider.provider,
+            model=config.model,
+            prompt_in=f"SYSTEM: {system}\n\nHUMAN: {human}",
+            response_out=response.content,
+            tokens_in=response.tokens_in,
+            tokens_out=response.tokens_out,
+            cost_usd=response.cost_usd,
+            cost_thb=cost_thb,
+            exchange_rate=float(usd_thb) if usd_thb else 0.0,
+        )
+        self._db.add(log)
+        await self._db.flush()
+
+        logger.info("LLM logged: tokens_in=%d tokens_out=%d cost_usd=%.6f",
+                    response.tokens_in, response.tokens_out, response.cost_usd)
+        return response.content
 
     async def _get_feature_config(self, feature_key: str, user_id: uuid.UUID) -> FeatureLLMConfig:
         result = await self._db.execute(

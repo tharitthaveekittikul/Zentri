@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { api } from "@/lib/api";
 import { fetchPlatforms, createPlatform } from "@/lib/services/platforms";
 import {
   analyzeFile,
@@ -110,6 +111,17 @@ export default function ImportPage() {
       toast.error("Failed to confirm import.");
     } finally {
       setConfirming(false);
+    }
+  }
+
+  async function handleRemap() {
+    if (!platformId) return;
+    if (!confirm("Delete the saved mapping for this platform? The next upload will ask the AI to re-learn the format.")) return;
+    try {
+      await api.delete(`/api/v1/import/template/${platformId}`);
+      handleReset();
+    } catch {
+      toast.error("Failed to delete template.");
     }
   }
 
@@ -306,6 +318,14 @@ export default function ImportPage() {
               <button onClick={handleReset} className="px-4 py-2 rounded-md border text-sm font-medium">
                 Cancel
               </button>
+              {analyzeResult?.template_status === "match" && (
+                <button
+                  onClick={handleRemap}
+                  className="text-sm text-destructive underline ml-2"
+                >
+                  Re-map (re-learn format)
+                </button>
+              )}
             </div>
           </CardContent>
         </Card>

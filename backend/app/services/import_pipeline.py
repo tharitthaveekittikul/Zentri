@@ -13,12 +13,11 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logging import get_logger
+from app.core.canonical import apply_template, _classify_row_asset_type
 from app.models.import_template import ImportTemplate
 from app.services.llm_gateway import LLMGateway
 
 logger = get_logger(__name__)
-
-CANONICAL_FIELDS = {"symbol", "date", "type", "units", "price", "currency", "total_thb", "fee_thb", "asset_type", "notes"}
 
 
 def detect_file_format(filename: str, content: bytes) -> str:
@@ -72,45 +71,6 @@ def compute_signature(headers: list[str]) -> str:
     return hashlib.sha256(",".join(sorted(headers)).encode()).hexdigest()
 
 
-def _classify_row_asset_type(row: dict, rules: list[dict], fallback: str) -> str:
-    for rule in rules:
-        field = rule.get("field", "")
-        value = str(row.get(field, ""))
-        if "values" in rule:
-            if value in rule["values"]:
-                return rule["asset_type"]
-        elif "pattern" in rule:
-            if re.match(rule["pattern"], value, re.IGNORECASE):
-                return rule["asset_type"]
-    return fallback
-
-
-def apply_template(rows: list[dict], template: dict) -> list[dict]:
-    field_map: dict[str, str] = template.get("field_map", {})
-    rules: list[dict] = template.get("asset_type_rules", [])
-    fallback: str = template.get("asset_type_fallback", "us_stock")
-    currency_default: str = template.get("currency_default", "THB")
-
-    result = []
-    for raw in rows:
-        normalized: dict[str, Any] = {}
-        # Copy canonical fields that are already present
-        for k, v in raw.items():
-            if k in CANONICAL_FIELDS:
-                normalized[k] = v
-        # Apply field_map
-        for src, dst in field_map.items():
-            if src in raw:
-                normalized[dst] = raw[src]
-        # Defaults
-        normalized.setdefault("currency", currency_default)
-        normalized.setdefault("fee_thb", 0.0)
-        normalized.setdefault("notes", None)
-        # Asset type from rules
-        normalized["asset_type"] = _classify_row_asset_type(raw, rules, fallback)
-        result.append(normalized)
-    return result
-
 
 async def get_template(db: AsyncSession, user_id: uuid.UUID, platform_id: uuid.UUID) -> ImportTemplate | None:
     result = await db.execute(
@@ -151,6 +111,9 @@ async def save_template(
         existing.asset_type_rules = template_data.get("asset_type_rules", [])
         existing.asset_type_fallback = template_data.get("asset_type_fallback", "us_stock")
         existing.currency_default = template_data.get("currency_default", "THB")
+        existing.value_transforms = template_data.get("value_transforms", {})
+        existing.derived_fields = template_data.get("derived_fields", {})
+        existing.defaults = template_data.get("defaults", {})
         existing.json_path = template_data.get("json_path", json_path)
         existing.column_signature = signature
         existing.file_format = file_format
@@ -169,6 +132,9 @@ async def save_template(
         asset_type_rules=template_data.get("asset_type_rules", []),
         asset_type_fallback=template_data.get("asset_type_fallback", "us_stock"),
         currency_default=template_data.get("currency_default", "THB"),
+        value_transforms=template_data.get("value_transforms", {}),
+        derived_fields=template_data.get("derived_fields", {}),
+        defaults=template_data.get("defaults", {}),
         created_at=now,
         updated_at=now,
     )
@@ -197,6 +163,42 @@ async def generate_template_via_llm(
     )
     raw = raw.strip()
     if raw.startswith("```"):
-        raw = "\n".join(raw.split("\n")[1:-1])
+        raw = re.sub(r"^```[a-z]*\n?", "", raw)
+        raw = re.sub(r"\n?```$", "", raw)
+    template_data = json.loads(raw)
+    template_data.setdefault("value_transforms", {})
+    template_data.setdefault("derived_fields", {})
+    template_data.setdefault("defaults", {})
+    template_data.setdefault("asset_type_rules", [])
+    template_data.setdefault("asset_type_fallback", "us_stock")
     logger.info("LLM template generated for user=%s format=%s", user_id, file_format)
-    return json.loads(raw)
+    return template_data
+
+
+async def enrich_exchange_rates(
+    db: AsyncSession,
+    rows: list[dict],
+) -> list[dict]:
+    from app.services.exchange_rate import get_historical_usd_thb
+    import dateutil.parser as dp
+
+    for row in rows:
+        if row.get("exchange_rate") is not None:
+            continue
+        currency = row.get("currency", "THB")
+        if currency == "THB":
+            row["exchange_rate"] = 1.0
+            continue
+        trade_date_raw = row.get("trade_date")
+        if not trade_date_raw:
+            continue
+        try:
+            trade_dt = dp.parse(str(trade_date_raw)).date()
+            rate = await get_historical_usd_thb(db, trade_dt)
+            if rate is not None:
+                row["exchange_rate"] = float(rate)
+                if row.get("gross_amount") and not row.get("gross_thb"):
+                    row["gross_thb"] = float(row["gross_amount"]) * float(rate)
+        except Exception:
+            pass
+    return rows

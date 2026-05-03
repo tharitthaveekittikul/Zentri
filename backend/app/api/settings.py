@@ -106,3 +106,40 @@ async def test_llm_connection(
         return {"ok": True, "latency_ms": latency_ms, "response": resp.content[:50]}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
+class DisplaySettingsOut(BaseModel):
+    currency_primary: str
+    currency_secondary: str
+
+
+class DisplaySettingsIn(BaseModel):
+    currency_primary: str
+    currency_secondary: str
+
+
+@router.get("/display", response_model=DisplaySettingsOut)
+async def get_display_settings(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return DisplaySettingsOut(
+        currency_primary=current_user.currency_primary,
+        currency_secondary=current_user.currency_secondary,
+    )
+
+
+@router.patch("/display", response_model=DisplaySettingsOut)
+async def update_display_settings(
+    body: DisplaySettingsIn,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    current_user.currency_primary = body.currency_primary
+    current_user.currency_secondary = body.currency_secondary
+    await db.commit()
+    await db.refresh(current_user)
+    return DisplaySettingsOut(
+        currency_primary=current_user.currency_primary,
+        currency_secondary=current_user.currency_secondary,
+    )

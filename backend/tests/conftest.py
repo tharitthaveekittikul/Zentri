@@ -54,3 +54,26 @@ async def auth_client():
         c.headers["Authorization"] = f"Bearer {token}"
         yield c
     app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def sample_finnomena_rows():
+    return [
+        {"Template": "Buy Note", "Fund_Code": "SCBSET50", "Trade_Date": "2026-04-27",
+         "Total_Amount": "500", "Number_of_Units": "22.5926", "Filename": "confirmation.pdf"},
+    ]
+
+@pytest.fixture
+def sample_dime_rows():
+    return [
+        {"type": "BUY", "symbol": "ABNB", "unit": "0.2889284", "price": "95.56",
+         "currency": "USD", "settlement_date": "28/11/2022", "gross_ccy": "27.61",
+         "fee_ccy": "0.00", "exchange_rate": "35.9775", "total_buy_thb": "993.34"},
+    ]
+
+@pytest.fixture
+def sample_streaming_rows():
+    return [
+        {"type": "BUY", "share_name": "PTT", "unit": 100, "unit_price": 34.5,
+         "net_amount": 3455.8, "trading_date": "30/09/2022"},
+    ]

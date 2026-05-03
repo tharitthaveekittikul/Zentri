@@ -15,6 +15,9 @@ class ImportTemplateOut(BaseModel):
     asset_type_rules: list
     asset_type_fallback: str
     currency_default: str
+    value_transforms: dict
+    derived_fields: dict
+    defaults: dict
     updated_at: datetime
 
     model_config = {"from_attributes": True}

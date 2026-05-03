@@ -54,6 +54,9 @@ async def analyze_file(
                 "asset_type_rules": existing_template.asset_type_rules,
                 "asset_type_fallback": existing_template.asset_type_fallback,
                 "currency_default": existing_template.currency_default,
+                "value_transforms": existing_template.value_transforms,
+                "derived_fields": existing_template.derived_fields,
+                "defaults": existing_template.defaults,
             }
             preview = pipeline_svc.apply_template(structure["all_rows"], tmpl_dict)
     else:
@@ -66,6 +69,9 @@ async def analyze_file(
                 "asset_type_rules": existing_template.asset_type_rules,
                 "asset_type_fallback": existing_template.asset_type_fallback,
                 "currency_default": existing_template.currency_default,
+                "value_transforms": existing_template.value_transforms,
+                "derived_fields": existing_template.derived_fields,
+                "defaults": existing_template.defaults,
             }
             preview = pipeline_svc.apply_template(structure["all_rows"], tmpl_dict)
         else:
@@ -110,6 +116,7 @@ async def generate_template(
         db, current_user.id, platform_id, template_data, file_format, template_data.get("json_path", json_path), signature
     )
     preview = pipeline_svc.apply_template(structure["all_rows"], template_data)
+    preview = await pipeline_svc.enrich_exchange_rates(db, preview)
     logger.info("Template generated via LLM: platform=%s user=%s", platform_id, current_user.id)
     return {"template": ImportTemplateOut.model_validate(tmpl), "preview_rows": preview}
 
@@ -211,3 +218,24 @@ async def confirm_import(
     await db.commit()
     logger.info("Import confirm: imported=%d errors=%d user=%s", imported, len(errors), current_user.id)
     return {"imported": imported, "errors": errors}
+
+
+@router.delete("/template/{platform_id}", status_code=204)
+async def delete_template(
+    platform_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    from app.models.import_template import ImportTemplate
+    result = await db.execute(
+        select(ImportTemplate).where(
+            ImportTemplate.platform_id == platform_id,
+            ImportTemplate.user_id == current_user.id,
+        )
+    )
+    tmpl = result.scalar_one_or_none()
+    if tmpl is None:
+        raise HTTPException(status_code=404, detail="Template not found")
+    await db.delete(tmpl)
+    await db.commit()
+    logger.info("ImportTemplate deleted (re-map): platform=%s user=%s", platform_id, current_user.id)

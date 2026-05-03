@@ -11,9 +11,12 @@ from app.models.price import Price  # noqa: F401
 from app.models.provider_config import ProviderConfig  # noqa: F401
 from app.models.transaction import Transaction  # noqa: F401
 from app.models.user import User  # noqa: F401
+from app.models.llm_call_log import LLMCallLog  # noqa: F401
+from app.models.exchange_rate_cache import ExchangeRateCache  # noqa: F401
 
 __all__ = [
     "User", "Asset", "Platform", "Holding", "Transaction", "ImportProfile",
     "Price", "PipelineLog", "Benchmark", "BenchmarkPrice",
     "ProviderConfig", "FeatureLLMConfig", "CashBalance", "ImportTemplate",
+    "LLMCallLog", "ExchangeRateCache",
 ]
