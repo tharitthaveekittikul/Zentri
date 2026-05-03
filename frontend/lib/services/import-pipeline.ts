@@ -42,6 +42,16 @@ export async function analyzeFile(file: File): Promise<AnalyzeResponse> {
   return r.json();
 }
 
+export class LLMQuotaError extends Error {
+  provider: string;
+  billingUrl: string;
+  constructor(message: string, provider: string, billingUrl: string) {
+    super(message);
+    this.provider = provider;
+    this.billingUrl = billingUrl;
+  }
+}
+
 export async function generateTemplate(
   platform_id: string,
   file: File,
@@ -58,6 +68,10 @@ export async function generateTemplate(
     },
     body: form,
   });
+  if (r.status === 402) {
+    const body = await r.json();
+    throw new LLMQuotaError(body.detail.message, body.detail.provider, body.detail.billing_url);
+  }
   if (!r.ok) throw new Error("Failed to generate template");
   return r.json();
 }

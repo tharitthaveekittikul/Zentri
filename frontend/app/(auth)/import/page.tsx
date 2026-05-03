@@ -8,6 +8,7 @@ import { fetchPlatforms, createPlatform } from "@/lib/services/platforms";
 import {
   analyzeFile,
   generateTemplate,
+  LLMQuotaError,
   confirmImportPipeline,
   type AnalyzeResponse,
 } from "@/lib/services/import-pipeline";
@@ -90,8 +91,18 @@ export default function ImportPage() {
       setPreviewRows(result.preview_rows);
       setStep("review");
       toast.success("Template generated successfully.");
-    } catch {
-      toast.error("Failed to generate template.");
+    } catch (err) {
+      if (err instanceof LLMQuotaError) {
+        toast.error(`${err.provider} credits exhausted.`, {
+          description: "Your prepayment balance is depleted.",
+          action: {
+            label: "Recharge →",
+            onClick: () => window.open(err.billingUrl, "_blank"),
+          },
+        });
+      } else {
+        toast.error("Failed to generate template. Please try again.");
+      }
     } finally {
       setGenerating(false);
     }

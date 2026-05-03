@@ -41,5 +41,5 @@ class TemplateSaveRequest(BaseModel):
 
 
 class ConfirmImportRequest(BaseModel):
-    platform_id: uuid.UUID
+    platform_id: uuid.UUID | None = None
     rows: list[dict]  # normalized canonical rows after user review

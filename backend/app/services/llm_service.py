@@ -5,6 +5,14 @@ from app.core.logging import get_logger
 
 logger = get_logger(__name__)
 
+
+class LLMQuotaExceededError(Exception):
+    def __init__(self, provider: str, billing_url: str):
+        self.provider = provider
+        self.billing_url = billing_url
+        super().__init__(f"{provider} credits exhausted. Recharge at: {billing_url}")
+
+
 PRICING: dict[str, tuple[float, float]] = {
     "claude-sonnet-4-6":         (3.0,   15.0),
     "claude-opus-4-7":           (15.0,  75.0),

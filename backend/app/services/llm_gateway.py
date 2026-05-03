@@ -91,11 +91,21 @@ class AnthropicAdapter(LLMAdapter):
         self._client = anthropic.AsyncAnthropic(api_key=api_key)
 
     async def complete(self, system: str, human: str, model: str) -> LLMResponse:
-        msg = await self._client.messages.create(
-            model=model, max_tokens=2048,
-            system=system,
-            messages=[{"role": "user", "content": human}],
-        )
+        from app.services.llm_service import LLMQuotaExceededError
+        try:
+            msg = await self._client.messages.create(
+                model=model, max_tokens=2048,
+                system=system,
+                messages=[{"role": "user", "content": human}],
+            )
+        except Exception as exc:
+            try:
+                import anthropic
+                if isinstance(exc, anthropic.RateLimitError):
+                    raise LLMQuotaExceededError("anthropic", "https://console.anthropic.com/settings/billing") from exc
+            except ImportError:
+                pass
+            raise
         tokens_in = msg.usage.input_tokens
         tokens_out = msg.usage.output_tokens
         cost_usd = calc_cost(model, tokens_in, tokens_out)
@@ -113,10 +123,20 @@ class OpenAIAdapter(LLMAdapter):
         self._client = AsyncOpenAI(api_key=api_key, base_url=base_url)
 
     async def complete(self, system: str, human: str, model: str) -> LLMResponse:
-        resp = await self._client.chat.completions.create(
-            model=model,
-            messages=[{"role": "system", "content": system}, {"role": "user", "content": human}],
-        )
+        from app.services.llm_service import LLMQuotaExceededError
+        try:
+            resp = await self._client.chat.completions.create(
+                model=model,
+                messages=[{"role": "system", "content": system}, {"role": "user", "content": human}],
+            )
+        except Exception as exc:
+            try:
+                import openai
+                if isinstance(exc, openai.RateLimitError):
+                    raise LLMQuotaExceededError("openai", "https://platform.openai.com/settings/organization/billing") from exc
+            except ImportError:
+                pass
+            raise
         tokens_in = resp.usage.prompt_tokens
         tokens_out = resp.usage.completion_tokens
         cost_usd = calc_cost(model, tokens_in, tokens_out)
@@ -136,8 +156,18 @@ class GeminiAdapter(LLMAdapter):
 
     async def complete(self, system: str, human: str, model: str) -> LLMResponse:
         import asyncio
+        from app.services.llm_service import LLMQuotaExceededError
         m = self._genai.GenerativeModel(model_name=model, system_instruction=system)
-        response = await asyncio.to_thread(m.generate_content, human)
+        try:
+            response = await asyncio.to_thread(m.generate_content, human)
+        except Exception as exc:
+            try:
+                from google.api_core.exceptions import ResourceExhausted
+                if isinstance(exc, ResourceExhausted):
+                    raise LLMQuotaExceededError("gemini", "https://aistudio.google.com/billing") from exc
+            except ImportError:
+                pass
+            raise
         tokens_in = response.usage_metadata.prompt_token_count if response.usage_metadata else 0
         tokens_out = response.usage_metadata.candidates_token_count if response.usage_metadata else 0
         cost_usd = calc_cost(model, tokens_in, tokens_out)

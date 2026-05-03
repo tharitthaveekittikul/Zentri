@@ -51,6 +51,11 @@ async def update_platform(
 
 
 async def delete_platform(db: AsyncSession, platform: Platform) -> None:
+    from sqlalchemy import delete as sa_delete
+    from app.models.import_template import ImportTemplate
+    await db.execute(
+        sa_delete(ImportTemplate).where(ImportTemplate.platform_id == platform.id)
+    )
     logger.info("Platform deleted: id=%s name=%s", platform.id, platform.name)
     await db.delete(platform)
     await db.commit()

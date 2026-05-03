@@ -5,7 +5,8 @@ from app.services.llm_service import (
     OllamaProvider,
     OpenAIProvider,
     LLMResponse,
-    _calc_cost,
+    LLMQuotaExceededError,
+    calc_cost as _calc_cost,
 )
 
 
@@ -67,3 +68,64 @@ async def test_claude_provider_complete():
     assert result.content == "BUY signal"
     assert result.tokens_in == 500
     assert result.cost_usd > 0
+
+
+def test_llm_quota_exceeded_error_has_provider_and_url():
+    err = LLMQuotaExceededError("gemini", "https://aistudio.google.com/billing")
+    assert err.provider == "gemini"
+    assert err.billing_url == "https://aistudio.google.com/billing"
+    assert "gemini" in str(err)
+
+
+@pytest.mark.asyncio
+async def test_gemini_adapter_raises_quota_exceeded_on_resource_exhausted():
+    from app.services.llm_gateway import GeminiAdapter
+    adapter = GeminiAdapter.__new__(GeminiAdapter)
+    mock_genai = MagicMock()
+    mock_model = MagicMock()
+    mock_genai.GenerativeModel.return_value = mock_model
+    adapter._genai = mock_genai
+
+    from google.api_core.exceptions import ResourceExhausted
+
+    async def raise_exhausted(*args, **kwargs):
+        raise ResourceExhausted("Your prepayment credits are depleted.")
+
+    with patch("asyncio.to_thread", side_effect=raise_exhausted):
+        with pytest.raises(LLMQuotaExceededError) as exc_info:
+            await adapter.complete("sys", "human", "gemini-2.0-flash")
+    assert exc_info.value.provider == "gemini"
+
+
+@pytest.mark.asyncio
+async def test_openai_adapter_raises_quota_exceeded_on_rate_limit():
+    from app.services.llm_gateway import OpenAIAdapter
+    import openai
+
+    adapter = OpenAIAdapter.__new__(OpenAIAdapter)
+    mock_client = AsyncMock()
+    mock_client.chat.completions.create.side_effect = openai.RateLimitError(
+        "Rate limit exceeded", response=MagicMock(status_code=429), body={}
+    )
+    adapter._client = mock_client
+
+    with pytest.raises(LLMQuotaExceededError) as exc_info:
+        await adapter.complete("sys", "human", "gpt-4o")
+    assert exc_info.value.provider == "openai"
+
+
+@pytest.mark.asyncio
+async def test_anthropic_adapter_raises_quota_exceeded_on_rate_limit():
+    from app.services.llm_gateway import AnthropicAdapter
+    import anthropic
+
+    adapter = AnthropicAdapter.__new__(AnthropicAdapter)
+    mock_client = AsyncMock()
+    mock_client.messages.create.side_effect = anthropic.RateLimitError(
+        message="Rate limit exceeded", response=MagicMock(status_code=429), body={}
+    )
+    adapter._client = mock_client
+
+    with pytest.raises(LLMQuotaExceededError) as exc_info:
+        await adapter.complete("sys", "human", "claude-sonnet-4-6")
+    assert exc_info.value.provider == "anthropic"

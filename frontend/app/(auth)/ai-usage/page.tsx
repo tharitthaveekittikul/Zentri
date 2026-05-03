@@ -17,6 +17,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import {
   Bar,
   BarChart,
@@ -26,6 +34,7 @@ import {
   YAxis,
 } from "recharts";
 import { api } from "@/lib/api";
+import { toast } from "sonner";
 
 interface Summary {
   total_cost_usd: number;
@@ -46,6 +55,23 @@ interface Analysis {
   asset_id: string;
 }
 
+interface CallLog {
+  id: string;
+  feature_key: string;
+  provider: string;
+  model: string;
+  tokens_in: number;
+  tokens_out: number;
+  cost_usd: number;
+  cost_thb: number;
+  created_at: string;
+}
+
+interface CallLogDetail extends CallLog {
+  prompt_in: string;
+  response_out: string;
+}
+
 export default function AIUsagePage() {
   const [summary, setSummary] = useState<Summary | null>(null);
   const [logs, setLogs] = useState<Analysis[]>([]);
@@ -54,6 +80,25 @@ export default function AIUsagePage() {
     Record<string, { role: string; content: string }[]>
   >({});
   const [openRows, setOpenRows] = useState<Set<string>>(new Set());
+
+  const [callLogs, setCallLogs] = useState<CallLog[]>([]);
+  const [callLogDetail, setCallLogDetail] = useState<CallLogDetail | null>(null);
+  const [payloadOpen, setPayloadOpen] = useState(false);
+  const [loadingPayload, setLoadingPayload] = useState(false);
+  const [copiedPrompt, setCopiedPrompt] = useState(false);
+  const [copiedResponse, setCopiedResponse] = useState(false);
+
+  function copyToClipboard(text: string, type: "prompt" | "response") {
+    navigator.clipboard.writeText(text).then(() => {
+      if (type === "prompt") {
+        setCopiedPrompt(true);
+        setTimeout(() => setCopiedPrompt(false), 2000);
+      } else {
+        setCopiedResponse(true);
+        setTimeout(() => setCopiedResponse(false), 2000);
+      }
+    });
+  }
 
   async function load() {
     const summaryRes = await api.get("/api/v1/analysis/usage/summary");
@@ -66,8 +111,17 @@ export default function AIUsagePage() {
     if (logsRes.ok) setLogs(await logsRes.json());
   }
 
+  async function loadCallLogs() {
+    const r = await api.get("/api/v1/llm/call-logs?limit=100");
+    if (r.ok) {
+      const data = await r.json();
+      setCallLogs(data.logs ?? []);
+    }
+  }
+
   useEffect(() => {
     load();
+    loadCallLogs();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterProvider]);
 
@@ -86,6 +140,16 @@ export default function AIUsagePage() {
       }
     }
     setOpenRows(new Set(next));
+  }
+
+  async function viewPayload(logId: string) {
+    setPayloadOpen(true);
+    setLoadingPayload(true);
+    setCallLogDetail(null);
+    const r = await api.get(`/api/v1/llm/call-logs/${logId}`);
+    if (r.ok) setCallLogDetail(await r.json());
+    else toast.error("Failed to load payload");
+    setLoadingPayload(false);
   }
 
   const providers = summary
@@ -151,99 +215,207 @@ export default function AIUsagePage() {
         </>
       )}
 
-      <div className="flex items-center gap-3">
-        <Select
-          value={filterProvider}
-          onValueChange={(v) => setFilterProvider(v ?? "all")}
-        >
-          <SelectTrigger className="w-40">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {providers.map((p) => (
-              <SelectItem key={p} value={p}>
-                {p}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      <Tabs defaultValue="analyses">
+        <TabsList>
+          <TabsTrigger value="analyses">Analyses</TabsTrigger>
+          <TabsTrigger value="call-logs">LLM Call Logs</TabsTrigger>
+        </TabsList>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Verdict</TableHead>
-            <TableHead>Model</TableHead>
-            <TableHead>Tokens In</TableHead>
-            <TableHead>Tokens Out</TableHead>
-            <TableHead>Cost</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead />
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {logs.map((a) => (
-            <React.Fragment key={a.id}>
+        <TabsContent value="analyses" className="space-y-4 pt-2">
+          <div className="flex items-center gap-3">
+            <Select
+              value={filterProvider}
+              onValueChange={(v) => setFilterProvider(v ?? "all")}
+            >
+              <SelectTrigger className="w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {providers.map((p) => (
+                  <SelectItem key={p} value={p}>
+                    {p}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell>
-                  <span
-                    className={
-                      a.verdict === "BUY"
-                        ? "text-green-500"
-                        : a.verdict === "SELL"
-                          ? "text-red-500"
-                          : "text-yellow-500"
-                    }
-                  >
-                    {a.verdict}
-                  </span>
-                </TableCell>
-                <TableCell className="text-sm">{a.model}</TableCell>
-                <TableCell>{a.tokens_in.toLocaleString()}</TableCell>
-                <TableCell>{a.tokens_out.toLocaleString()}</TableCell>
-                <TableCell>${a.cost_usd.toFixed(6)}</TableCell>
-                <TableCell className="text-sm text-muted-foreground">
-                  {new Date(a.created_at).toLocaleDateString()}
-                </TableCell>
-                <TableCell>
-                  <button
-                    className="text-xs text-muted-foreground underline"
-                    onClick={() => toggleConversation(a.id)}
-                  >
-                    {openRows.has(a.id) ? "Hide" : "View"} log
-                  </button>
-                </TableCell>
+                <TableHead>Verdict</TableHead>
+                <TableHead>Model</TableHead>
+                <TableHead>Tokens In</TableHead>
+                <TableHead>Tokens Out</TableHead>
+                <TableHead>Cost</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead />
               </TableRow>
-              {openRows.has(a.id) && (
-                <TableRow key={`${a.id}-conv`}>
-                  <TableCell colSpan={7}>
-                    <div className="space-y-1 max-h-48 overflow-y-auto py-1">
-                      {(conversations[a.id] ?? []).map((m, i) => (
-                        <div key={i} className="text-xs bg-muted rounded p-2">
-                          <span className="font-semibold capitalize">
-                            {m.role}:{" "}
-                          </span>
-                          {m.content}
+            </TableHeader>
+            <TableBody>
+              {logs.map((a) => (
+                <React.Fragment key={a.id}>
+                  <TableRow>
+                    <TableCell>
+                      <span
+                        className={
+                          a.verdict === "BUY"
+                            ? "text-green-500"
+                            : a.verdict === "SELL"
+                              ? "text-red-500"
+                              : "text-yellow-500"
+                        }
+                      >
+                        {a.verdict}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-sm">{a.model}</TableCell>
+                    <TableCell>{a.tokens_in.toLocaleString()}</TableCell>
+                    <TableCell>{a.tokens_out.toLocaleString()}</TableCell>
+                    <TableCell>${a.cost_usd.toFixed(6)}</TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {new Date(a.created_at).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>
+                      <button
+                        className="text-xs text-muted-foreground underline"
+                        onClick={() => toggleConversation(a.id)}
+                      >
+                        {openRows.has(a.id) ? "Hide" : "View"} log
+                      </button>
+                    </TableCell>
+                  </TableRow>
+                  {openRows.has(a.id) && (
+                    <TableRow key={`${a.id}-conv`}>
+                      <TableCell colSpan={7}>
+                        <div className="space-y-1 max-h-48 overflow-y-auto py-1">
+                          {(conversations[a.id] ?? []).map((m, i) => (
+                            <div key={i} className="text-xs bg-muted rounded p-2">
+                              <span className="font-semibold capitalize">
+                                {m.role}:{" "}
+                              </span>
+                              {m.content}
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </React.Fragment>
+              ))}
+              {logs.length === 0 && (
+                <TableRow>
+                  <TableCell
+                    colSpan={7}
+                    className="text-center text-muted-foreground py-8"
+                  >
+                    No analyses yet.
                   </TableCell>
                 </TableRow>
               )}
-            </React.Fragment>
-          ))}
-          {logs.length === 0 && (
-            <TableRow>
-              <TableCell
-                colSpan={7}
-                className="text-center text-muted-foreground py-8"
-              >
-                No analyses yet.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+            </TableBody>
+          </Table>
+        </TabsContent>
+
+        <TabsContent value="call-logs" className="pt-2">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Feature</TableHead>
+                <TableHead>Provider</TableHead>
+                <TableHead>Model</TableHead>
+                <TableHead>Tokens In</TableHead>
+                <TableHead>Tokens Out</TableHead>
+                <TableHead>Cost (USD)</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead />
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {callLogs.map((log) => (
+                <TableRow key={log.id}>
+                  <TableCell className="text-sm">{log.feature_key}</TableCell>
+                  <TableCell className="text-sm">{log.provider}</TableCell>
+                  <TableCell className="text-sm">{log.model}</TableCell>
+                  <TableCell>{log.tokens_in.toLocaleString()}</TableCell>
+                  <TableCell>{log.tokens_out.toLocaleString()}</TableCell>
+                  <TableCell>${log.cost_usd.toFixed(6)}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">
+                    {new Date(log.created_at).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>
+                    <button
+                      className="text-xs text-muted-foreground underline"
+                      onClick={() => viewPayload(log.id)}
+                    >
+                      View payload
+                    </button>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {callLogs.length === 0 && (
+                <TableRow>
+                  <TableCell
+                    colSpan={8}
+                    className="text-center text-muted-foreground py-8"
+                  >
+                    No LLM calls yet.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TabsContent>
+      </Tabs>
+
+      <Dialog open={payloadOpen} onOpenChange={setPayloadOpen}>
+        <DialogContent className="max-w-5xl w-[90vw] max-h-[90vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>LLM Payload</DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto pr-1">
+            {loadingPayload && (
+              <p className="text-sm text-muted-foreground">Loading…</p>
+            )}
+            {callLogDetail && (
+              <div className="space-y-4 text-sm">
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="font-semibold">Input Prompt</p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-7 text-xs px-2"
+                      onClick={() => copyToClipboard(callLogDetail.prompt_in, "prompt")}
+                    >
+                      {copiedPrompt ? "✓ Copied" : "Copy"}
+                    </Button>
+                  </div>
+                  <pre className="bg-muted rounded p-3 whitespace-pre-wrap text-xs overflow-x-auto max-h-[35vh]">
+                    {callLogDetail.prompt_in}
+                  </pre>
+                </div>
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="font-semibold">Output Response</p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-7 text-xs px-2"
+                      onClick={() => copyToClipboard(callLogDetail.response_out, "response")}
+                    >
+                      {copiedResponse ? "✓ Copied" : "Copy"}
+                    </Button>
+                  </div>
+                  <pre className="bg-muted rounded p-3 whitespace-pre-wrap text-xs overflow-x-auto max-h-[35vh]">
+                    {callLogDetail.response_out}
+                  </pre>
+                </div>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

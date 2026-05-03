@@ -75,3 +75,34 @@ async def get_call_logs(
             for log in logs
         ],
     }
+
+
+@router.get("/call-logs/{log_id}")
+async def get_call_log_detail(
+    log_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    result = await db.execute(
+        select(LLMCallLog).where(
+            LLMCallLog.id == log_id,
+            LLMCallLog.user_id == current_user.id,
+        )
+    )
+    log = result.scalar_one_or_none()
+    if log is None:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Log not found")
+    return {
+        "id": str(log.id),
+        "feature_key": log.feature_key,
+        "provider": log.provider,
+        "model": log.model,
+        "tokens_in": log.tokens_in,
+        "tokens_out": log.tokens_out,
+        "cost_usd": float(log.cost_usd),
+        "cost_thb": float(log.cost_thb),
+        "created_at": log.created_at.isoformat(),
+        "prompt_in": log.prompt_in,
+        "response_out": log.response_out,
+    }

@@ -108,8 +108,16 @@ async def generate_template(
 
     try:
         template_data = await pipeline_svc.generate_template_via_llm(db, current_user.id, file_format, structure)
-    except ValueError as exc:
-        raise HTTPException(status_code=424, detail=str(exc))
+    except Exception as exc:
+        from app.services.llm_service import LLMQuotaExceededError
+        if isinstance(exc, LLMQuotaExceededError):
+            raise HTTPException(
+                status_code=402,
+                detail={"message": str(exc), "provider": exc.provider, "billing_url": exc.billing_url},
+            )
+        if isinstance(exc, ValueError):
+            raise HTTPException(status_code=424, detail=str(exc))
+        raise
 
     signature = pipeline_svc.compute_signature(structure["headers"])
     tmpl = await pipeline_svc.save_template(
@@ -159,10 +167,10 @@ async def confirm_import(
             currency = row.get("currency", "THB")
 
             tx_type = row.get("type", "buy").lower()
-            quantity = Decimal(str(row.get("units", row.get("quantity", 0))))
+            quantity = Decimal(str(row.get("unit", row.get("units", row.get("quantity", 0)))))
             price = Decimal(str(row.get("price", 0)))
             fee = Decimal(str(row.get("fee_thb", row.get("fee", 0)) or 0))
-            raw_date = row.get("date", "")
+            raw_date = row.get("trade_date", row.get("date", ""))
             if raw_date:
                 try:
                     executed_at = datetime.fromisoformat(raw_date).replace(tzinfo=timezone.utc)

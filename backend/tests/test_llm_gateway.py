@@ -21,3 +21,10 @@ def test_human_prompt_classifier_has_placeholders():
     assert "{symbol}" in prompt
     assert "{exchange}" in prompt
     assert "{currency}" in prompt
+
+
+@pytest.mark.asyncio
+async def test_get_call_log_detail_404_for_unknown_id(auth_client):
+    fake_id = "00000000-0000-0000-0000-000000000000"
+    r = await auth_client.get(f"/api/v1/llm/call-logs/{fake_id}")
+    assert r.status_code == 404

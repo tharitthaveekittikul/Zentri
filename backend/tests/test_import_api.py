@@ -75,3 +75,27 @@ async def test_confirm_saves_platform_id_on_transactions(auth_client, db):
     txs = result.scalars().all()
     assert len(txs) == 1
     assert str(txs[0].platform_id) == pid
+
+
+@pytest.mark.asyncio
+async def test_confirm_import_uses_canonical_unit_and_trade_date(auth_client):
+    rows = [
+        {
+            "symbol": "AAPL",
+            "asset_type": "us_stock",
+            "type": "BUY",
+            "unit": "10",
+            "price": "150.00",
+            "currency": "USD",
+            "trade_date": "2026-01-15",
+            "fee": "0",
+        }
+    ]
+    r = await auth_client.post(
+        "/api/v1/import/confirm",
+        json={"platform_id": None, "rows": rows},
+    )
+    assert r.status_code == 200
+    data = r.json()
+    assert data["imported"] == 1
+    assert data["errors"] == []
