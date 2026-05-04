@@ -86,5 +86,11 @@ def apply_template(rows: list[dict], template: dict) -> list[dict]:
                 normalized[k] = v
 
         normalized["asset_type"] = _classify_row_asset_type(raw, asset_type_rules, fallback)
+
+        # Guarantee every canonical field is present (null if not mapped/derived)
+        for k in CANONICAL_FIELDS:
+            if k not in normalized:
+                normalized[k] = None
+
         result.append(normalized)
     return result

@@ -11,6 +11,7 @@ from app.api.deps import get_current_user
 from app.core.database import get_db
 from app.core.logging import get_logger
 from app.models.asset import Asset
+from app.models.holding import Holding
 from app.models.platform import Platform
 from app.models.transaction import Transaction
 from app.models.user import User
@@ -32,8 +33,8 @@ async def analyze_file(
 ):
     content = await file.read()
     file_format = pipeline_svc.detect_file_format(file.filename or "", content)
-    json_path = None
-    structure = pipeline_svc.extract_structure(file_format, content, json_path)
+    # Extract outer structure (no json_path) so headers match the stored column_signature
+    structure = pipeline_svc.extract_structure(file_format, content, None)
     signature = pipeline_svc.compute_signature(structure["headers"])
 
     matched_platform_id: uuid.UUID | None = None
@@ -58,7 +59,9 @@ async def analyze_file(
                 "derived_fields": existing_template.derived_fields,
                 "defaults": existing_template.defaults,
             }
-            preview = pipeline_svc.apply_template(structure["all_rows"], tmpl_dict)
+            # Use saved json_path to get flat rows for preview
+            flat = pipeline_svc.extract_structure(file_format, content, existing_template.json_path)
+            preview = pipeline_svc.apply_template(flat["all_rows"], tmpl_dict)
     else:
         existing_template = await pipeline_svc.get_template_by_signature(db, current_user.id, signature)
         if existing_template:
@@ -73,7 +76,9 @@ async def analyze_file(
                 "derived_fields": existing_template.derived_fields,
                 "defaults": existing_template.defaults,
             }
-            preview = pipeline_svc.apply_template(structure["all_rows"], tmpl_dict)
+            # Use saved json_path to get flat rows for preview
+            flat = pipeline_svc.extract_structure(file_format, content, existing_template.json_path)
+            preview = pipeline_svc.apply_template(flat["all_rows"], tmpl_dict)
         else:
             status = "new"
             preview = None
@@ -104,10 +109,19 @@ async def generate_template(
     file_format = pipeline_svc.detect_file_format(file.filename or "", content)
     existing = await pipeline_svc.get_template(db, current_user.id, platform_id)
     json_path = existing.json_path if existing else None
-    structure = pipeline_svc.extract_structure(file_format, content, json_path)
+
+    # Always pass outer structure (json_path=None) so LLM can detect the correct json_path
+    outer_structure = pipeline_svc.extract_structure(file_format, content, None)
+
+    # If json_path is already known (re-generate), also resolve flat rows so LLM sees propagated fields
+    if json_path:
+        flat_for_llm = pipeline_svc.extract_structure(file_format, content, json_path)
+        llm_structure = flat_for_llm
+    else:
+        llm_structure = outer_structure
 
     try:
-        template_data = await pipeline_svc.generate_template_via_llm(db, current_user.id, file_format, structure)
+        template_data = await pipeline_svc.generate_template_via_llm(db, current_user.id, file_format, llm_structure)
     except Exception as exc:
         from app.services.llm_service import LLMQuotaExceededError
         if isinstance(exc, LLMQuotaExceededError):
@@ -119,13 +133,17 @@ async def generate_template(
             raise HTTPException(status_code=424, detail=str(exc))
         raise
 
-    signature = pipeline_svc.compute_signature(structure["headers"])
+    # Signature always from outer headers (stable key regardless of json_path)
+    signature = pipeline_svc.compute_signature(outer_structure["headers"])
+    effective_json_path = template_data.get("json_path") or json_path
     tmpl = await pipeline_svc.save_template(
-        db, current_user.id, platform_id, template_data, file_format, template_data.get("json_path", json_path), signature
+        db, current_user.id, platform_id, template_data, file_format, effective_json_path, signature
     )
-    preview = pipeline_svc.apply_template(structure["all_rows"], template_data)
+    # Extract flat rows using the resolved json_path for the preview
+    flat_structure = pipeline_svc.extract_structure(file_format, content, effective_json_path)
+    preview = pipeline_svc.apply_template(flat_structure["all_rows"], template_data)
     preview = await pipeline_svc.enrich_exchange_rates(db, preview)
-    logger.info("Template generated via LLM: platform=%s user=%s", platform_id, current_user.id)
+    logger.info("Template generated via LLM: platform=%s user=%s effective_json_path=%s", platform_id, current_user.id, effective_json_path)
     return {"template": ImportTemplateOut.model_validate(tmpl), "preview_rows": preview}
 
 
@@ -219,6 +237,69 @@ async def confirm_import(
                 )
                 db.add(tx)
                 await db.flush()
+
+                # Upsert holding so portfolio reflects the import
+                holding_result = await db.execute(
+                    select(Holding).where(
+                        Holding.asset_id == asset.id,
+                        Holding.user_id == current_user.id,
+                    )
+                )
+                holding = holding_result.scalar_one_or_none()
+
+                if tx_type == "buy":
+                    if holding is None:
+                        holding = Holding(
+                            id=uuid.uuid4(),
+                            user_id=current_user.id,
+                            asset_id=asset.id,
+                            quantity=quantity,
+                            avg_cost_price=price,
+                            currency=currency,
+                            updated_at=datetime.now(timezone.utc),
+                        )
+                        db.add(holding)
+                    else:
+                        # Weighted average cost
+                        total_qty = holding.quantity + quantity
+                        if total_qty > 0:
+                            holding.avg_cost_price = (
+                                holding.quantity * holding.avg_cost_price + quantity * price
+                            ) / total_qty
+                        holding.quantity = total_qty
+                        holding.updated_at = datetime.now(timezone.utc)
+
+                elif tx_type == "sell" and holding is not None:
+                    holding.quantity -= quantity
+                    holding.updated_at = datetime.now(timezone.utc)
+                    if holding.quantity <= 0:
+                        await db.delete(holding)
+
+                elif tx_type == "reward":
+                    # Bonus shares / staking rewards — add units at zero cost basis
+                    if holding is None:
+                        holding = Holding(
+                            id=uuid.uuid4(),
+                            user_id=current_user.id,
+                            asset_id=asset.id,
+                            quantity=quantity,
+                            avg_cost_price=Decimal("0"),
+                            currency=currency,
+                            updated_at=datetime.now(timezone.utc),
+                        )
+                        db.add(holding)
+                    else:
+                        # Keep existing avg cost, just add the free units
+                        holding.quantity += quantity
+                        holding.updated_at = datetime.now(timezone.utc)
+
+                # dividend, fee, transfer — transaction recorded but no holding adjustment
+                # dividend: cash payout doesn't change unit count
+                # fee:      cost recorded on transaction only
+                # transfer: movement between platforms, net position unchanged
+
+                await db.flush()
+
             imported += 1
         except Exception as exc:
             errors.append({"row": row, "error": str(exc)})

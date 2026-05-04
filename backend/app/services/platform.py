@@ -51,11 +51,22 @@ async def update_platform(
 
 
 async def delete_platform(db: AsyncSession, platform: Platform) -> None:
-    from sqlalchemy import delete as sa_delete
+    from sqlalchemy import delete as sa_delete, update as sa_update
     from app.models.import_template import ImportTemplate
+    from app.models.transaction import Transaction
+
+    # Null out FK on transactions that reference this platform (column is nullable)
+    await db.execute(
+        sa_update(Transaction)
+        .where(Transaction.platform_id == platform.id)
+        .values(platform_id=None)
+    )
+
+    # Remove any import templates tied to this platform
     await db.execute(
         sa_delete(ImportTemplate).where(ImportTemplate.platform_id == platform.id)
     )
+
     logger.info("Platform deleted: id=%s name=%s", platform.id, platform.name)
     await db.delete(platform)
     await db.commit()

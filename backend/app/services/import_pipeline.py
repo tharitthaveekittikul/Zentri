@@ -33,21 +33,39 @@ def detect_file_format(filename: str, content: bytes) -> str:
 
 
 def _resolve_json_path(data: Any, path: str) -> list[dict]:
-    """Resolve a dotted path like '[].transactions[]' into a flat list of dicts."""
+    """Resolve a dotted path like '[].transactions[]' into a flat list of dicts.
+
+    Parent-level scalar fields (e.g. trading_date, account_no) are merged
+    into each child row so they are available for field_map mapping.
+    """
     items = data if isinstance(data, list) else [data]
-    for part in path.split("."):
-        part = part.strip("[]")
-        if not part:
-            continue
-        next_items: list[dict] = []
+    parts = [p.strip("[]") for p in path.split(".") if p.strip("[]")]
+
+    def _extract(items: list, parts: list, parent_ctx: dict) -> list[dict]:
+        if not parts:
+            # Leaf: merge parent context into each item
+            result = []
+            for item in items:
+                if isinstance(item, dict):
+                    merged = {**parent_ctx, **item}  # item fields win
+                    result.append(merged)
+            return result
+
+        key = parts[0]
+        rest = parts[1:]
+        result = []
         for item in items:
-            val = item.get(part, [])
-            if isinstance(val, list):
-                next_items.extend(val)
-            elif isinstance(val, dict):
-                next_items.append(val)
-        items = next_items
-    return items
+            if not isinstance(item, dict):
+                continue
+            # Collect scalar parent fields to propagate down
+            ctx = {k: v for k, v in item.items() if not isinstance(v, (dict, list))}
+            ctx.update(parent_ctx)  # grandparent ctx has lower priority
+            val = item.get(key, [])
+            children = val if isinstance(val, list) else [val] if isinstance(val, dict) else []
+            result.extend(_extract(children, rest, ctx))
+        return result
+
+    return _extract(items, parts, {})
 
 
 def extract_structure(file_format: str, content: bytes, json_path: str | None) -> dict:
