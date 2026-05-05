@@ -62,3 +62,15 @@ export async function fetchAssetHistory(symbol: string, range: string): Promise<
   if (!res.ok) throw new Error("Failed to fetch asset history");
   return res.json();
 }
+
+export interface NetWorthPoint {
+  date: string;
+  value_usd: string;
+  cost_usd: string;
+}
+
+export async function fetchNetWorthTimeline(range: string): Promise<NetWorthPoint[]> {
+  const res = await api.get(`/api/v1/overview/net-worth?range=${range}`);
+  if (!res.ok) throw new Error("Failed to fetch net worth timeline");
+  return res.json();
+}

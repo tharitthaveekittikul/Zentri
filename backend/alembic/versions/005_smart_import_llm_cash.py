@@ -84,9 +84,10 @@ def upgrade() -> None:
     op.create_index("ix_import_templates_platform_id", "import_templates", ["platform_id"])
     op.create_index("ix_import_templates_user_id", "import_templates", ["user_id"])
 
-    op.add_column(
-        "transactions",
-        sa.Column("platform_id", UUID(as_uuid=True), sa.ForeignKey("platforms.id"), nullable=True),
+    # platform_id already exists on transactions (added in migration 002 CREATE TABLE).
+    # Use IF NOT EXISTS to be idempotent on fresh DBs and existing DBs alike.
+    op.execute(
+        "ALTER TABLE transactions ADD COLUMN IF NOT EXISTS platform_id UUID REFERENCES platforms(id)"
     )
 
 

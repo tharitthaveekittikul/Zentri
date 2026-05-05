@@ -10,10 +10,11 @@ from app.models.transaction import Transaction  # noqa: F401
 from app.models.user import User  # noqa: F401
 from app.models.llm_call_log import LLMCallLog  # noqa: F401
 from app.models.exchange_rate_cache import ExchangeRateCache  # noqa: F401
+from app.models.net_worth_snapshot import NetWorthSnapshot  # noqa: F401
 
 __all__ = [
     "User", "Asset", "Holding", "Transaction",
     "Price", "PipelineLog", "Benchmark", "BenchmarkPrice",
     "ProviderConfig", "FeatureLLMConfig", "CashBalance",
-    "LLMCallLog", "ExchangeRateCache",
+    "LLMCallLog", "ExchangeRateCache", "NetWorthSnapshot",
 ]

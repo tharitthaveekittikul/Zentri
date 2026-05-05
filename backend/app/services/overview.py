@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone, date
 from decimal import Decimal
 
 from sqlalchemy import select
@@ -10,6 +10,7 @@ from app.models.asset import Asset
 from app.models.cash_balance import CashBalance
 from app.models.holding import Holding
 from app.models.price import Price
+from app.models.net_worth_snapshot import NetWorthSnapshot
 
 logger = get_logger(__name__)
 
@@ -154,3 +155,30 @@ async def get_performance(db: AsyncSession, user_id: uuid.UUID, range_: str) -> 
 
     logger.info("Performance: user=%s range=%s points=%d", user_id, range_, len(portfolio_series))
     return {"portfolio": normalize(portfolio_series), "benchmark": normalize(benchmark_series)}
+
+
+def _net_worth_range_start(range_: str) -> date | None:
+    from datetime import date as date_type
+    today = date_type.today()
+    ranges = {"1M": 30, "3M": 90, "6M": 180, "1Y": 365}
+    days = ranges.get(range_)
+    if days is None:
+        return None
+    return today - timedelta(days=days)
+
+
+async def get_net_worth_timeline(
+    db: AsyncSession, user_id: uuid.UUID, range_: str
+) -> list[dict]:
+    stmt = select(NetWorthSnapshot).where(NetWorthSnapshot.user_id == user_id)
+    start = _net_worth_range_start(range_)
+    if start is not None:
+        stmt = stmt.where(NetWorthSnapshot.snapshot_date >= start)
+    stmt = stmt.order_by(NetWorthSnapshot.snapshot_date.asc())
+
+    rows = list((await db.execute(stmt)).scalars().all())
+    logger.info("net_worth_timeline user=%s range=%s points=%d", user_id, range_, len(rows))
+    return [
+        {"date": r.snapshot_date, "value_usd": r.total_value_usd, "cost_usd": r.total_cost_usd}
+        for r in rows
+    ]

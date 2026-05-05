@@ -27,3 +27,9 @@ class PerformancePoint(BaseModel):
 class PerformanceResponse(BaseModel):
     portfolio: list[PerformancePoint]
     benchmark: list[PerformancePoint]
+
+
+class NetWorthPoint(BaseModel):
+    date: date
+    value_usd: Decimal
+    cost_usd: Decimal

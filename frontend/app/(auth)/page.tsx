@@ -8,6 +8,7 @@ import { PerformanceChart } from "@/components/overview/PerformanceChart";
 import { AllocationDonut } from "@/components/overview/AllocationDonut";
 import { HoldingsSnapshot, SnapshotHolding } from "@/components/overview/HoldingsSnapshot";
 import { Skeleton } from "@/components/ui/skeleton";
+import { NetWorthChart } from "@/components/net-worth-chart";
 
 export default function OverviewPage() {
   const { data: summary, isLoading: summaryLoading } = useQuery({
@@ -45,6 +46,8 @@ export default function OverviewPage() {
       ) : summary ? (
         <SummaryBar summary={summary} />
       ) : null}
+
+      <NetWorthChart privacyMode={false} />
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         <div className="lg:col-span-3 bg-card rounded-lg border p-4">
