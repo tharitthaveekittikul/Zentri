@@ -28,24 +28,51 @@ _ASSET_TYPE_ALIASES: dict[str, str] = {
 }
 
 
+def _to_decimal(val: Any) -> Decimal | None:
+    if val is None:
+        return None
+    s = re.sub(r"[^\d.\-]", "", str(val).strip())
+    try:
+        return Decimal(s) if s else None
+    except InvalidOperation:
+        return None
+
+
 def _eval_expression(expr: str, row: dict[str, Any]) -> Decimal | None:
     expr = expr.strip()
     for op_char, op_fn in _OPERATORS.items():
         if op_char in expr:
             left_key, right_key = expr.split(op_char, 1)
-            left_val = row.get(left_key.strip())
-            right_val = row.get(right_key.strip())
-            if left_val is None or right_val is None:
+            l = _to_decimal(row.get(left_key.strip()))
+            r = _to_decimal(row.get(right_key.strip()))
+            if l is None or r is None:
                 return None
             try:
-                l, r = Decimal(str(left_val)), Decimal(str(right_val))
                 if op_char == "/" and r == 0:
                     return None
                 return op_fn(l, r)
             except (InvalidOperation, ZeroDivisionError):
                 return None
-    val = row.get(expr)
-    return Decimal(str(val)) if val is not None else None
+    return _to_decimal(row.get(expr))
+
+
+def _normalize_date(value: Any) -> Any:
+    """Normalize trade_date to dd/mm/yyyy. Handles dd-mm-yyyy and yyyy-mm-dd."""
+    if not value:
+        return value
+    s = str(value).strip()
+    if re.match(r"^\d{2}/\d{2}/\d{4}$", s):
+        return s
+    m = re.match(r"^(\d{2})-(\d{2})-(\d{4})$", s)
+    if m:
+        return f"{m.group(1)}/{m.group(2)}/{m.group(3)}"
+    m = re.match(r"^(\d{4})-(\d{2})-(\d{2})$", s)
+    if m:
+        return f"{m.group(3)}/{m.group(2)}/{m.group(1)}"
+    m = re.match(r"^(\d{4})/(\d{2})/(\d{2})$", s)
+    if m:
+        return f"{m.group(3)}/{m.group(2)}/{m.group(1)}"
+    return s
 
 
 def _normalize_asset_type(value: str, fallback: str) -> str:
@@ -112,6 +139,13 @@ def apply_template(rows: list[dict], template: dict) -> list[dict]:
             if canonical_key in normalized:
                 val = str(normalized[canonical_key])
                 normalized[canonical_key] = transform_map.get(val, normalized[canonical_key])
+            else:
+                # LLM forgot to add the source column to field_map — scan raw row for a
+                # column whose value matches a key in the transform map and apply it.
+                for raw_col, raw_val in raw.items():
+                    if str(raw_val) in transform_map:
+                        normalized[canonical_key] = transform_map[str(raw_val)]
+                        break
 
         for dst_key, expr in derived_fields.items():
             if normalized.get(dst_key) is None:
@@ -121,7 +155,19 @@ def apply_template(rows: list[dict], template: dict) -> list[dict]:
             if normalized.get(k) is None:
                 normalized[k] = v
 
+        # Recover symbol: if LLM forgot to map it, find a column named like a ticker/fund code.
+        if not normalized.get("symbol"):
+            _SYMBOL_HINTS = ("code", "symbol", "ticker", "fund", "isin", "scrip")
+            for col, val in raw.items():
+                if any(h in col.lower() for h in _SYMBOL_HINTS) and val:
+                    normalized["symbol"] = val
+                    break
+
         normalized["asset_type"] = _classify_row_asset_type(raw, asset_type_rules, fallback)
+
+        # Normalize trade_date to dd/mm/yyyy
+        if "trade_date" in normalized:
+            normalized["trade_date"] = _normalize_date(normalized["trade_date"])
 
         # THB transactions: exchange_rate is 1 by definition
         if normalized.get("exchange_rate") is None and str(normalized.get("currency", "")).upper() == "THB":

@@ -154,6 +154,7 @@ async def add_manual_transaction(
             holding = Holding(
                 id=uuid.uuid4(), user_id=user_id, asset_id=asset.id,
                 quantity=quantity, avg_cost_price=price, currency=currency,
+                platform=platform, purchased_at=executed_at.date(),
                 updated_at=datetime.now(timezone.utc),
             )
             db.add(holding)
@@ -175,6 +176,7 @@ async def add_manual_transaction(
             holding = Holding(
                 id=uuid.uuid4(), user_id=user_id, asset_id=asset.id,
                 quantity=quantity, avg_cost_price=Decimal("0"), currency=currency,
+                platform=platform, purchased_at=executed_at.date(),
                 updated_at=datetime.now(timezone.utc),
             )
             db.add(holding)

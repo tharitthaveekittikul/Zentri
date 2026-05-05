@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { CanonicalRow } from "@/lib/services/import-pipeline";
 import { Input } from "@/components/ui/input";
 import {
@@ -11,7 +12,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-const REQUIRED_FIELDS = ["trade_date", "type", "symbol", "unit"] as const;
+const REQUIRED_FIELDS = ["trade_date", "type", "symbol", "unit", "price"] as const;
+const BULK_APPLY_FIELDS = ["type", "exchange", "platform"] as const;
 const VISIBLE_FIELDS = [
   "trade_date",
   "type",
@@ -36,11 +38,19 @@ interface Props {
 }
 
 export function ReviewTable({ rows, onChange }: Props) {
+  const [bulkValues, setBulkValues] = useState<Record<string, string>>({});
+
   function handleChange(rowIdx: number, field: string, value: string) {
     const updated = rows.map((r, i) =>
       i === rowIdx ? { ...r, [field]: value || null } : r
     );
     onChange(updated);
+  }
+
+  function applyBulk(field: string) {
+    const value = bulkValues[field]?.trim();
+    if (!value) return;
+    onChange(rows.map((r) => ({ ...r, [field]: value })));
   }
 
   function isMissing(row: CanonicalRow, field: string): boolean {
@@ -57,6 +67,25 @@ export function ReviewTable({ rows, onChange }: Props) {
               <TableHead key={f} className="whitespace-nowrap text-xs">
                 {f}
                 {(REQUIRED_FIELDS as readonly string[]).includes(f) ? " *" : ""}
+              </TableHead>
+            ))}
+          </TableRow>
+          <TableRow className="bg-muted/30 hover:bg-muted/30">
+            <TableHead className="text-center text-xs text-muted-foreground py-1">apply all</TableHead>
+            {VISIBLE_FIELDS.map((f) => (
+              <TableHead key={f} className="p-1">
+                {(BULK_APPLY_FIELDS as readonly string[]).includes(f) ? (
+                  <Input
+                    className="h-6 text-xs min-w-[80px]"
+                    placeholder="apply all…"
+                    value={bulkValues[f] ?? ""}
+                    onChange={(e) =>
+                      setBulkValues((prev) => ({ ...prev, [f]: e.target.value }))
+                    }
+                    onBlur={() => applyBulk(f)}
+                    onKeyDown={(e) => { if (e.key === "Enter") applyBulk(f); }}
+                  />
+                ) : null}
               </TableHead>
             ))}
           </TableRow>
