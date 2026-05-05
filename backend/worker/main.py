@@ -14,6 +14,7 @@ from worker.jobs.price_fetch import (
     job_fetch_prices_crypto,
     job_fetch_prices_us,
 )
+from worker.jobs.watchlist_alert import job_check_watchlist_alerts
 
 setup_logging()
 logger = get_logger(__name__)
@@ -43,6 +44,7 @@ class WorkerSettings:
         job_run_analysis,
         job_snapshot_net_worth,
         job_fetch_dividends,
+        job_check_watchlist_alerts,
     ]
     cron_jobs = [
         cron(job_fetch_prices_us, minute={0, 15, 30, 45}),

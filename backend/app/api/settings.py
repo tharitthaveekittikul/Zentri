@@ -11,6 +11,7 @@ from app.core.encryption import decrypt, encrypt
 from app.models.llm_settings import LLMSettings
 from app.models.user import User
 from app.services.hardware import detect_hardware
+from app.services.telegram import send_message as _send_telegram
 from app.services.user_context import get_user_age_context
 
 router = APIRouter(prefix="/settings", tags=["settings"])
@@ -196,3 +197,56 @@ async def update_profile_settings(
         years_remaining=ctx["years_remaining"] if ctx else None,
         target_year=ctx["target_year"] if ctx else None,
     )
+
+
+class TelegramConfigIn(BaseModel):
+    bot_token: str
+    chat_id: str
+
+
+class TelegramConfigOut(BaseModel):
+    chat_id: str | None
+    has_token: bool
+
+
+@router.get("/telegram", response_model=TelegramConfigOut)
+async def get_telegram_config(
+    current_user: User = Depends(get_current_user),
+):
+    return TelegramConfigOut(
+        chat_id=current_user.telegram_chat_id,
+        has_token=bool(current_user.telegram_bot_token),
+    )
+
+
+@router.put("/telegram", response_model=TelegramConfigOut)
+async def save_telegram_config(
+    body: TelegramConfigIn,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    current_user.telegram_bot_token = encrypt(body.bot_token)
+    current_user.telegram_chat_id = body.chat_id
+    await db.commit()
+    return TelegramConfigOut(chat_id=body.chat_id, has_token=True)
+
+
+@router.post("/telegram/test")
+async def test_telegram(
+    current_user: User = Depends(get_current_user),
+):
+    if not current_user.telegram_bot_token or not current_user.telegram_chat_id:
+        raise HTTPException(
+            status_code=400,
+            detail="Telegram not configured — save bot_token and chat_id first",
+        )
+    try:
+        bot_token = decrypt(current_user.telegram_bot_token)
+        await _send_telegram(
+            bot_token,
+            current_user.telegram_chat_id,
+            "✅ <b>Zentri</b> — Test message received! Price alerts are configured correctly.",
+        )
+    except Exception:
+        raise HTTPException(status_code=502, detail="Telegram delivery failed — check bot token and chat ID")
+    return {"ok": True}

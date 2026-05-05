@@ -20,6 +20,7 @@ async def job_fetch_prices_us(ctx: dict) -> dict:
         try:
             count = await fetch_us_prices(db)
             await finish_log(db, log, success=True)
+            await ctx["redis"].enqueue_job("job_check_watchlist_alerts", _job_id="watchlist_alert_check")
             return {"inserted": count}
         except Exception as e:
             logger.exception("job_fetch_prices_us failed: %s", e)
@@ -35,6 +36,7 @@ async def job_fetch_prices_crypto(ctx: dict) -> dict:
         try:
             count = await fetch_crypto_prices(db)
             await finish_log(db, log, success=True)
+            await ctx["redis"].enqueue_job("job_check_watchlist_alerts", _job_id="watchlist_alert_check")
             return {"inserted": count}
         except Exception as e:
             logger.exception("job_fetch_prices_crypto failed: %s", e)
@@ -50,6 +52,7 @@ async def job_fetch_price_gold(ctx: dict) -> dict:
         try:
             count = await fetch_gold_price(db)
             await finish_log(db, log, success=True)
+            await ctx["redis"].enqueue_job("job_check_watchlist_alerts", _job_id="watchlist_alert_check")
             return {"inserted": count}
         except Exception as e:
             logger.exception("job_fetch_price_gold failed: %s", e)
