@@ -44,7 +44,12 @@ def parse_all_rows(file_format: str, content: bytes) -> list[dict]:
 
 
 def _extract_rows_by_path(data: Any, json_path: str | None) -> list[dict]:
-    """Flatten nested JSON using json_path returned by LLM (e.g. 'transactions')."""
+    """Flatten nested JSON using json_path returned by LLM (e.g. 'transactions').
+
+    When each outer object groups transactions for a date/account, scalar fields
+    from the outer object (e.g. trading_date, account_no) are merged into every
+    inner row so the field_map can reference them.
+    """
     if not json_path:
         return data if isinstance(data, list) else []
     if isinstance(data, list):
@@ -53,7 +58,13 @@ def _extract_rows_by_path(data: Any, json_path: str | None) -> list[dict]:
             if isinstance(item, dict):
                 nested = item.get(json_path)
                 if isinstance(nested, list):
-                    rows.extend(nested)
+                    outer = {k: v for k, v in item.items()
+                             if k != json_path and not isinstance(v, (list, dict))}
+                    for inner in nested:
+                        if isinstance(inner, dict):
+                            rows.append({**outer, **inner})
+                        else:
+                            rows.append(inner)
         return rows
     if isinstance(data, dict):
         nested = data.get(json_path)
@@ -69,6 +80,7 @@ def is_canonical(headers: list[str]) -> bool:
 async def translate_via_llm(
     db: AsyncSession,
     user_id: Any,
+    file_format: str,
     headers: list[str],
     sample_rows: list[dict],
 ) -> dict:
@@ -76,7 +88,11 @@ async def translate_via_llm(
     raw = await gw.complete(
         feature_key="import_translator",
         user_id=user_id,
-        variables={"headers": str(headers), "sample_rows": json.dumps(sample_rows[:5])},
+        variables={
+            "file_format": file_format,
+            "headers": str(headers),
+            "sample_rows": json.dumps(sample_rows[:5], ensure_ascii=False),
+        },
     )
     if isinstance(raw, str):
         raw = raw.strip()
@@ -105,7 +121,7 @@ async def process_file(
         logger.info("File is canonical — direct import, %d rows", len(top_rows))
         return top_rows, "direct"
     logger.info("Non-canonical headers %s — calling LLM translator", headers)
-    mapping = await translate_via_llm(db, user_id, headers, top_rows)
+    mapping = await translate_via_llm(db, user_id, file_format, headers, top_rows)
 
     # Extract transaction rows using json_path (handles nested JSON like Dime offshore)
     json_path = mapping.get("json_path")

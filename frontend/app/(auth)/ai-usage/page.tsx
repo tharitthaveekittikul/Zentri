@@ -274,7 +274,7 @@ export default function AIUsagePage() {
                     <TableCell>{a.tokens_out.toLocaleString()}</TableCell>
                     <TableCell>${a.cost_usd.toFixed(6)}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">
-                      {new Date(a.created_at).toLocaleDateString()}
+                      {new Date(a.created_at).toLocaleString()}
                     </TableCell>
                     <TableCell>
                       <button
@@ -318,6 +318,11 @@ export default function AIUsagePage() {
         </TabsContent>
 
         <TabsContent value="call-logs" className="pt-2">
+          <div className="flex justify-end mb-2">
+            <Button variant="outline" size="sm" onClick={loadCallLogs}>
+              Refresh
+            </Button>
+          </div>
           <Table>
             <TableHeader>
               <TableRow>
@@ -341,7 +346,7 @@ export default function AIUsagePage() {
                   <TableCell>{log.tokens_out.toLocaleString()}</TableCell>
                   <TableCell>${log.cost_usd.toFixed(6)}</TableCell>
                   <TableCell className="text-sm text-muted-foreground">
-                    {new Date(log.created_at).toLocaleDateString()}
+                    {new Date(log.created_at).toLocaleString()}
                   </TableCell>
                   <TableCell>
                     <button

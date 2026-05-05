@@ -2,6 +2,9 @@
 // This avoids exposing internal Docker hostnames to the browser.
 const API_BASE = "";
 
+// Prevents concurrent 401s from triggering multiple simultaneous refresh calls.
+let refreshPromise: Promise<boolean> | null = null;
+
 async function fetchWithAuth(
   path: string,
   options: RequestInit = {}
@@ -21,7 +24,10 @@ async function fetchWithAuth(
   });
 
   if (response.status === 401) {
-    const refreshed = await tryRefresh();
+    if (!refreshPromise) {
+      refreshPromise = tryRefresh().finally(() => { refreshPromise = null; });
+    }
+    const refreshed = await refreshPromise;
     if (refreshed) {
       headers["Authorization"] = `Bearer ${localStorage.getItem("access_token")}`;
       return fetch(`${API_BASE}${path}`, { ...options, headers });
@@ -44,6 +50,7 @@ async function tryRefresh(): Promise<boolean> {
     if (!res.ok) return false;
     const data = await res.json();
     localStorage.setItem("access_token", data.access_token);
+    document.cookie = `access_token=${data.access_token}; path=/; SameSite=Strict; max-age=3600`;
     return true;
   } catch {
     return false;

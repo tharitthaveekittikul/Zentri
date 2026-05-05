@@ -19,9 +19,14 @@ const VISIBLE_FIELDS = [
   "unit",
   "price",
   "currency",
+  "exchange",
+  "gross_amount",
+  "fee",
+  "gross_thb",
+  "fee_thb",
+  "exchange_rate",
   "asset_type",
   "platform",
-  "fee",
   "notes",
 ] as const;
 
@@ -47,6 +52,7 @@ export function ReviewTable({ rows, onChange }: Props) {
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead className="w-[50px] text-center text-xs">#</TableHead>
             {VISIBLE_FIELDS.map((f) => (
               <TableHead key={f} className="whitespace-nowrap text-xs">
                 {f}
@@ -58,6 +64,9 @@ export function ReviewTable({ rows, onChange }: Props) {
         <TableBody>
           {rows.map((row, i) => (
             <TableRow key={i}>
+              <TableCell className="text-center text-xs text-muted-foreground">
+                {i + 1}
+              </TableCell>
               {VISIBLE_FIELDS.map((f) => (
                 <TableCell key={f} className="p-1">
                   <Input

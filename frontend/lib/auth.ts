@@ -4,7 +4,7 @@ export function saveTokens(accessToken: string, refreshToken: string) {
   localStorage.setItem("access_token", accessToken);
   localStorage.setItem("refresh_token", refreshToken);
   // Cookie read by middleware for server-side route protection
-  document.cookie = `access_token=${accessToken}; path=/; SameSite=Strict; max-age=900`;
+  document.cookie = `access_token=${accessToken}; path=/; SameSite=Strict; max-age=3600`;
 }
 
 export function clearTokens() {

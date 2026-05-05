@@ -42,6 +42,7 @@ async def upload_file(
         rows, method = await pipeline_svc.process_file(db, current_user.id, file_format, content)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc))
+    await db.commit()
     logger.info("Upload: method=%s rows=%d user=%s", method, len(rows), current_user.id)
     return UploadResponse(rows=rows, method=method, total=len(rows))
 

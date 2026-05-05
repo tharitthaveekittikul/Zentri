@@ -25,18 +25,25 @@ FEATURE_KEYS = (
 
 DEFAULT_SYSTEM_PROMPTS: dict[str, str] = {
     "import_translator": (
-        "You are a financial data normalization expert. Given headers and sample rows from a "
-        "broker export file, produce a JSON mapping to translate them to canonical fields.\n\n"
-        "Canonical fields: trade_date, type (BUY|SELL|DIVIDEND|REWARD|FEE|TRANSFER), symbol, "
-        "unit (number of units), price, currency (ISO code), exchange, gross_amount, fee, "
-        "gross_thb, fee_thb, exchange_rate, asset_type (us_stock|thai_stock|th_fund|etf|crypto|gold|cash), "
-        "platform, notes.\n\n"
-        "Return ONLY valid JSON with this structure (no explanation):\n"
+        "You are a financial data normalization expert. Given a broker export file's structure "
+        "and sample data, produce a JSON template that maps source fields to the canonical schema.\n\n"
+        "CANONICAL FIELDS (use ONLY these as field_map values):\n"
+        "trade_date, type, symbol, unit, price, currency, exchange, gross_amount, fee, "
+        "gross_thb, fee_thb, exchange_rate, asset_type, platform, notes\n\n"
+        "VALID type VALUES: BUY, SELL, DIVIDEND, REWARD, FEE, TRANSFER\n"
+        "VALID asset_type VALUES: us_stock, thai_stock, th_fund, etf, crypto, gold, cash\n\n"
+        "For nested JSON files, set json_path to the key path to the transaction array "
+        "(e.g. \"transactions\"). For CSV or top-level arrays, set json_path to null.\n\n"
+        "Return ONLY valid JSON — no explanation, no markdown:\n"
         "{\n"
-        "  \"field_map\": {\"SourceCol\": \"canonical_field\", ...},\n"
-        "  \"type_map\": {\"SourceValue\": \"CANONICAL_TYPE\", ...},\n"
-        "  \"currency_default\": \"THB\",\n"
-        "  \"asset_type_default\": \"us_stock\"\n"
+        "  \"file_format\": \"csv\" or \"json\",\n"
+        "  \"json_path\": null or \"transactions\",\n"
+        "  \"field_map\": {\"source_col\": \"canonical_field\", ...},\n"
+        "  \"value_transforms\": {\"type\": {\"Buy Note\": \"BUY\"}},\n"
+        "  \"derived_fields\": {\"gross_thb\": \"unit * price * exchange_rate\"},\n"
+        "  \"defaults\": {\"currency\": \"THB\", \"platform\": \"Broker Name\"},\n"
+        "  \"asset_type_rules\": [{\"field\": \"exchange\", \"values\": [\"SET\"], \"asset_type\": \"thai_stock\"}],\n"
+        "  \"asset_type_fallback\": \"thai_stock\"\n"
         "}"
     ),
     "transaction_classifier": (
@@ -56,7 +63,7 @@ DEFAULT_SYSTEM_PROMPTS: dict[str, str] = {
 }
 
 HUMAN_PROMPTS: dict[str, str] = {
-    "import_translator": "Headers: {headers}\n\nSample rows:\n{sample_rows}",
+    "import_translator": "File format: {file_format}\nHeaders/keys: {headers}\n\nSample rows (first 5):\n{sample_rows}",
     "transaction_classifier": (
         "Symbol: {symbol}\nExchange: {exchange}\nCurrency: {currency}\n"
         "What is the asset_type?"
