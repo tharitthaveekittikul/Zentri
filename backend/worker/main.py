@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from app.core.config import settings
 from app.core.logging import get_logger, setup_logging
+from worker.jobs.dividend_fetch import job_fetch_dividends
 from worker.jobs.ingest_document import job_ingest_document
 from worker.jobs.net_worth_snapshot import job_snapshot_net_worth
 from worker.jobs.run_analysis import job_run_analysis
@@ -41,6 +42,7 @@ class WorkerSettings:
         job_ingest_document,
         job_run_analysis,
         job_snapshot_net_worth,
+        job_fetch_dividends,
     ]
     cron_jobs = [
         cron(job_fetch_prices_us, minute={0, 15, 30, 45}),
@@ -48,4 +50,5 @@ class WorkerSettings:
         cron(job_fetch_price_gold, minute={0, 15, 30, 45}),
         cron(job_fetch_benchmark_prices, minute=0),
         cron(job_snapshot_net_worth, hour=1, minute=0),
+        cron(job_fetch_dividends, weekday=0, hour=2, minute=0),
     ]

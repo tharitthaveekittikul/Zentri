@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import (
-    analysis, assets, auth, cash_balance, documents,
+    analysis, assets, auth, cash_balance, dividends, documents,
     feature_llm_config, health, import_pipeline, llm_usage,
     overview, pipeline, portfolio, provider_config, settings,
 )
@@ -36,3 +36,4 @@ app.include_router(feature_llm_config.router, prefix="/api/v1")
 app.include_router(cash_balance.router, prefix="/api/v1")
 app.include_router(import_pipeline.router, prefix="/api/v1")
 app.include_router(llm_usage.router, prefix="/api/v1")
+app.include_router(dividends.router, prefix="/api/v1")

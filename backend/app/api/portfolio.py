@@ -11,7 +11,7 @@ from app.core.database import get_db
 from app.models.user import User
 from app.models.asset import Asset
 from app.schemas.holding import HoldingCreate, HoldingRow, HoldingUpdate, PortfolioSummary
-from app.schemas.transaction import ManualTransactionCreate, TransactionCreate, TransactionResponse
+from app.schemas.transaction import ManualTransactionCreate, TransactionCreate, TransactionResponse, TransactionRow, TransactionUpdate
 from app.services import portfolio as portfolio_service
 from sqlalchemy import select
 
@@ -114,13 +114,39 @@ async def add_transaction(
     )
 
 
-@router.get("/transactions", response_model=list[TransactionResponse])
+@router.get("/transactions", response_model=list[TransactionRow])
 async def list_transactions(
     asset_id: uuid.UUID | None = None,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    return await portfolio_service.list_transactions(db, current_user.id, asset_id)
+    return await portfolio_service.list_transactions_with_assets(db, current_user.id, asset_id)
+
+
+@router.patch("/transactions/{transaction_id}", response_model=TransactionResponse)
+async def update_transaction(
+    transaction_id: uuid.UUID,
+    body: TransactionUpdate,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    tx = await portfolio_service.get_transaction(db, current_user.id, transaction_id)
+    if tx is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transaction not found")
+    return await portfolio_service.update_transaction(db, tx, body.model_dump(exclude_none=True))
+
+
+@router.delete("/transactions/{transaction_id}", status_code=204)
+async def delete_transaction(
+    transaction_id: uuid.UUID,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    tx = await portfolio_service.get_transaction(db, current_user.id, transaction_id)
+    if tx is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transaction not found")
+    await portfolio_service.delete_transaction(db, tx)
+    return Response(status_code=204)
 
 
 @router.get("/summary", response_model=PortfolioSummary)

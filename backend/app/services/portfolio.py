@@ -224,6 +224,63 @@ async def list_transactions(
     return list(result.scalars().all())
 
 
+async def get_transaction(
+    db: AsyncSession, user_id: uuid.UUID, transaction_id: uuid.UUID
+) -> Transaction | None:
+    result = await db.execute(
+        select(Transaction).where(Transaction.id == transaction_id, Transaction.user_id == user_id)
+    )
+    return result.scalar_one_or_none()
+
+
+async def update_transaction(db: AsyncSession, tx: Transaction, data: dict) -> Transaction:
+    for field, value in data.items():
+        if value is not None:
+            setattr(tx, field, value)
+    await db.commit()
+    await db.refresh(tx)
+    logger.info("Transaction updated: id=%s", tx.id)
+    return tx
+
+
+async def delete_transaction(db: AsyncSession, tx: Transaction) -> None:
+    logger.info("Transaction deleted: id=%s user=%s", tx.id, tx.user_id)
+    await db.delete(tx)
+    await db.commit()
+
+
+async def list_transactions_with_assets(
+    db: AsyncSession,
+    user_id: uuid.UUID,
+    asset_id: uuid.UUID | None = None,
+) -> list[dict]:
+    q = (
+        select(Transaction, Asset)
+        .join(Asset, Asset.id == Transaction.asset_id)
+        .where(Transaction.user_id == user_id)
+    )
+    if asset_id:
+        q = q.where(Transaction.asset_id == asset_id)
+    result = await db.execute(q.order_by(Transaction.executed_at.desc()))
+    rows = []
+    for tx, asset in result.all():
+        rows.append({
+            "id": tx.id,
+            "asset_id": tx.asset_id,
+            "symbol": asset.symbol,
+            "asset_type": asset.asset_type,
+            "platform": tx.platform,
+            "type": tx.type,
+            "quantity": tx.quantity,
+            "price": tx.price,
+            "fee": tx.fee,
+            "source": tx.source,
+            "executed_at": tx.executed_at,
+            "created_at": tx.created_at,
+        })
+    return rows
+
+
 async def get_portfolio_summary(
     db: AsyncSession,
     user_id: uuid.UUID,

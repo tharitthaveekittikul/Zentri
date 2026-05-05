@@ -41,3 +41,29 @@ class TransactionResponse(BaseModel):
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class TransactionRow(BaseModel):
+    id: uuid.UUID
+    asset_id: uuid.UUID
+    symbol: str
+    asset_type: str
+    platform: str | None
+    type: str
+    quantity: Decimal
+    price: Decimal
+    fee: Decimal
+    source: str
+    executed_at: datetime
+    created_at: datetime
+
+    model_config = {"from_attributes": False}
+
+
+class TransactionUpdate(BaseModel):
+    type: Literal["buy", "sell", "dividend", "reward", "fee", "transfer"] | None = None
+    quantity: Decimal | None = None
+    price: Decimal | None = None
+    fee: Decimal | None = None
+    executed_at: datetime | None = None
+    platform: str | None = None

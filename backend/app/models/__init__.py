@@ -1,6 +1,7 @@
 from app.models.asset import Asset  # noqa: F401
 from app.models.benchmark import Benchmark, BenchmarkPrice  # noqa: F401
 from app.models.cash_balance import CashBalance  # noqa: F401
+from app.models.dividend_event import DividendEvent  # noqa: F401
 from app.models.feature_llm_config import FeatureLLMConfig  # noqa: F401
 from app.models.holding import Holding  # noqa: F401
 from app.models.pipeline_log import PipelineLog  # noqa: F401
@@ -16,5 +17,5 @@ __all__ = [
     "User", "Asset", "Holding", "Transaction",
     "Price", "PipelineLog", "Benchmark", "BenchmarkPrice",
     "ProviderConfig", "FeatureLLMConfig", "CashBalance",
-    "LLMCallLog", "ExchangeRateCache", "NetWorthSnapshot",
+    "LLMCallLog", "ExchangeRateCache", "NetWorthSnapshot", "DividendEvent",
 ]
