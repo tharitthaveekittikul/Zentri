@@ -1,28 +1,38 @@
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 
 from pydantic import BaseModel
 
 
 class HoldingCreate(BaseModel):
-    asset_id: uuid.UUID
+    symbol: str
+    asset_type: str = "us_stock"
+    purchased_at: date | None = None
     quantity: Decimal
     avg_cost_price: Decimal
-    currency: str = "USD"
+    currency: str = "THB"
 
 
-class HoldingResponse(BaseModel):
+class HoldingRow(BaseModel):
     id: uuid.UUID
     asset_id: uuid.UUID
-    quantity: Decimal
-    avg_cost_price: Decimal
+    symbol: str
+    asset_type: str
     currency: str
-    updated_at: datetime
+    purchased_at: date | None
+    outstanding_shares: Decimal
+    cost_per_share: Decimal
+    total_cost: Decimal
+    current_price: Decimal | None = None
+    holding_value: Decimal | None = None
+    unrealized_pnl: Decimal | None = None
+    price_1d_change: Decimal | None = None
 
     model_config = {"from_attributes": True}
 
 
 class PortfolioSummary(BaseModel):
     holdings_count: int
-    total_cost_usd: Decimal
+    total_cost: Decimal
+    primary_currency: str

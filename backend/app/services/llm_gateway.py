@@ -17,26 +17,27 @@ from sqlalchemy import select
 logger = get_logger(__name__)
 
 FEATURE_KEYS = (
-    "import_template_generator",
+    "import_translator",
     "transaction_classifier",
     "portfolio_analysis",
     "chat",
 )
 
 DEFAULT_SYSTEM_PROMPTS: dict[str, str] = {
-    "import_template_generator": (
-        "You are a financial data normalization expert. Given a transaction file structure, "
-        "produce a JSON mapping template that translates source fields to the canonical schema.\n\n"
-        "Canonical fields: trade_date (datetime), type (BUY|SELL|DIVIDEND|REWARD|FEE|TRANSFER), "
-        "symbol (ticker or fund code), unit (decimal), price (decimal|null), currency (ISO code, default THB), "
-        "exchange (exchange name|null), gross_amount (decimal|null), fee (decimal|null), "
-        "gross_thb (decimal|null), fee_thb (decimal|null), exchange_rate (decimal|null), "
-        "asset_type (us_stock|thai_stock|th_fund|etf|crypto|gold|cash|null), platform (str|null), notes (str|null).\n\n"
-        "IMPORTANT — for nested JSON files: parent-level scalar fields (e.g. trading_date, account_no) "
-        "are automatically merged into each child transaction row. Include ALL such propagated parent fields "
-        "in field_map, not just child-level fields. For example, if trading_date lives at the parent level "
-        "it will appear in each row — map it: {\"trading_date\": \"trade_date\"}.\n\n"
-        "Respond with valid JSON only. No explanation."
+    "import_translator": (
+        "You are a financial data normalization expert. Given headers and sample rows from a "
+        "broker export file, produce a JSON mapping to translate them to canonical fields.\n\n"
+        "Canonical fields: trade_date, type (BUY|SELL|DIVIDEND|REWARD|FEE|TRANSFER), symbol, "
+        "unit (number of units), price, currency (ISO code), exchange, gross_amount, fee, "
+        "gross_thb, fee_thb, exchange_rate, asset_type (us_stock|thai_stock|th_fund|etf|crypto|gold|cash), "
+        "platform, notes.\n\n"
+        "Return ONLY valid JSON with this structure (no explanation):\n"
+        "{\n"
+        "  \"field_map\": {\"SourceCol\": \"canonical_field\", ...},\n"
+        "  \"type_map\": {\"SourceValue\": \"CANONICAL_TYPE\", ...},\n"
+        "  \"currency_default\": \"THB\",\n"
+        "  \"asset_type_default\": \"us_stock\"\n"
+        "}"
     ),
     "transaction_classifier": (
         "You are a financial asset classifier. Given a symbol, exchange, and currency, "
@@ -55,29 +56,7 @@ DEFAULT_SYSTEM_PROMPTS: dict[str, str] = {
 }
 
 HUMAN_PROMPTS: dict[str, str] = {
-    "import_template_generator": (
-        "File format: {file_format}\n"
-        "Headers/keys: {headers}\n"
-        "Sample rows (first 3):\n{sample_rows}\n\n"
-        "Return a JSON object with exactly these keys:\n"
-        "- file_format: 'csv' or 'json'\n"
-        "- json_path: dotted path to transaction array (null for csv or top-level array)\n"
-        "- field_map: {{source_field: canonical_field}} — map source field names to canonical names.\n"
-        "  Valid canonical field names (use ONLY these as values): "
-        "trade_date, type, symbol, unit, price, currency, exchange, "
-        "gross_amount, fee, gross_thb, fee_thb, exchange_rate, asset_type, platform, notes\n"
-        "- value_transforms: {{canonical_field: {{source_value: canonical_value}}}} "
-        "e.g. {{\"type\": {{\"Buy Note\": \"BUY\"}}}}. "
-        "Valid type values: BUY, SELL, DIVIDEND, REWARD, FEE, TRANSFER\n"
-        "- derived_fields: {{canonical_field: 'canonical_field_a * canonical_field_b'}} "
-        "arithmetic using canonical field names only. "
-        "Example: {{\"gross_amount\": \"unit * price\"}}\n"
-        "- defaults: {{canonical_field: value}} fill when field is missing or null. "
-        "Example: {{\"currency\": \"THB\", \"exchange\": \"SET\", \"platform\": \"Bualuang Securities\"}}\n"
-        "- asset_type_rules: [{{'field': '...', 'values': [...] or 'pattern': '...', 'asset_type': '...'}}]. "
-        "Valid asset_type values: us_stock, thai_stock, th_fund, etf, crypto, gold, cash\n"
-        "- asset_type_fallback: one of us_stock, thai_stock, th_fund, etf, crypto, gold, cash"
-    ),
+    "import_translator": "Headers: {headers}\n\nSample rows:\n{sample_rows}",
     "transaction_classifier": (
         "Symbol: {symbol}\nExchange: {exchange}\nCurrency: {currency}\n"
         "What is the asset_type?"

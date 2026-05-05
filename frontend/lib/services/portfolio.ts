@@ -1,18 +1,25 @@
 import { api } from "@/lib/api";
 
-export interface Holding {
+export interface HoldingRow {
   id: string;
   asset_id: string;
-  quantity: string;
-  avg_cost_price: string;
+  symbol: string;
+  asset_type: string;
   currency: string;
-  updated_at: string;
+  purchased_at: string | null;
+  outstanding_shares: string;
+  cost_per_share: string;
+  total_cost: string;
+  current_price: string | null;
+  holding_value: string | null;
+  unrealized_pnl: string | null;
+  price_1d_change: string | null;
 }
 
 export interface Transaction {
   id: string;
   asset_id: string;
-  platform_id: string | null;
+  platform: string | null;
   type: string;
   quantity: string;
   price: string;
@@ -24,21 +31,24 @@ export interface Transaction {
 
 export interface PortfolioSummary {
   holdings_count: number;
-  total_cost_usd: string;
+  total_cost: string;
+  primary_currency: string;
 }
 
-export async function fetchHoldings(): Promise<Holding[]> {
+export async function fetchHoldings(): Promise<HoldingRow[]> {
   const res = await api.get("/api/v1/portfolio/holdings");
   if (!res.ok) throw new Error("Failed to fetch holdings");
   return res.json();
 }
 
 export async function addHolding(body: {
-  asset_id: string;
+  symbol: string;
+  asset_type: string;
+  purchased_at: string | null;
   quantity: string;
   avg_cost_price: string;
   currency: string;
-}): Promise<Holding> {
+}): Promise<HoldingRow> {
   const res = await api.post("/api/v1/portfolio/holdings", body);
   if (!res.ok) throw new Error("Failed to add holding");
   return res.json();
@@ -54,27 +64,21 @@ export async function fetchSummary(): Promise<PortfolioSummary> {
   return res.json();
 }
 
-export async function previewImport(file: File): Promise<{ columns: string[]; rows: Record<string, string>[] }> {
-  const formData = new FormData();
-  formData.append("file", file);
-  const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "";
-  const res = await fetch(`${API_BASE}/api/v1/portfolio/import/preview`, {
-    method: "POST",
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-    body: formData,
-  });
-  if (!res.ok) throw new Error("Preview failed");
-  return res.json();
-}
-
-export async function confirmImport(payload: {
-  rows: Array<{ date: string; symbol: string; type: string; quantity: string; price: string; fee: string }>;
+export async function addManualTransaction(body: {
+  symbol: string;
   asset_type: string;
-  save_profile: boolean;
-  broker_name: string | null;
-}): Promise<{ imported: number; skipped: number; errors: string[] }> {
-  const res = await api.post("/api/v1/portfolio/import/confirm", payload);
-  if (!res.ok) throw new Error("Import failed");
+  currency: string;
+  platform: string | null;
+  type: string;
+  quantity: string;
+  price: string;
+  fee: string;
+  executed_at: string;
+}): Promise<Transaction> {
+  const res = await api.post("/api/v1/portfolio/transactions/manual", body);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Failed to add transaction");
+  }
   return res.json();
 }

@@ -3,7 +3,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchOverviewSummary, fetchAllocation } from "@/lib/services/overview";
 import { fetchHoldings } from "@/lib/services/portfolio";
-import { fetchAllAssets } from "@/lib/services/assets";
 import { SummaryBar } from "@/components/overview/SummaryBar";
 import { PerformanceChart } from "@/components/overview/PerformanceChart";
 import { AllocationDonut } from "@/components/overview/AllocationDonut";
@@ -28,26 +27,14 @@ export default function OverviewPage() {
     queryFn: fetchHoldings,
   });
 
-  const { data: assets = [] } = useQuery({
-    queryKey: ["assets"],
-    queryFn: fetchAllAssets,
-  });
-
-  const snapshotHoldings: SnapshotHolding[] = holdings
-    .map((h) => {
-      const asset = assets.find((a) => a.id === h.asset_id);
-      if (!asset) return null;
-      const cost = Number(h.avg_cost_price) * Number(h.quantity);
-      return {
-        symbol: asset.symbol,
-        name: asset.name,
-        asset_type: asset.asset_type,
-        quantity: h.quantity,
-        current_value: cost,
-        pnl_pct: 0,
-      };
-    })
-    .filter(Boolean) as SnapshotHolding[];
+  const snapshotHoldings: SnapshotHolding[] = holdings.map((h) => ({
+    symbol: h.symbol,
+    name: h.symbol,
+    asset_type: h.asset_type,
+    quantity: h.outstanding_shares,
+    current_value: h.holding_value != null ? Number(h.holding_value) : Number(h.total_cost),
+    pnl_pct: 0,
+  }));
 
   const sorted = [...snapshotHoldings].sort((a, b) => b.current_value - a.current_value);
 

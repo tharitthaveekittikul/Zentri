@@ -11,7 +11,7 @@ export interface FeatureLLMConfig {
 }
 
 export const FEATURE_LABELS: Record<string, string> = {
-  import_template_generator: "Import Template Generator",
+  import_translator: "Import Translator",
   transaction_classifier: "Transaction Classifier",
   portfolio_analysis: "Portfolio Analysis",
   chat: "Chat Assistant",

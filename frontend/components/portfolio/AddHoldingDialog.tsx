@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -19,38 +19,50 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { createAsset } from "@/lib/services/assets";
 import { addHolding } from "@/lib/services/portfolio";
 import { Plus } from "lucide-react";
 
-const ASSET_TYPES = ["us_stock", "thai_stock", "th_fund", "crypto", "gold"];
+const ASSET_TYPES = [
+  "us_stock",
+  "thai_stock",
+  "th_fund",
+  "etf",
+  "crypto",
+  "gold",
+  "cash",
+];
 
 interface Props {
+  primaryCurrency: string;
   onAdded: () => void;
 }
 
-export function AddHoldingDialog({ onAdded }: Props) {
+export function AddHoldingDialog({ primaryCurrency, onAdded }: Props) {
   const [open, setOpen] = useState(false);
   const [symbol, setSymbol] = useState("");
   const [assetType, setAssetType] = useState("us_stock");
-  const [name, setName] = useState("");
+  const [purchasedAt, setPurchasedAt] = useState("");
   const [quantity, setQuantity] = useState("");
   const [avgCost, setAvgCost] = useState("");
-  const [currency, setCurrency] = useState("USD");
+  const [currency, setCurrency] = useState(primaryCurrency);
   const [loading, setLoading] = useState(false);
+
+  const totalCost = useMemo(() => {
+    const q = parseFloat(quantity);
+    const c = parseFloat(avgCost);
+    if (!isNaN(q) && !isNaN(c))
+      return (q * c).toLocaleString(undefined, { minimumFractionDigits: 2 });
+    return "—";
+  }, [quantity, avgCost]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     try {
-      const asset = await createAsset({
+      await addHolding({
         symbol,
         asset_type: assetType,
-        name: name || symbol,
-        currency,
-      });
-      await addHolding({
-        asset_id: asset.id,
+        purchased_at: purchasedAt || null,
         quantity,
         avg_cost_price: avgCost,
         currency,
@@ -58,9 +70,9 @@ export function AddHoldingDialog({ onAdded }: Props) {
       toast.success(`Added ${symbol} to portfolio`);
       setOpen(false);
       setSymbol("");
-      setName("");
       setQuantity("");
       setAvgCost("");
+      setPurchasedAt("");
       onAdded();
     } catch {
       toast.error("Failed to add holding");
@@ -95,13 +107,8 @@ export function AddHoldingDialog({ onAdded }: Props) {
               />
             </div>
             <div className="space-y-1">
-              <Label>Type</Label>
-              <Select
-                value={assetType}
-                onValueChange={(v) => {
-                  if (v !== null) setAssetType(v);
-                }}
-              >
+              <Label>Asset Type</Label>
+              <Select value={assetType} onValueChange={(v) => { if (v !== null) setAssetType(v); }}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -116,16 +123,16 @@ export function AddHoldingDialog({ onAdded }: Props) {
             </div>
           </div>
           <div className="space-y-1">
-            <Label>Name (optional)</Label>
+            <Label>First Purchase Date (optional)</Label>
             <Input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Apple Inc."
+              type="date"
+              value={purchasedAt}
+              onChange={(e) => setPurchasedAt(e.target.value)}
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <Label>Quantity</Label>
+              <Label>Outstanding Shares</Label>
               <Input
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
@@ -134,7 +141,7 @@ export function AddHoldingDialog({ onAdded }: Props) {
               />
             </div>
             <div className="space-y-1">
-              <Label>Avg Cost Price</Label>
+              <Label>Cost per Share</Label>
               <Input
                 value={avgCost}
                 onChange={(e) => setAvgCost(e.target.value)}
@@ -148,11 +155,17 @@ export function AddHoldingDialog({ onAdded }: Props) {
             <Input
               value={currency}
               onChange={(e) => setCurrency(e.target.value.toUpperCase())}
-              placeholder="USD"
+              placeholder="THB"
             />
           </div>
+          <div className="rounded-md bg-muted px-3 py-2 text-sm flex justify-between">
+            <span className="text-muted-foreground">Total Cost</span>
+            <span className="font-medium">
+              {currency} {totalCost}
+            </span>
+          </div>
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Adding..." : "Add Holding"}
+            {loading ? "Adding…" : "Add Holding"}
           </Button>
         </form>
       </DialogContent>

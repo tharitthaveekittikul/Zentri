@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -7,10 +8,9 @@ import {
   deleteHolding,
   fetchSummary,
 } from "@/lib/services/portfolio";
-import { fetchAllAssets } from "@/lib/services/assets";
 import { HoldingsTable } from "@/components/portfolio/HoldingsTable";
 import { AddHoldingDialog } from "@/components/portfolio/AddHoldingDialog";
-import { ImportDrawer } from "@/components/portfolio/ImportDrawer";
+import { AddTransactionDialog } from "@/components/portfolio/AddTransactionDialog";
 import {
   Card,
   CardContent,
@@ -20,10 +20,22 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { usePrivacyStore } from "@/store/privacy";
+import { api } from "@/lib/api";
 
 export default function PortfolioPage() {
   const qc = useQueryClient();
   const { isPrivate } = usePrivacyStore();
+  const [primaryCurrency, setPrimaryCurrency] = useState("THB");
+
+  useEffect(() => {
+    api
+      .get("/api/v1/settings/display")
+      .then((r) => r.json())
+      .then((d: { currency_primary?: string }) => {
+        if (d.currency_primary) setPrimaryCurrency(d.currency_primary);
+      })
+      .catch(() => {});
+  }, []);
 
   const { data: holdings = [], isLoading } = useQuery({
     queryKey: ["holdings"],
@@ -34,15 +46,6 @@ export default function PortfolioPage() {
     queryKey: ["portfolio-summary"],
     queryFn: fetchSummary,
   });
-
-  const { data: assets = [] } = useQuery({
-    queryKey: ["assets"],
-    queryFn: fetchAllAssets,
-  });
-
-  const assetMap = Object.fromEntries(
-    assets.map((a) => [a.id, a.symbol])
-  );
 
   const deleteMutation = useMutation({
     mutationFn: deleteHolding,
@@ -57,8 +60,9 @@ export default function PortfolioPage() {
   const refresh = () => {
     qc.invalidateQueries({ queryKey: ["holdings"] });
     qc.invalidateQueries({ queryKey: ["portfolio-summary"] });
-    qc.invalidateQueries({ queryKey: ["assets"] });
   };
+
+  const displayCurrency = summary?.primary_currency ?? primaryCurrency;
 
   return (
     <div className="space-y-6">
@@ -73,8 +77,14 @@ export default function PortfolioPage() {
           </Link>
         </div>
         <div className="flex gap-2 ml-4">
-          <ImportDrawer onImported={refresh} />
-          <AddHoldingDialog onAdded={refresh} />
+          <AddTransactionDialog
+            primaryCurrency={displayCurrency}
+            onAdded={refresh}
+          />
+          <AddHoldingDialog
+            primaryCurrency={displayCurrency}
+            onAdded={refresh}
+          />
         </div>
       </div>
 
@@ -102,7 +112,7 @@ export default function PortfolioPage() {
               {isPrivate
                 ? "••••"
                 : summary
-                ? `$${parseFloat(summary.total_cost_usd).toLocaleString()}`
+                ? `${displayCurrency} ${parseFloat(summary.total_cost).toLocaleString(undefined, { minimumFractionDigits: 2 })}`
                 : "—"}
             </p>
           </CardContent>
@@ -114,7 +124,7 @@ export default function PortfolioPage() {
       ) : (
         <HoldingsTable
           holdings={holdings}
-          assetMap={assetMap}
+          primaryCurrency={displayCurrency}
           onDelete={(id) => deleteMutation.mutate(id)}
         />
       )}

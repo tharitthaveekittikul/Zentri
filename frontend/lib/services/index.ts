@@ -2,7 +2,6 @@ export * from "./assets";
 export * from "./auth";
 export * from "./overview";
 export * from "./pipeline";
-export * from "./platforms";
 export * from "./portfolio";
 export * from "./provider-config";
 export * from "./feature-llm-config";

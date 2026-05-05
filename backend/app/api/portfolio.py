@@ -2,39 +2,47 @@ import csv
 import io
 import uuid
 
-from fastapi import APIRouter, Depends, File, HTTPException, Response, UploadFile, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user
 from app.core.database import get_db
 from app.models.user import User
-from app.schemas.csv_import import ImportConfirmRequest, ImportConfirmResponse, ImportPreviewResponse
-from app.schemas.holding import HoldingCreate, HoldingResponse, PortfolioSummary
-from app.schemas.transaction import TransactionCreate, TransactionResponse
-from app.services import csv_import as csv_import_service
+from app.schemas.holding import HoldingCreate, HoldingRow, PortfolioSummary
+from app.schemas.transaction import ManualTransactionCreate, TransactionCreate, TransactionResponse
 from app.services import portfolio as portfolio_service
 
 router = APIRouter(prefix="/portfolio", tags=["portfolio"])
 
 
-@router.post("/holdings", response_model=HoldingResponse, status_code=201)
+@router.post("/holdings", response_model=HoldingRow, status_code=201)
 async def add_holding(
     body: HoldingCreate,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    return await portfolio_service.add_holding(
-        db, current_user.id, body.asset_id, body.quantity, body.avg_cost_price, body.currency
+    holding, asset = await portfolio_service.add_holding(
+        db, current_user.id, body.symbol, body.asset_type,
+        body.quantity, body.avg_cost_price, body.currency, body.purchased_at,
+    )
+    total_cost = holding.quantity * holding.avg_cost_price
+    return HoldingRow(
+        id=holding.id, asset_id=holding.asset_id,
+        symbol=asset.symbol, asset_type=asset.asset_type,
+        currency=holding.currency, purchased_at=holding.purchased_at,
+        outstanding_shares=holding.quantity, cost_per_share=holding.avg_cost_price,
+        total_cost=total_cost,
     )
 
 
-@router.get("/holdings", response_model=list[HoldingResponse])
+@router.get("/holdings", response_model=list[HoldingRow])
 async def list_holdings(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    return await portfolio_service.list_holdings(db, current_user.id)
+    rows = await portfolio_service.list_holdings_with_assets(db, current_user.id)
+    return [HoldingRow(**r) for r in rows]
 
 
 @router.delete("/holdings/{holding_id}", status_code=204)
@@ -50,6 +58,18 @@ async def delete_holding(
     return Response(status_code=204)
 
 
+@router.post("/transactions/manual", response_model=TransactionResponse, status_code=201)
+async def add_manual_transaction(
+    body: ManualTransactionCreate,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    return await portfolio_service.add_manual_transaction(
+        db, current_user.id, body.symbol, body.asset_type, body.type,
+        body.quantity, body.price, body.fee, body.currency, body.executed_at, body.platform,
+    )
+
+
 @router.post("/transactions", response_model=TransactionResponse, status_code=201)
 async def add_transaction(
     body: TransactionCreate,
@@ -57,8 +77,8 @@ async def add_transaction(
     db: AsyncSession = Depends(get_db),
 ):
     return await portfolio_service.add_transaction(
-        db, current_user.id, body.asset_id, body.type, body.quantity,
-        body.price, body.fee, body.executed_at, body.platform_id
+        db, current_user.id, body.asset_id, body.type,
+        body.quantity, body.price, body.fee, body.executed_at, body.platform,
     )
 
 
@@ -77,33 +97,6 @@ async def portfolio_summary(
     db: AsyncSession = Depends(get_db),
 ):
     return await portfolio_service.get_portfolio_summary(db, current_user.id)
-
-
-@router.post("/import/preview", response_model=ImportPreviewResponse)
-async def import_preview(
-    file: UploadFile = File(...),
-    _: User = Depends(get_current_user),
-):
-    content = await file.read(10 * 1024 * 1024 + 1)
-    if len(content) > 10 * 1024 * 1024:
-        raise HTTPException(
-            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-            detail="File too large. Maximum size is 10MB.",
-        )
-    return csv_import_service.parse_csv_preview(content)
-
-
-@router.post("/import/confirm", response_model=ImportConfirmResponse)
-async def import_confirm(
-    body: ImportConfirmRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
-):
-    rows = [r.model_dump() for r in body.rows]
-    result = await csv_import_service.confirm_import(
-        db, current_user.id, rows, body.asset_type, body.save_profile, body.broker_name
-    )
-    return ImportConfirmResponse(**result)
 
 
 @router.get("/export")

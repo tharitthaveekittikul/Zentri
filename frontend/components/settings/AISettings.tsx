@@ -51,7 +51,7 @@ const PROVIDER_OPTIONS: { value: Provider; label: string }[] = [
 ];
 
 const FEATURE_KEYS = [
-  "import_template_generator",
+  "import_translator",
   "transaction_classifier",
   "portfolio_analysis",
   "chat",

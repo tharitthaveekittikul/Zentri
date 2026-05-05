@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
-import { PlatformsManager } from "@/components/settings/PlatformsManager";
+import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 import { AISettings } from "@/components/settings/AISettings";
 
 interface HardwareRecommendation {
@@ -104,8 +105,6 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
 
-          <PlatformsManager />
-
           <Card>
             <CardHeader>
               <CardTitle>Display</CardTitle>
@@ -136,12 +135,19 @@ export default function SettingsPage() {
                     ))}
                   </select>
                 </div>
-                <button
-                  onClick={saveCurrencyPrefs}
-                  className="px-4 py-2 bg-primary text-primary-foreground rounded text-sm"
+                <Button
+                  onClick={async () => {
+                    try {
+                      await saveCurrencyPrefs();
+                      toast.success("Display settings saved");
+                    } catch {
+                      toast.error("Failed to save settings");
+                    }
+                  }}
+                  className="hover:bg-primary/90 active:scale-95 transition-all cursor-pointer"
                 >
                   Save
-                </button>
+                </Button>
               </div>
             </CardContent>
           </Card>

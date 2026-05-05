@@ -16,42 +16,99 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
-import { Holding } from "@/lib/services/portfolio";
+import { HoldingRow } from "@/lib/services/portfolio";
 import { PrivacyValue } from "@/components/ui/PrivacyValue";
 
 interface Props {
-  holdings: Holding[];
-  assetMap: Record<string, string>;
+  holdings: HoldingRow[];
+  primaryCurrency: string;
   onDelete: (id: string) => void;
 }
 
-export function HoldingsTable({ holdings, assetMap, onDelete }: Props) {
-  const columns: ColumnDef<Holding>[] = [
+export function HoldingsTable({ holdings, primaryCurrency, onDelete }: Props) {
+  function fmtMoney(val: string | null | undefined): string {
+    if (val == null) return "—";
+    return `${primaryCurrency} ${Number(val).toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+  }
+
+  const columns: ColumnDef<HoldingRow>[] = [
     {
-      accessorKey: "asset_id",
-      header: "Symbol",
+      accessorKey: "symbol",
+      header: "Symbol / Fund Code",
+    },
+    {
+      accessorKey: "outstanding_shares",
+      header: "Outstanding Shares",
       cell: ({ row }) =>
-        assetMap[row.original.asset_id] ?? row.original.asset_id.slice(0, 8),
+        Number(row.original.outstanding_shares).toLocaleString(),
     },
     {
-      accessorKey: "quantity",
-      header: "Quantity",
-      cell: ({ row }) => row.original.quantity,
-    },
-    {
-      accessorKey: "avg_cost_price",
-      header: "Avg Cost",
+      accessorKey: "cost_per_share",
+      header: "Cost per Share",
       cell: ({ row }) => (
-        <PrivacyValue
-          value={`${row.original.currency} ${row.original.avg_cost_price}`}
-        />
+        <PrivacyValue value={fmtMoney(row.original.cost_per_share)} />
       ),
     },
     {
-      accessorKey: "updated_at",
-      header: "Updated",
+      accessorKey: "total_cost",
+      header: "Total Cost",
+      cell: ({ row }) => (
+        <PrivacyValue value={fmtMoney(row.original.total_cost)} />
+      ),
+    },
+    {
+      accessorKey: "current_price",
+      header: "Current Price",
       cell: ({ row }) =>
-        new Date(row.original.updated_at).toLocaleDateString(),
+        row.original.current_price ? (
+          <PrivacyValue value={fmtMoney(row.original.current_price)} />
+        ) : (
+          "—"
+        ),
+    },
+    {
+      accessorKey: "price_1d_change",
+      header: "1D Change",
+      cell: ({ row }) => {
+        const val = row.original.price_1d_change;
+        if (val == null) return "—";
+        const num = Number(val);
+        const color = num >= 0 ? "text-green-600" : "text-red-600";
+        return (
+          <span className={color}>
+            {num >= 0 ? "+" : ""}
+            {num.toFixed(2)}%
+          </span>
+        );
+      },
+    },
+    {
+      accessorKey: "holding_value",
+      header: "Holding Value",
+      cell: ({ row }) =>
+        row.original.holding_value ? (
+          <PrivacyValue value={fmtMoney(row.original.holding_value)} />
+        ) : (
+          "—"
+        ),
+    },
+    {
+      accessorKey: "unrealized_pnl",
+      header: "Unrealized P/L",
+      cell: ({ row }) => {
+        const val = row.original.unrealized_pnl;
+        if (val == null) return "—";
+        const num = Number(val);
+        const color = num >= 0 ? "text-green-600" : "text-red-600";
+        return (
+          <span className={color}>
+            <PrivacyValue value={fmtMoney(val)} />
+          </span>
+        );
+      },
     },
     {
       id: "actions",
@@ -104,7 +161,7 @@ export function HoldingsTable({ holdings, assetMap, onDelete }: Props) {
                 colSpan={columns.length}
                 className="text-center text-muted-foreground py-8"
               >
-                No holdings yet. Add one or import from CSV.
+                No holdings. Add one or import from the Import page.
               </TableCell>
             </TableRow>
           )}

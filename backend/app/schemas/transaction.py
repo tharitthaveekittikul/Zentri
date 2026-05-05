@@ -8,8 +8,20 @@ from pydantic import BaseModel
 
 class TransactionCreate(BaseModel):
     asset_id: uuid.UUID
-    platform_id: uuid.UUID | None = None
-    type: Literal["buy", "sell", "dividend"]
+    platform: str | None = None
+    type: Literal["buy", "sell", "dividend", "reward", "fee", "transfer"]
+    quantity: Decimal
+    price: Decimal
+    fee: Decimal = Decimal("0")
+    executed_at: datetime
+
+
+class ManualTransactionCreate(BaseModel):
+    symbol: str
+    asset_type: str = "us_stock"
+    currency: str = "THB"
+    platform: str | None = None
+    type: Literal["buy", "sell", "dividend", "reward", "fee", "transfer"]
     quantity: Decimal
     price: Decimal
     fee: Decimal = Decimal("0")
@@ -19,7 +31,7 @@ class TransactionCreate(BaseModel):
 class TransactionResponse(BaseModel):
     id: uuid.UUID
     asset_id: uuid.UUID
-    platform_id: uuid.UUID | None
+    platform: str | None
     type: str
     quantity: Decimal
     price: Decimal

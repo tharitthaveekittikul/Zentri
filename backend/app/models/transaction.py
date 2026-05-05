@@ -8,7 +8,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base
 
-TRANSACTION_TYPES = ("buy", "sell", "dividend")
+TRANSACTION_TYPES = ("buy", "sell", "dividend", "reward", "fee", "transfer")
 TRANSACTION_SOURCES = ("manual", "csv_import")
 
 
@@ -18,7 +18,7 @@ class Transaction(Base):
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True)
     asset_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("assets.id"), nullable=False)
-    platform_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("platforms.id"), nullable=True)
+    platform: Mapped[str | None] = mapped_column(String(100), nullable=True)
     type: Mapped[str] = mapped_column(
         Enum(*TRANSACTION_TYPES, name="transaction_type_enum"), nullable=False
     )

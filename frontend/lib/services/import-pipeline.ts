@@ -1,95 +1,56 @@
-import { api } from "@/lib/api";
-
-export interface AnalyzeResponse {
-  signature: string;
-  structure: {
-    headers: string[];
-    sample_rows: Record<string, unknown>[];
-    total_rows: number;
-  };
-  template_status: "match" | "mismatch" | "new";
-  template: ImportTemplate | null;
-  preview_rows: Record<string, unknown>[] | null;
-  matched_platform_id: string | null;
+export interface CanonicalRow {
+  trade_date: string | null;
+  type: string | null;
+  symbol: string | null;
+  unit: string | null;
+  price: string | null;
+  currency: string | null;
+  exchange: string | null;
+  gross_amount: string | null;
+  fee: string | null;
+  gross_thb: string | null;
+  fee_thb: string | null;
+  exchange_rate: string | null;
+  asset_type: string | null;
+  platform: string | null;
+  notes: string | null;
+  [key: string]: unknown;
 }
 
-export interface ImportTemplate {
-  id: string;
-  platform_id: string;
-  file_format: string;
-  json_path: string | null;
-  column_signature: string;
-  field_map: Record<string, string>;
-  asset_type_rules: unknown[];
-  asset_type_fallback: string;
-  currency_default: string;
-  updated_at: string;
+export interface UploadResponse {
+  rows: CanonicalRow[];
+  method: "direct" | "llm_translated";
+  total: number;
 }
 
-export async function analyzeFile(file: File): Promise<AnalyzeResponse> {
+function authHeader(): Record<string, string> {
+  const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : "";
+  return { Authorization: `Bearer ${token}` };
+}
+
+export async function uploadFile(file: File): Promise<UploadResponse> {
   const form = new FormData();
   form.append("file", file);
-  const r = await fetch("/api/v1/import/analyze", {
+  const r = await fetch("/api/v1/import/upload", {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${
-        typeof window !== "undefined" ? localStorage.getItem("access_token") : ""
-      }`,
-    },
+    headers: authHeader(),
     body: form,
   });
-  if (!r.ok) throw new Error("Failed to analyze file");
+  if (!r.ok) {
+    const err = await r.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Upload failed");
+  }
   return r.json();
 }
 
-export class LLMQuotaError extends Error {
-  provider: string;
-  billingUrl: string;
-  constructor(message: string, provider: string, billingUrl: string) {
-    super(message);
-    this.provider = provider;
-    this.billingUrl = billingUrl;
-  }
-}
-
-export async function generateTemplate(
-  platform_id: string,
-  file: File,
-): Promise<{ template: ImportTemplate; preview_rows: Record<string, unknown>[] }> {
-  const form = new FormData();
-  form.append("platform_id", platform_id);
-  form.append("file", file);
-  const r = await fetch("/api/v1/import/generate-template", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${
-        typeof window !== "undefined" ? localStorage.getItem("access_token") : ""
-      }`,
-    },
-    body: form,
-  });
-  if (r.status === 402) {
-    const body = await r.json();
-    throw new LLMQuotaError(body.detail.message, body.detail.provider, body.detail.billing_url);
-  }
-  if (!r.ok) throw new Error("Failed to generate template");
-  return r.json();
-}
-
-export async function confirmImportPipeline(
-  platform_id: string,
-  rows: Record<string, unknown>[],
+export async function confirmImport(
+  rows: CanonicalRow[]
 ): Promise<{ imported: number; errors: unknown[] }> {
   const r = await fetch("/api/v1/import/confirm", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${
-        typeof window !== "undefined" ? localStorage.getItem("access_token") : ""
-      }`,
-    },
-    body: JSON.stringify({ platform_id, rows }),
+    headers: { "Content-Type": "application/json", ...authHeader() },
+    body: JSON.stringify({ rows }),
   });
-  if (!r.ok) throw new Error("Failed to confirm import");
+  if (!r.ok) throw new Error("Confirm failed");
   return r.json();
 }

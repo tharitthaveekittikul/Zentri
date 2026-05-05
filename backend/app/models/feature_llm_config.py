@@ -8,7 +8,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.core.database import Base
 
 FEATURE_KEYS = (
-    "import_template_generator",
+    "import_translator",
     "transaction_classifier",
     "portfolio_analysis",
     "chat",
