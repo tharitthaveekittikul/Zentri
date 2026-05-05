@@ -9,6 +9,7 @@ from app.core.logging import get_logger
 from app.models.asset import Asset
 from app.models.holding import Holding
 from app.models.transaction import Transaction
+from app.services.exchange_rate import get_rate
 
 logger = get_logger(__name__)
 
@@ -203,7 +204,38 @@ async def list_transactions(
     return list(result.scalars().all())
 
 
-async def get_portfolio_summary(db: AsyncSession, user_id: uuid.UUID) -> dict:
+async def get_portfolio_summary(
+    db: AsyncSession,
+    user_id: uuid.UUID,
+    currency_primary: str = "THB",
+    currency_secondary: str = "USD",
+) -> dict:
     rows = await list_holdings_with_assets(db, user_id)
-    total_cost = sum(r["total_cost"] for r in rows)
-    return {"holdings_count": len(rows), "total_cost": total_cost, "primary_currency": "THB"}
+    rate_date = datetime.now(timezone.utc).date()
+
+    total_primary = Decimal("0")
+    for r in rows:
+        holding_currency = r["currency"].upper()
+        cost = r["total_cost"]
+        rate = await get_rate(db, holding_currency, currency_primary)
+        if rate is not None:
+            total_primary += cost * rate
+        else:
+            logger.warning(
+                "portfolio_summary: no rate for %s→%s, using raw value",
+                holding_currency, currency_primary,
+            )
+            total_primary += cost
+
+    sec_rate = await get_rate(db, currency_primary, currency_secondary)
+    total_secondary = total_primary * sec_rate if sec_rate is not None else None
+
+    return {
+        "holdings_count": len(rows),
+        "total_cost": total_primary,
+        "total_cost_secondary": total_secondary,
+        "primary_currency": currency_primary,
+        "secondary_currency": currency_secondary,
+        "exchange_rate": sec_rate,
+        "exchange_rate_date": rate_date.isoformat(),
+    }

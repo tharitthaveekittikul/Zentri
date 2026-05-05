@@ -35,4 +35,8 @@ class HoldingRow(BaseModel):
 class PortfolioSummary(BaseModel):
     holdings_count: int
     total_cost: Decimal
+    total_cost_secondary: Decimal | None = None
     primary_currency: str
+    secondary_currency: str
+    exchange_rate: Decimal | None = None
+    exchange_rate_date: str | None = None

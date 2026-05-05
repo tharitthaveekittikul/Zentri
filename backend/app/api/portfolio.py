@@ -96,7 +96,12 @@ async def portfolio_summary(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    return await portfolio_service.get_portfolio_summary(db, current_user.id)
+    return await portfolio_service.get_portfolio_summary(
+        db,
+        current_user.id,
+        current_user.currency_primary,
+        current_user.currency_secondary,
+    )
 
 
 @router.get("/export")

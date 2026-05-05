@@ -32,7 +32,11 @@ export interface Transaction {
 export interface PortfolioSummary {
   holdings_count: number;
   total_cost: string;
+  total_cost_secondary: string | null;
   primary_currency: string;
+  secondary_currency: string;
+  exchange_rate: string | null;
+  exchange_rate_date: string | null;
 }
 
 export async function fetchHoldings(): Promise<HoldingRow[]> {

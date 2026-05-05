@@ -1,10 +1,11 @@
 "use client";
 
+import { ReactNode } from "react";
 import { usePrivacyStore } from "@/store/privacy";
 import { cn } from "@/lib/utils";
 
 interface Props {
-  value: string;
+  value: string | ReactNode;
   className?: string;
 }
 

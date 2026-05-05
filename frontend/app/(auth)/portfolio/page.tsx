@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -19,20 +19,34 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+import { Info } from "lucide-react";
 import { usePrivacyStore } from "@/store/privacy";
 import { api } from "@/lib/api";
+
+function InfoTooltip({ content }: { content: React.ReactNode }) {
+  return (
+    <span className="relative group inline-flex items-center ml-1 align-middle">
+      <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+      <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-56 rounded-md border bg-popover text-popover-foreground text-xs px-2.5 py-1.5 shadow-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+        {content}
+      </span>
+    </span>
+  );
+}
 
 export default function PortfolioPage() {
   const qc = useQueryClient();
   const { isPrivate } = usePrivacyStore();
   const [primaryCurrency, setPrimaryCurrency] = useState("THB");
+  const [secondaryCurrency, setSecondaryCurrency] = useState("USD");
 
   useEffect(() => {
     api
       .get("/api/v1/settings/display")
       .then((r) => r.json())
-      .then((d: { currency_primary?: string }) => {
+      .then((d: { currency_primary?: string; currency_secondary?: string }) => {
         if (d.currency_primary) setPrimaryCurrency(d.currency_primary);
+        if (d.currency_secondary) setSecondaryCurrency(d.currency_secondary);
       })
       .catch(() => {});
   }, []);
@@ -63,6 +77,7 @@ export default function PortfolioPage() {
   };
 
   const displayCurrency = summary?.primary_currency ?? primaryCurrency;
+  const displaySecondaryCurrency = summary?.secondary_currency ?? secondaryCurrency;
 
   return (
     <div className="space-y-6">
@@ -103,8 +118,18 @@ export default function PortfolioPage() {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">
+            <CardTitle className="text-sm text-muted-foreground flex items-center">
               Total Cost
+              {summary?.exchange_rate && summary.exchange_rate_date && (
+                <InfoTooltip
+                  content={
+                    <>
+                      <p>1 {displayCurrency} = {parseFloat(summary.exchange_rate).toFixed(4)} {displaySecondaryCurrency}</p>
+                      <p className="text-muted-foreground mt-0.5">Rate date: {summary.exchange_rate_date}</p>
+                    </>
+                  }
+                />
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -112,9 +137,14 @@ export default function PortfolioPage() {
               {isPrivate
                 ? "••••"
                 : summary
-                ? `${displayCurrency} ${parseFloat(summary.total_cost).toLocaleString(undefined, { minimumFractionDigits: 2 })}`
+                ? `${parseFloat(summary.total_cost).toLocaleString(undefined, { minimumFractionDigits: 2 })} ${displayCurrency}`
                 : "—"}
             </p>
+            {!isPrivate && summary?.total_cost_secondary != null && (
+              <p className="text-xs text-muted-foreground mt-0.5">
+                ≈ {parseFloat(summary.total_cost_secondary).toLocaleString(undefined, { minimumFractionDigits: 2 })} {displaySecondaryCurrency}
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -125,6 +155,12 @@ export default function PortfolioPage() {
         <HoldingsTable
           holdings={holdings}
           primaryCurrency={displayCurrency}
+          secondaryCurrency={displaySecondaryCurrency}
+          primaryToSecondaryRate={
+            summary?.total_cost_secondary != null && parseFloat(summary.total_cost) > 0
+              ? parseFloat(summary.total_cost_secondary) / parseFloat(summary.total_cost)
+              : undefined
+          }
           onDelete={(id) => deleteMutation.mutate(id)}
         />
       )}
