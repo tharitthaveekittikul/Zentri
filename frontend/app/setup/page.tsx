@@ -8,9 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
-import { setupAccount, type HardwareRecommendation } from "@/lib/services/auth";
+import { setupAccount, saveProfile, type HardwareRecommendation } from "@/lib/services/auth";
 
-type Step = "account" | "hardware" | "llm";
+type Step = "account" | "profile" | "hardware" | "llm";
 
 export default function SetupPage() {
   const router = useRouter();
@@ -18,6 +18,8 @@ export default function SetupPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [hardware, setHardware] = useState<HardwareRecommendation | null>(null);
+  const [birthDate, setBirthDate] = useState("");
+  const [planToAge, setPlanToAge] = useState("85");
   const [loading, setLoading] = useState(false);
 
   async function handleCreateAccount(e: React.FormEvent) {
@@ -31,10 +33,27 @@ export default function SetupPage() {
         return;
       }
       setHardware(result.hardware);
-      setStep("hardware");
+      setStep("profile");
     } finally {
       setLoading(false);
     }
+  }
+
+  async function handleSaveProfile() {
+    setLoading(true);
+    try {
+      if (birthDate) {
+        await saveProfile({
+          birth_date: birthDate,
+          plan_to_age: planToAge ? parseInt(planToAge) : null,
+        });
+      }
+    } catch {
+      // non-fatal — user can update in settings
+    } finally {
+      setLoading(false);
+    }
+    setStep("hardware");
   }
 
   if (step === "account") {
@@ -43,10 +62,8 @@ export default function SetupPage() {
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle>Welcome to Zentri</CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Step 1 of 3 — Create your account
-            </p>
-            <Progress value={33} className="mt-2" />
+            <p className="text-sm text-muted-foreground">Step 1 of 4 — Create your account</p>
+            <Progress value={25} className="mt-2" />
           </CardHeader>
           <CardContent>
             <form onSubmit={handleCreateAccount} className="space-y-4">
@@ -74,14 +91,60 @@ export default function SetupPage() {
     );
   }
 
+  if (step === "profile") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle>Your Profile</CardTitle>
+            <p className="text-sm text-muted-foreground">Step 2 of 4 — Optional</p>
+            <Progress value={50} className="mt-2" />
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-xs text-muted-foreground">
+              Used for age-aware analysis and net worth projections. You can add or change this in Settings later.
+            </p>
+            <div className="space-y-1">
+              <Label>Date of Birth</Label>
+              <Input
+                type="date"
+                value={birthDate}
+                onChange={(e) => setBirthDate(e.target.value)}
+              />
+            </div>
+            <div className="space-y-1">
+              <Label>Plan to Age</Label>
+              <Input
+                type="number"
+                min={1}
+                max={120}
+                value={planToAge}
+                onChange={(e) => setPlanToAge(e.target.value)}
+                placeholder="85"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" className="flex-1" onClick={() => setStep("hardware")}>
+                Skip for now
+              </Button>
+              <Button className="flex-1" disabled={loading} onClick={handleSaveProfile}>
+                {loading ? "Saving..." : "Continue"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   if (step === "hardware") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle>Hardware Detected</CardTitle>
-            <p className="text-sm text-muted-foreground">Step 2 of 3</p>
-            <Progress value={66} className="mt-2" />
+            <p className="text-sm text-muted-foreground">Step 3 of 4</p>
+            <Progress value={75} className="mt-2" />
           </CardHeader>
           <CardContent className="space-y-4">
             {hardware ? (
@@ -118,7 +181,7 @@ export default function SetupPage() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Setup Complete</CardTitle>
-          <p className="text-sm text-muted-foreground">Step 3 of 3</p>
+          <p className="text-sm text-muted-foreground">Step 4 of 4</p>
           <Progress value={100} className="mt-2" />
         </CardHeader>
         <CardContent className="space-y-4">

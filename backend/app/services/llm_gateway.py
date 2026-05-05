@@ -12,6 +12,7 @@ from app.models.feature_llm_config import FeatureLLMConfig
 from app.models.provider_config import ProviderConfig
 from app.services.exchange_rate import get_current_usd_thb
 from app.services.llm_service import LLMResponse, calc_cost
+from app.services.user_context import get_user_age_context
 from sqlalchemy import select
 
 logger = get_logger(__name__)
@@ -262,7 +263,14 @@ class LLMGateway:
         provider = await self._get_provider(config.provider_config_id)
         api_key = decrypt(provider.encrypted_api_key) if provider.encrypted_api_key else None
         adapter = _build_adapter(provider.provider, api_key, provider.host_url)
-        system = config.system_prompt or DEFAULT_SYSTEM_PROMPTS.get(feature_key, "")
+
+        from app.models.user import User
+        user_row = (await self._db.execute(select(User).where(User.id == user_id))).scalar_one_or_none()
+        age_ctx = get_user_age_context(user_row) if user_row else None
+        age_prefix = f"{age_ctx['prompt']}\n\n" if age_ctx else ""
+        logger.debug("Age context injected: %s", age_ctx["prompt"] if age_ctx else "none")
+
+        system = age_prefix + (config.system_prompt or DEFAULT_SYSTEM_PROMPTS.get(feature_key, ""))
         human = HUMAN_PROMPTS[feature_key].format(**variables)
         logger.info("LLM call: feature=%s provider=%s model=%s", feature_key, provider.provider, config.model)
 

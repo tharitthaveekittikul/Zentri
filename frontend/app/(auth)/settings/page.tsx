@@ -6,7 +6,9 @@ import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { AISettings } from "@/components/settings/AISettings";
+import { getProfile, saveProfile, type ProfileSettings } from "@/lib/services/auth";
 
 interface HardwareRecommendation {
   can_run_local_llm: boolean;
@@ -27,6 +29,9 @@ export default function SettingsPage() {
   const CURRENCIES = ["THB", "USD", "EUR", "GBP", "JPY", "SGD"];
   const [currencyPrimary, setCurrencyPrimary] = useState("THB");
   const [currencySecondary, setCurrencySecondary] = useState("USD");
+  const [profile, setProfile] = useState<ProfileSettings | null>(null);
+  const [birthDate, setBirthDate] = useState("");
+  const [planToAge, setPlanToAge] = useState("85");
 
   useEffect(() => {
     api
@@ -47,11 +52,34 @@ export default function SettingsPage() {
       .catch(() => null);
   }, []);
 
+  useEffect(() => {
+    getProfile()
+      .then((p) => {
+        if (!p) return;
+        setProfile(p);
+        setBirthDate(p.birth_date ?? "");
+        setPlanToAge(p.plan_to_age?.toString() ?? "85");
+      })
+      .catch(() => null);
+  }, []);
+
   async function saveCurrencyPrefs() {
     await api.patch("/api/v1/settings/display", {
       currency_primary: currencyPrimary,
       currency_secondary: currencySecondary,
     });
+  }
+
+  async function saveProfileSettings() {
+    const result = await saveProfile({
+      birth_date: birthDate || null,
+      plan_to_age: planToAge ? parseInt(planToAge) : null,
+    });
+    if (result) {
+      setProfile(result);
+      setBirthDate(result.birth_date ?? "");
+      setPlanToAge(result.plan_to_age?.toString() ?? "85");
+    }
   }
 
   return (
@@ -149,6 +177,56 @@ export default function SettingsPage() {
                   Save
                 </Button>
               </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Profile</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex gap-4 items-end">
+                <div className="flex-1">
+                  <label className="text-sm font-medium mb-1 block">Date of Birth</label>
+                  <Input
+                    type="date"
+                    value={birthDate}
+                    onChange={(e) => setBirthDate(e.target.value)}
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="text-sm font-medium mb-1 block">Plan to Age</label>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={120}
+                    value={planToAge}
+                    onChange={(e) => setPlanToAge(e.target.value)}
+                    placeholder="85"
+                  />
+                </div>
+                <Button
+                  onClick={async () => {
+                    try {
+                      await saveProfileSettings();
+                      toast.success("Profile saved");
+                    } catch {
+                      toast.error("Failed to save profile");
+                    }
+                  }}
+                  className="hover:bg-primary/90 active:scale-95 transition-all cursor-pointer"
+                >
+                  Save
+                </Button>
+              </div>
+              {profile?.current_age != null && (
+                <div className="text-xs text-muted-foreground space-y-0.5">
+                  <p>Current age: {profile.current_age}</p>
+                  <p>
+                    Planning horizon: Until {profile.target_year} ({profile.years_remaining} years remaining)
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

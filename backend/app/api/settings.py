@@ -1,3 +1,5 @@
+from datetime import date as date_type
+
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy import select, update
@@ -9,6 +11,7 @@ from app.core.encryption import decrypt, encrypt
 from app.models.llm_settings import LLMSettings
 from app.models.user import User
 from app.services.hardware import detect_hardware
+from app.services.user_context import get_user_age_context
 
 router = APIRouter(prefix="/settings", tags=["settings"])
 
@@ -142,4 +145,54 @@ async def update_display_settings(
     return DisplaySettingsOut(
         currency_primary=current_user.currency_primary,
         currency_secondary=current_user.currency_secondary,
+    )
+
+
+class ProfileSettingsIn(BaseModel):
+    birth_date: date_type | None = None
+    plan_to_age: int | None = None
+
+
+class ProfileSettingsOut(BaseModel):
+    birth_date: date_type | None
+    plan_to_age: int | None
+    current_age: int | None
+    years_remaining: int | None
+    target_year: int | None
+
+
+@router.get("/profile", response_model=ProfileSettingsOut)
+async def get_profile_settings(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    ctx = get_user_age_context(current_user)
+    return ProfileSettingsOut(
+        birth_date=current_user.birth_date,
+        plan_to_age=current_user.plan_to_age,
+        current_age=ctx["current_age"] if ctx else None,
+        years_remaining=ctx["years_remaining"] if ctx else None,
+        target_year=ctx["target_year"] if ctx else None,
+    )
+
+
+@router.patch("/profile", response_model=ProfileSettingsOut)
+async def update_profile_settings(
+    body: ProfileSettingsIn,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    if "birth_date" in body.model_fields_set:
+        current_user.birth_date = body.birth_date
+    if "plan_to_age" in body.model_fields_set:
+        current_user.plan_to_age = body.plan_to_age
+    await db.commit()
+    await db.refresh(current_user)
+    ctx = get_user_age_context(current_user)
+    return ProfileSettingsOut(
+        birth_date=current_user.birth_date,
+        plan_to_age=current_user.plan_to_age,
+        current_age=ctx["current_age"] if ctx else None,
+        years_remaining=ctx["years_remaining"] if ctx else None,
+        target_year=ctx["target_year"] if ctx else None,
     )

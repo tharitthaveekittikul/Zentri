@@ -51,3 +51,24 @@ export async function login(
   saveTokens(data.access_token, data.refresh_token);
   return { ok: true };
 }
+
+export interface ProfileSettings {
+  birth_date: string | null;   // ISO date "YYYY-MM-DD"
+  plan_to_age: number | null;
+  current_age: number | null;
+  years_remaining: number | null;
+  target_year: number | null;
+}
+
+export async function getProfile(): Promise<ProfileSettings | null> {
+  const res = await api.get("/api/v1/settings/profile");
+  return res.ok ? res.json() : null;
+}
+
+export async function saveProfile(data: {
+  birth_date?: string | null;
+  plan_to_age?: number | null;
+}): Promise<ProfileSettings | null> {
+  const res = await api.patch("/api/v1/settings/profile", data);
+  return res.ok ? res.json() : null;
+}

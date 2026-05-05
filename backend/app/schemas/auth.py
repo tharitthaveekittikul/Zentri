@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 
 from pydantic import BaseModel, Field
 
@@ -33,5 +33,7 @@ class UserResponse(BaseModel):
     id: uuid.UUID
     username: str
     created_at: datetime
+    birth_date: date | None = None
+    plan_to_age: int | None = None
 
     model_config = {"from_attributes": True}
