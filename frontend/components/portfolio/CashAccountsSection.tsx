@@ -24,7 +24,9 @@ interface CashAccountState {
 
 export function CashAccountsSection() {
   const [accounts, setAccounts] = useState<CashAccountState[]>([]);
-  const [updateTarget, setUpdateTarget] = useState<CashAccountState | null>(null);
+  const [updateTarget, setUpdateTarget] = useState<CashAccountState | null>(
+    null,
+  );
   const [updateOpen, setUpdateOpen] = useState(false);
 
   const load = useCallback(async () => {
@@ -54,28 +56,33 @@ export function CashAccountsSection() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Cash &amp; Bank Accounts</h2>
+        <h2 className="text-lg font-semibold text-foreground">
+          Cash &amp; Bank Accounts
+        </h2>
         <AddCashAccountDialog onAdded={load} />
       </div>
 
       {accounts.length === 0 ? (
-        <p className="text-sm text-muted-foreground">
-          No cash accounts yet. Add one to track bank balances.
-        </p>
+        <div className="flex flex-col items-center gap-2 py-6 text-muted-foreground">
+          <span className="text-sm font-medium">No cash accounts yet</span>
+          <span className="text-xs">Add one to track bank balances.</span>
+        </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
           {accounts.map(({ asset, latest }) => (
-            <Card key={asset.id}>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base">{asset.symbol}</CardTitle>
+            <Card key={asset.id} className="rounded-2xl border border-border">
+              <CardHeader className="pb-2 px-5 pt-5">
+                <CardTitle className="text-base font-semibold text-foreground">
+                  {asset.symbol}
+                </CardTitle>
                 {asset.metadata_?.account_number && (
                   <p className="text-xs text-muted-foreground">
                     {asset.metadata_.account_number}
                   </p>
                 )}
               </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="text-2xl font-bold">
+              <CardContent className="space-y-3 px-5 pb-5">
+                <div className="text-2xl font-semibold font-mono tabular-nums tracking-tight">
                   <PrivacyValue
                     value={
                       latest
@@ -94,7 +101,7 @@ export function CashAccountsSection() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="w-full"
+                  className="w-full transition-colors duration-150"
                   onClick={() => {
                     setUpdateTarget({ asset, latest });
                     setUpdateOpen(true);
@@ -112,7 +119,9 @@ export function CashAccountsSection() {
         <UpdateCashBalanceDialog
           assetId={updateTarget.asset.id}
           assetSymbol={updateTarget.asset.symbol}
-          currentBalance={updateTarget.latest ? Number(updateTarget.latest.balance) : 0}
+          currentBalance={
+            updateTarget.latest ? Number(updateTarget.latest.balance) : 0
+          }
           open={updateOpen}
           onOpenChange={setUpdateOpen}
           onUpdated={load}

@@ -19,7 +19,7 @@ Calm, composed, trustworthy. A private advisor who has already read everything �
 ## Anti-references
 
 - **Robinhood / crypto-native apps** — gamified green/red, confetti on trades, designed to maximize engagement and trades. Zentri is the opposite of addictive.
-- **Generic SaaS cream** — purple gradient heroes, floating glass cards, "modern startup" templates. Interchangeable and meaningless.
+- **Generic SaaS cream** — purple gradient heroes, "modern startup" templates. Interchangeable and meaningless. Note: structural chrome (sidebar, nav, overlays) uses iOS 26-style Liquid Glass; data cards and content panes stay solid.
 - **Bloomberg Terminal** — overwhelming data density, no breathing room, treats every pixel as a cell in a spreadsheet. Zentri synthesizes; it does not merely dump.
 - **Dark neon / cyberpunk** — neon glows, matrix vibes, techno-hype. Antithetical to calm and trust.
 

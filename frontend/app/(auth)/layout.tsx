@@ -29,7 +29,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <TopNav />
-        <main className="flex-1 overflow-auto p-6">{children}</main>
+        <main className="flex-1 overflow-auto p-6 bg-background">{children}</main>
       </div>
       <CommandPalette />
     </div>

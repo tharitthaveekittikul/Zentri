@@ -83,16 +83,14 @@ export default function PortfolioPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div className="flex items-center justify-between flex-1">
-          <h1 className="text-2xl font-bold">Portfolio</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Portfolio</h1>
+        <div className="flex items-center gap-2">
           <Link
             href="/import"
-            className="px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium"
+            className="inline-flex items-center justify-center h-9 px-5 rounded-full bg-primary text-primary-foreground text-sm font-medium transition-all duration-150 hover:opacity-85 active:scale-[0.97]"
           >
             Import
           </Link>
-        </div>
-        <div className="flex gap-2 ml-4">
           <AddTransactionDialog
             primaryCurrency={displayCurrency}
             onAdded={refresh}
@@ -105,21 +103,21 @@ export default function PortfolioPage() {
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">
+        <Card className="min-h-[96px] flex flex-col justify-between">
+          <CardHeader className="pb-1">
+            <CardTitle className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
               Holdings
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">
+            <p className="text-3xl font-semibold tracking-tight tabular-nums">
               {summary?.holdings_count ?? "—"}
             </p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground flex items-center">
+        <Card className="min-h-[96px] flex flex-col justify-between">
+          <CardHeader className="pb-1">
+            <CardTitle className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center">
               Total Cost
               {summary?.exchange_rate && summary.exchange_rate_date && (
                 <InfoTooltip
@@ -134,7 +132,7 @@ export default function PortfolioPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">
+            <p className="text-2xl font-semibold font-mono tabular-nums tracking-tight">
               {isPrivate
                 ? "••••"
                 : summary
@@ -142,7 +140,7 @@ export default function PortfolioPage() {
                 : "—"}
             </p>
             {!isPrivate && summary?.total_cost_secondary != null && (
-              <p className="text-xs text-muted-foreground mt-0.5">
+              <p className="text-xs text-muted-foreground mt-1 font-mono tabular-nums">
                 ≈ {parseFloat(summary.total_cost_secondary).toLocaleString(undefined, { minimumFractionDigits: 2 })} {displaySecondaryCurrency}
               </p>
             )}

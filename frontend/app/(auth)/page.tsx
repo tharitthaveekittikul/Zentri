@@ -40,26 +40,26 @@ export default function OverviewPage() {
   const sorted = [...snapshotHoldings].sort((a, b) => b.current_value - a.current_value);
 
   return (
-    <div className="p-6 flex flex-col gap-6 max-w-7xl mx-auto">
+    <div className="flex flex-col gap-6 max-w-7xl mx-auto">
       {summaryLoading ? (
-        <Skeleton className="h-24 w-full" />
+        <Skeleton className="h-20 w-full rounded-2xl" />
       ) : summary ? (
         <SummaryBar summary={summary} />
       ) : null}
 
       <NetWorthChart privacyMode={false} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        <div className="lg:col-span-3 bg-card rounded-lg border p-4">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+        <div className="lg:col-span-3 bg-card rounded-2xl border border-border p-5 overflow-hidden">
           <PerformanceChart />
         </div>
-        <div className="lg:col-span-2 bg-card rounded-lg border p-4">
+        <div className="lg:col-span-2 bg-card rounded-2xl border border-border p-5 overflow-hidden">
           <AllocationDonut allocation={allocation} />
         </div>
       </div>
 
       <div>
-        <h2 className="text-sm font-medium text-muted-foreground mb-2">Holdings</h2>
+        <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-3">Holdings</h2>
         <HoldingsSnapshot holdings={sorted} />
       </div>
     </div>

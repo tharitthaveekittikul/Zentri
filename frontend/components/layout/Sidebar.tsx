@@ -31,29 +31,66 @@ const navItems = [
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
+const mainNavItems = navItems.slice(0, 5);
+const toolNavItems = navItems.slice(5);
+
 export function Sidebar() {
   const pathname = usePathname();
   return (
-    <aside className="w-56 border-r bg-card flex flex-col py-4">
-      <div className="px-4 mb-6">
-        <span className="font-bold text-lg">Zentri</span>
+    <aside className="w-56 border-r border-sidebar-border glass-chrome flex flex-col py-4 h-full">
+      <div className="px-5 mb-5">
+        <span className="text-sm font-semibold tracking-widest uppercase text-foreground">Zentri</span>
       </div>
-      <nav className="flex-1 space-y-1 px-2">
-        {navItems.map(({ href, label, icon: Icon }) => (
-          <Link
-            key={href}
-            href={href}
-            className={cn(
-              "flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors",
-              pathname === href
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-            )}
-          >
-            <Icon className="h-4 w-4" />
-            {label}
-          </Link>
-        ))}
+      <nav className="flex-1 flex flex-col gap-0.5 px-2">
+        {mainNavItems.map(({ href, label, icon: Icon }) => {
+          const isActive = pathname === href;
+          return (
+            <Link
+              key={href}
+              href={href}
+              className={cn(
+                "flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-150",
+                isActive
+                  ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                  : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              )}
+            >
+              <Icon
+                className={cn(
+                  "h-4 w-4 shrink-0",
+                  isActive ? "opacity-100" : "opacity-70"
+                )}
+              />
+              {label}
+            </Link>
+          );
+        })}
+
+        <div className="my-3 mx-3 h-px bg-border/50" />
+
+        {toolNavItems.map(({ href, label, icon: Icon }) => {
+          const isActive = pathname === href;
+          return (
+            <Link
+              key={href}
+              href={href}
+              className={cn(
+                "flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-150",
+                isActive
+                  ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                  : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              )}
+            >
+              <Icon
+                className={cn(
+                  "h-4 w-4 shrink-0",
+                  isActive ? "opacity-100" : "opacity-70"
+                )}
+              />
+              {label}
+            </Link>
+          );
+        })}
       </nav>
     </aside>
   );

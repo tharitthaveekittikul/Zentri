@@ -50,7 +50,7 @@ export function HoldingsTable({
 }: Props) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [platformFilter, setPlatformFilter] = useState<string>("all");
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(25);
   const [pageIndex, setPageIndex] = useState(0);
   const [editHolding, setEditHolding] = useState<HoldingRow | null>(null);
   const [editOpen, setEditOpen] = useState(false);
@@ -76,7 +76,10 @@ export function HoldingsTable({
     return nonCashHoldings.filter((h) => h.platform === platformFilter);
   }, [nonCashHoldings, platformFilter]);
 
-  function fmt(val: string | number | null | undefined, currency: string): string {
+  function fmt(
+    val: string | number | null | undefined,
+    currency: string,
+  ): string {
     if (val == null) return "—";
     return `${Number(val).toLocaleString(undefined, {
       minimumFractionDigits: 2,
@@ -105,7 +108,11 @@ export function HoldingsTable({
       if (primaryToSecondaryRate != null && secondaryCurrency) {
         secondaryVal = num * primaryToSecondaryRate;
       }
-    } else if (native === secondary && primaryToSecondaryRate != null && primaryToSecondaryRate > 0) {
+    } else if (
+      native === secondary &&
+      primaryToSecondaryRate != null &&
+      primaryToSecondaryRate > 0
+    ) {
       primaryVal = num / primaryToSecondaryRate;
       secondaryVal = num;
     } else {
@@ -125,7 +132,8 @@ export function HoldingsTable({
   }
 
   function SortIcon({ isSorted }: { isSorted: false | "asc" | "desc" }) {
-    if (!isSorted) return <ArrowUpDown className="ml-1 h-3 w-3 inline opacity-40" />;
+    if (!isSorted)
+      return <ArrowUpDown className="ml-1 h-3 w-3 inline opacity-40" />;
     if (isSorted === "asc") return <ArrowUp className="ml-1 h-3 w-3 inline" />;
     return <ArrowDown className="ml-1 h-3 w-3 inline" />;
   }
@@ -135,7 +143,7 @@ export function HoldingsTable({
       accessorKey: "symbol",
       header: ({ column }) => (
         <button
-          className="flex items-center"
+          className="flex items-center text-xs font-medium text-muted-foreground uppercase tracking-wide"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Symbol <SortIcon isSorted={column.getIsSorted()} />
@@ -147,27 +155,40 @@ export function HoldingsTable({
       sortingFn: "alphanumeric",
       header: ({ column }) => (
         <button
-          className="flex items-center"
+          className="flex items-center text-xs font-medium text-muted-foreground uppercase tracking-wide"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Shares <SortIcon isSorted={column.getIsSorted()} />
         </button>
       ),
-      cell: ({ row }) => Number(row.original.outstanding_shares).toLocaleString(),
+      cell: ({ row }) => (
+        <span className="font-mono tabular-nums">
+          {Number(row.original.outstanding_shares).toLocaleString()}
+        </span>
+      ),
     },
     {
       accessorKey: "cost_per_share",
       sortingFn: "alphanumeric",
       header: ({ column }) => (
         <button
-          className="flex items-center"
+          className="flex items-center text-xs font-medium text-muted-foreground uppercase tracking-wide"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Cost/Share <SortIcon isSorted={column.getIsSorted()} />
         </button>
       ),
       cell: ({ row }) => (
-        <PrivacyValue value={<MoneyCell val={row.original.cost_per_share} nativeCurrency={row.original.currency} />} />
+        <span className="font-mono tabular-nums">
+          <PrivacyValue
+            value={
+              <MoneyCell
+                val={row.original.cost_per_share}
+                nativeCurrency={row.original.currency}
+              />
+            }
+          />
+        </span>
       ),
     },
     {
@@ -175,14 +196,23 @@ export function HoldingsTable({
       sortingFn: "alphanumeric",
       header: ({ column }) => (
         <button
-          className="flex items-center"
+          className="flex items-center text-xs font-medium text-muted-foreground uppercase tracking-wide"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Total Cost <SortIcon isSorted={column.getIsSorted()} />
         </button>
       ),
       cell: ({ row }) => (
-        <PrivacyValue value={<MoneyCell val={row.original.total_cost} nativeCurrency={row.original.currency} />} />
+        <span className="font-mono tabular-nums">
+          <PrivacyValue
+            value={
+              <MoneyCell
+                val={row.original.total_cost}
+                nativeCurrency={row.original.currency}
+              />
+            }
+          />
+        </span>
       ),
     },
     {
@@ -190,26 +220,47 @@ export function HoldingsTable({
       sortingFn: "alphanumeric",
       header: ({ column }) => (
         <button
-          className="flex items-center"
+          className="flex items-center text-xs font-medium text-muted-foreground uppercase tracking-wide"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Price <SortIcon isSorted={column.getIsSorted()} />
         </button>
       ),
       cell: ({ row }) => (
-        <PrivacyValue value={<MoneyCell val={row.original.current_price} nativeCurrency={row.original.currency} />} />
+        <span className="font-mono tabular-nums">
+          <PrivacyValue
+            value={
+              <MoneyCell
+                val={row.original.current_price}
+                nativeCurrency={row.original.currency}
+              />
+            }
+          />
+        </span>
       ),
     },
     {
       accessorKey: "price_1d_change",
-      header: "1D Change",
+      header: () => (
+        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+          1D Change
+        </span>
+      ),
       cell: ({ row }) => {
         const val = row.original.price_1d_change;
-        if (val == null) return "—";
+        if (val == null)
+          return (
+            <span className="font-mono tabular-nums text-muted-foreground">
+              —
+            </span>
+          );
         const num = Number(val);
-        const color = num >= 0 ? "text-green-600" : "text-red-600";
+        const color =
+          num >= 0
+            ? "text-emerald-600 dark:text-emerald-400"
+            : "text-destructive";
         return (
-          <span className={color}>
+          <span className={`${color} font-mono tabular-nums`}>
             {num >= 0 ? "+" : ""}
             {num.toFixed(2)}%
           </span>
@@ -221,14 +272,23 @@ export function HoldingsTable({
       sortingFn: "alphanumeric",
       header: ({ column }) => (
         <button
-          className="flex items-center"
+          className="flex items-center text-xs font-medium text-muted-foreground uppercase tracking-wide"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Value <SortIcon isSorted={column.getIsSorted()} />
         </button>
       ),
       cell: ({ row }) => (
-        <PrivacyValue value={<MoneyCell val={row.original.holding_value} nativeCurrency={row.original.currency} />} />
+        <span className="font-mono tabular-nums">
+          <PrivacyValue
+            value={
+              <MoneyCell
+                val={row.original.holding_value}
+                nativeCurrency={row.original.currency}
+              />
+            }
+          />
+        </span>
       ),
     },
     {
@@ -236,7 +296,7 @@ export function HoldingsTable({
       sortingFn: "alphanumeric",
       header: ({ column }) => (
         <button
-          className="flex items-center"
+          className="flex items-center text-xs font-medium text-muted-foreground uppercase tracking-wide"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           P/L <SortIcon isSorted={column.getIsSorted()} />
@@ -244,12 +304,24 @@ export function HoldingsTable({
       ),
       cell: ({ row }) => {
         const val = row.original.unrealized_pnl;
-        if (val == null) return <span>—</span>;
+        if (val == null)
+          return (
+            <span className="font-mono tabular-nums text-muted-foreground">
+              —
+            </span>
+          );
         const num = Number(val);
-        const color = num >= 0 ? "text-green-600" : "text-red-600";
+        const color =
+          num >= 0
+            ? "text-emerald-600 dark:text-emerald-400"
+            : "text-destructive";
         return (
-          <span className={color}>
-            <PrivacyValue value={<MoneyCell val={val} nativeCurrency={row.original.currency} />} />
+          <span className={`${color} font-mono tabular-nums`}>
+            <PrivacyValue
+              value={
+                <MoneyCell val={val} nativeCurrency={row.original.currency} />
+              }
+            />
           </span>
         );
       },
@@ -342,7 +414,7 @@ export function HoldingsTable({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {[10, 25, 50].map((n) => (
+              {[25, 50, 100].map((n) => (
                 <SelectItem key={n} value={String(n)}>
                   {n}
                 </SelectItem>
@@ -353,7 +425,7 @@ export function HoldingsTable({
       </div>
 
       {/* Table */}
-      <div className="rounded-md border">
+      <div className="rounded-2xl border border-border overflow-hidden">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((hg) => (
@@ -369,21 +441,30 @@ export function HoldingsTable({
           <TableBody>
             {table.getRowModel().rows.length > 0 ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
+                <TableRow
+                  key={row.id}
+                  className="hover:bg-muted/40 transition-colors duration-150"
+                >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="text-center text-muted-foreground py-8"
-                >
-                  No holdings. Add one or import from the Import page.
+                <TableCell colSpan={columns.length} className="py-12">
+                  <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                    <span className="text-2xl">📋</span>
+                    <span className="text-sm font-medium">No holdings yet</span>
+                    <span className="text-xs">
+                      Add one above or import from the Import page.
+                    </span>
+                  </div>
                 </TableCell>
               </TableRow>
             )}
