@@ -28,7 +28,7 @@ function InfoTooltip({ content }: { content: React.ReactNode }) {
   return (
     <span className="relative group inline-flex items-center ml-1 align-middle">
       <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
-      <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-56 rounded-md border bg-popover text-popover-foreground text-xs px-2.5 py-1.5 shadow-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+      <span className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-max max-w-56 rounded-md border bg-popover text-popover-foreground text-xs px-2.5 py-1.5 shadow-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
         {content}
       </span>
     </span>
