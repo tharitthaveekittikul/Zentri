@@ -9,6 +9,7 @@ import {
   fetchSummary,
 } from "@/lib/services/portfolio";
 import { HoldingsTable } from "@/components/portfolio/HoldingsTable";
+import { CashAccountsSection } from "@/components/portfolio/CashAccountsSection";
 import { AddHoldingDialog } from "@/components/portfolio/AddHoldingDialog";
 import { AddTransactionDialog } from "@/components/portfolio/AddTransactionDialog";
 import {
@@ -162,8 +163,11 @@ export default function PortfolioPage() {
               : undefined
           }
           onDelete={(id) => deleteMutation.mutate(id)}
+          onUpdated={refresh}
         />
       )}
+
+      <CashAccountsSection />
     </div>
   );
 }

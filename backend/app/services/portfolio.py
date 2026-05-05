@@ -23,6 +23,7 @@ async def add_holding(
     avg_cost_price: Decimal,
     currency: str,
     purchased_at: date | None = None,
+    platform: str | None = None,
 ) -> tuple[Holding, Asset]:
     symbol = symbol.strip().upper()
     result = await db.execute(
@@ -42,6 +43,7 @@ async def add_holding(
         id=uuid.uuid4(), user_id=user_id, asset_id=asset.id,
         quantity=quantity, avg_cost_price=avg_cost_price,
         currency=currency, purchased_at=purchased_at,
+        platform=platform,
         updated_at=datetime.now(timezone.utc),
     )
     db.add(holding)
@@ -66,6 +68,7 @@ async def list_holdings_with_assets(db: AsyncSession, user_id: uuid.UUID) -> lis
             "symbol": asset.symbol,
             "asset_type": asset.asset_type,
             "currency": holding.currency,
+            "platform": holding.platform,
             "purchased_at": holding.purchased_at,
             "outstanding_shares": holding.quantity,
             "cost_per_share": holding.avg_cost_price,
@@ -89,6 +92,21 @@ async def delete_holding(db: AsyncSession, holding: Holding) -> None:
     logger.info("Holding deleted: id=%s user=%s", holding.id, holding.user_id)
     await db.delete(holding)
     await db.commit()
+
+
+async def update_holding(
+    db: AsyncSession,
+    holding: Holding,
+    data: dict,
+) -> Holding:
+    for field, value in data.items():
+        if value is not None:
+            setattr(holding, field, value)
+    holding.updated_at = datetime.now(timezone.utc)
+    await db.commit()
+    await db.refresh(holding)
+    logger.info("Holding updated: id=%s", holding.id)
+    return holding
 
 
 async def add_manual_transaction(

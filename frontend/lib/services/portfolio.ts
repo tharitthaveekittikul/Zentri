@@ -6,6 +6,7 @@ export interface HoldingRow {
   symbol: string;
   asset_type: string;
   currency: string;
+  platform: string | null;
   purchased_at: string | null;
   outstanding_shares: string;
   cost_per_share: string;
@@ -60,6 +61,20 @@ export async function addHolding(body: {
 
 export async function deleteHolding(id: string): Promise<void> {
   await api.delete(`/api/v1/portfolio/holdings/${id}`);
+}
+
+export async function updateHolding(
+  id: string,
+  data: {
+    quantity?: string;
+    avg_cost_price?: string;
+    currency?: string;
+    platform?: string | null;
+  },
+): Promise<HoldingRow> {
+  const res = await api.patch(`/api/v1/portfolio/holdings/${id}`, data);
+  if (!res.ok) throw new Error("Failed to update holding");
+  return res.json();
 }
 
 export async function fetchSummary(): Promise<PortfolioSummary> {

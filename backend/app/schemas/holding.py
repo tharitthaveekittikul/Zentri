@@ -12,6 +12,14 @@ class HoldingCreate(BaseModel):
     quantity: Decimal
     avg_cost_price: Decimal
     currency: str = "THB"
+    platform: str | None = None
+
+
+class HoldingUpdate(BaseModel):
+    quantity: Decimal | None = None
+    avg_cost_price: Decimal | None = None
+    currency: str | None = None
+    platform: str | None = None
 
 
 class HoldingRow(BaseModel):
@@ -20,6 +28,7 @@ class HoldingRow(BaseModel):
     symbol: str
     asset_type: str
     currency: str
+    platform: str | None = None
     purchased_at: date | None
     outstanding_shares: Decimal
     cost_per_share: Decimal

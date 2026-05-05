@@ -22,3 +22,4 @@ class Holding(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
+    platform: Mapped[str | None] = mapped_column(String(100), nullable=True)

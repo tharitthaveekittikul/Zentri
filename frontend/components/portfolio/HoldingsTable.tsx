@@ -1,9 +1,13 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  SortingState,
   useReactTable,
 } from "@tanstack/react-table";
 import {
@@ -15,17 +19,25 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Trash2, Pencil, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { HoldingRow } from "@/lib/services/portfolio";
 import { PrivacyValue } from "@/components/ui/PrivacyValue";
+import { EditHoldingDialog } from "./EditHoldingDialog";
 
 interface Props {
   holdings: HoldingRow[];
   primaryCurrency: string;
   secondaryCurrency?: string;
-  /** Rate to convert 1 unit of primaryCurrency → secondaryCurrency */
   primaryToSecondaryRate?: number;
   onDelete: (id: string) => void;
+  onUpdated: () => void;
 }
 
 export function HoldingsTable({
@@ -34,7 +46,36 @@ export function HoldingsTable({
   secondaryCurrency,
   primaryToSecondaryRate,
   onDelete,
+  onUpdated,
 }: Props) {
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [platformFilter, setPlatformFilter] = useState<string>("all");
+  const [pageSize, setPageSize] = useState(10);
+  const [pageIndex, setPageIndex] = useState(0);
+  const [editHolding, setEditHolding] = useState<HoldingRow | null>(null);
+  const [editOpen, setEditOpen] = useState(false);
+
+  // Filter out cash assets — shown in a separate section
+  const nonCashHoldings = useMemo(
+    () => holdings.filter((h) => h.asset_type !== "cash"),
+    [holdings],
+  );
+
+  // Unique non-null platforms for dropdown
+  const platforms = useMemo(() => {
+    const seen = new Set<string>();
+    for (const h of nonCashHoldings) {
+      if (h.platform) seen.add(h.platform);
+    }
+    return Array.from(seen).sort();
+  }, [nonCashHoldings]);
+
+  // Apply platform filter
+  const filteredHoldings = useMemo(() => {
+    if (platformFilter === "all") return nonCashHoldings;
+    return nonCashHoldings.filter((h) => h.platform === platformFilter);
+  }, [nonCashHoldings, platformFilter]);
+
   function fmt(val: string | number | null | undefined, currency: string): string {
     if (val == null) return "—";
     return `${Number(val).toLocaleString(undefined, {
@@ -60,20 +101,15 @@ export function HoldingsTable({
     let secondaryVal: number | null = null;
 
     if (native === primary) {
-      // Already in primary — convert to secondary for hint
       primaryVal = num;
       if (primaryToSecondaryRate != null && secondaryCurrency) {
         secondaryVal = num * primaryToSecondaryRate;
       }
     } else if (native === secondary && primaryToSecondaryRate != null && primaryToSecondaryRate > 0) {
-      // Native is secondary — convert to primary, keep native as secondary hint
       primaryVal = num / primaryToSecondaryRate;
       secondaryVal = num;
     } else {
-      // Unknown currency — show native as-is with its own label
-      return (
-        <span>{fmt(num, nativeCurrency)}</span>
-      );
+      return <span>{fmt(num, nativeCurrency)}</span>;
     }
 
     return (
@@ -88,34 +124,78 @@ export function HoldingsTable({
     );
   }
 
+  function SortIcon({ isSorted }: { isSorted: false | "asc" | "desc" }) {
+    if (!isSorted) return <ArrowUpDown className="ml-1 h-3 w-3 inline opacity-40" />;
+    if (isSorted === "asc") return <ArrowUp className="ml-1 h-3 w-3 inline" />;
+    return <ArrowDown className="ml-1 h-3 w-3 inline" />;
+  }
+
   const columns: ColumnDef<HoldingRow>[] = [
     {
       accessorKey: "symbol",
-      header: "Symbol / Fund Code",
+      header: ({ column }) => (
+        <button
+          className="flex items-center"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Symbol <SortIcon isSorted={column.getIsSorted()} />
+        </button>
+      ),
     },
     {
       accessorKey: "outstanding_shares",
-      header: "Outstanding Shares",
-      cell: ({ row }) =>
-        Number(row.original.outstanding_shares).toLocaleString(),
+      sortingFn: "alphanumeric",
+      header: ({ column }) => (
+        <button
+          className="flex items-center"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Shares <SortIcon isSorted={column.getIsSorted()} />
+        </button>
+      ),
+      cell: ({ row }) => Number(row.original.outstanding_shares).toLocaleString(),
     },
     {
       accessorKey: "cost_per_share",
-      header: "Cost per Share",
+      sortingFn: "alphanumeric",
+      header: ({ column }) => (
+        <button
+          className="flex items-center"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Cost/Share <SortIcon isSorted={column.getIsSorted()} />
+        </button>
+      ),
       cell: ({ row }) => (
         <PrivacyValue value={<MoneyCell val={row.original.cost_per_share} nativeCurrency={row.original.currency} />} />
       ),
     },
     {
       accessorKey: "total_cost",
-      header: "Total Cost",
+      sortingFn: "alphanumeric",
+      header: ({ column }) => (
+        <button
+          className="flex items-center"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Total Cost <SortIcon isSorted={column.getIsSorted()} />
+        </button>
+      ),
       cell: ({ row }) => (
         <PrivacyValue value={<MoneyCell val={row.original.total_cost} nativeCurrency={row.original.currency} />} />
       ),
     },
     {
       accessorKey: "current_price",
-      header: "Current Price",
+      sortingFn: "alphanumeric",
+      header: ({ column }) => (
+        <button
+          className="flex items-center"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Price <SortIcon isSorted={column.getIsSorted()} />
+        </button>
+      ),
       cell: ({ row }) => (
         <PrivacyValue value={<MoneyCell val={row.original.current_price} nativeCurrency={row.original.currency} />} />
       ),
@@ -138,14 +218,30 @@ export function HoldingsTable({
     },
     {
       accessorKey: "holding_value",
-      header: "Holding Value",
+      sortingFn: "alphanumeric",
+      header: ({ column }) => (
+        <button
+          className="flex items-center"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Value <SortIcon isSorted={column.getIsSorted()} />
+        </button>
+      ),
       cell: ({ row }) => (
         <PrivacyValue value={<MoneyCell val={row.original.holding_value} nativeCurrency={row.original.currency} />} />
       ),
     },
     {
       accessorKey: "unrealized_pnl",
-      header: "Unrealized P/L",
+      sortingFn: "alphanumeric",
+      header: ({ column }) => (
+        <button
+          className="flex items-center"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          P/L <SortIcon isSorted={column.getIsSorted()} />
+        </button>
+      ),
       cell: ({ row }) => {
         const val = row.original.unrealized_pnl;
         if (val == null) return <span>—</span>;
@@ -161,60 +257,172 @@ export function HoldingsTable({
     {
       id: "actions",
       cell: ({ row }) => (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => onDelete(row.original.id)}
-        >
-          <Trash2 className="h-4 w-4 text-destructive" />
-        </Button>
+        <div className="flex gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => {
+              setEditHolding(row.original);
+              setEditOpen(true);
+            }}
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onDelete(row.original.id)}
+          >
+            <Trash2 className="h-4 w-4 text-destructive" />
+          </Button>
+        </div>
       ),
     },
   ];
 
   const table = useReactTable({
-    data: holdings,
+    data: filteredHoldings,
     columns,
+    state: { sorting, pagination: { pageIndex, pageSize } },
+    onSortingChange: setSorting,
+    onPaginationChange: (updater) => {
+      const next =
+        typeof updater === "function"
+          ? updater({ pageIndex, pageSize })
+          : updater;
+      setPageIndex(next.pageIndex);
+      setPageSize(next.pageSize);
+    },
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    manualPagination: false,
   });
 
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((hg) => (
-            <TableRow key={hg.id}>
-              {hg.headers.map((h) => (
-                <TableHead key={h.id}>
-                  {flexRender(h.column.columnDef.header, h.getContext())}
-                </TableHead>
+    <div className="space-y-2">
+      {/* Toolbar */}
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">Platform:</span>
+          <Select
+            value={platformFilter}
+            onValueChange={(v) => {
+              if (v !== null) {
+                setPlatformFilter(v);
+                setPageIndex(0);
+              }
+            }}
+          >
+            <SelectTrigger className="h-8 w-[180px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Platforms</SelectItem>
+              {platforms.map((p) => (
+                <SelectItem key={p} value={p}>
+                  {p}
+                </SelectItem>
               ))}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">Rows:</span>
+          <Select
+            value={String(pageSize)}
+            onValueChange={(v) => {
+              if (v !== null) {
+                setPageSize(Number(v));
+                setPageIndex(0);
+              }
+            }}
+          >
+            <SelectTrigger className="h-8 w-[80px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {[10, 25, 50].map((n) => (
+                <SelectItem key={n} value={String(n)}>
+                  {n}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((hg) => (
+              <TableRow key={hg.id}>
+                {hg.headers.map((h) => (
+                  <TableHead key={h.id}>
+                    {flexRender(h.column.columnDef.header, h.getContext())}
+                  </TableHead>
                 ))}
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell
-                colSpan={columns.length}
-                className="text-center text-muted-foreground py-8"
-              >
-                No holdings. Add one or import from the Import page.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows.length > 0 ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="text-center text-muted-foreground py-8"
+                >
+                  No holdings. Add one or import from the Import page.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Pagination */}
+      <div className="flex items-center justify-between text-sm text-muted-foreground">
+        <span>
+          Page {table.getState().pagination.pageIndex + 1} of{" "}
+          {Math.max(1, table.getPageCount())}
+        </span>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            ← Prev
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Next →
+          </Button>
+        </div>
+      </div>
+
+      <EditHoldingDialog
+        holding={editHolding}
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        onUpdated={onUpdated}
+      />
     </div>
   );
 }

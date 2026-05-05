@@ -9,9 +9,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.deps import get_current_user
 from app.core.database import get_db
 from app.models.user import User
-from app.schemas.holding import HoldingCreate, HoldingRow, PortfolioSummary
+from app.models.asset import Asset
+from app.schemas.holding import HoldingCreate, HoldingRow, HoldingUpdate, PortfolioSummary
 from app.schemas.transaction import ManualTransactionCreate, TransactionCreate, TransactionResponse
 from app.services import portfolio as portfolio_service
+from sqlalchemy import select
 
 router = APIRouter(prefix="/portfolio", tags=["portfolio"])
 
@@ -24,13 +26,15 @@ async def add_holding(
 ):
     holding, asset = await portfolio_service.add_holding(
         db, current_user.id, body.symbol, body.asset_type,
-        body.quantity, body.avg_cost_price, body.currency, body.purchased_at,
+        body.quantity, body.avg_cost_price, body.currency,
+        body.purchased_at, body.platform,
     )
     total_cost = holding.quantity * holding.avg_cost_price
     return HoldingRow(
         id=holding.id, asset_id=holding.asset_id,
         symbol=asset.symbol, asset_type=asset.asset_type,
-        currency=holding.currency, purchased_at=holding.purchased_at,
+        currency=holding.currency, platform=holding.platform,
+        purchased_at=holding.purchased_at,
         outstanding_shares=holding.quantity, cost_per_share=holding.avg_cost_price,
         total_cost=total_cost,
     )
@@ -56,6 +60,34 @@ async def delete_holding(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Holding not found")
     await portfolio_service.delete_holding(db, holding)
     return Response(status_code=204)
+
+
+@router.patch("/holdings/{holding_id}", response_model=HoldingRow)
+async def update_holding(
+    holding_id: uuid.UUID,
+    body: HoldingUpdate,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    holding = await portfolio_service.get_holding(db, current_user.id, holding_id)
+    if holding is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Holding not found")
+    updated = await portfolio_service.update_holding(
+        db, holding, body.model_dump(exclude_none=True)
+    )
+    result = await db.execute(
+        select(Asset).where(Asset.id == updated.asset_id)
+    )
+    asset = result.scalar_one()
+    total_cost = updated.quantity * updated.avg_cost_price
+    return HoldingRow(
+        id=updated.id, asset_id=updated.asset_id,
+        symbol=asset.symbol, asset_type=asset.asset_type,
+        currency=updated.currency, platform=updated.platform,
+        purchased_at=updated.purchased_at,
+        outstanding_shares=updated.quantity, cost_per_share=updated.avg_cost_price,
+        total_cost=total_cost,
+    )
 
 
 @router.post("/transactions/manual", response_model=TransactionResponse, status_code=201)
