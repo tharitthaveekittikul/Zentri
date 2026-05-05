@@ -11,6 +11,7 @@ JOB_TYPES = (
     "price_fetch_us", "price_fetch_crypto",
     "price_fetch_gold", "price_fetch_benchmark",
     "ingest_document", "run_analysis",
+    "watchlist_discovery", "watchlist_scan",
 )
 JOB_STATUSES = ("queued", "running", "done", "failed")
 

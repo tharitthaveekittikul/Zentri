@@ -12,9 +12,10 @@ export interface FeatureLLMConfig {
 
 export const FEATURE_LABELS: Record<string, string> = {
   import_translator: "Import Translator",
-  transaction_classifier: "Transaction Classifier",
   portfolio_analysis: "Portfolio Analysis",
   chat: "Chat Assistant",
+  watchlist_scan: "Watchlist Scanner",
+  watchlist_discovery: "Watchlist Discovery",
 };
 
 export async function listFeatureConfigs(): Promise<FeatureLLMConfig[]> {

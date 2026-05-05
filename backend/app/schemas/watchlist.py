@@ -38,4 +38,19 @@ class WatchlistItemOut(BaseModel):
     asset: AssetSummary
     current_price: Decimal | None
     pct_from_target: float | None
+    last_verdict: str | None = None
+    ai_suggested_price: Decimal | None = None
+    last_scanned_at: datetime | None = None
+    model_config = ConfigDict(from_attributes=True)
+
+
+class WatchlistSuggestionOut(BaseModel):
+    id: uuid.UUID
+    symbol: str
+    asset_id: uuid.UUID | None
+    reasoning: str
+    suggested_price: Decimal | None
+    verdict: str
+    status: str
+    created_at: datetime
     model_config = ConfigDict(from_attributes=True)

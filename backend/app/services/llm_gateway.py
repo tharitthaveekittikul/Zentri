@@ -19,9 +19,10 @@ logger = get_logger(__name__)
 
 FEATURE_KEYS = (
     "import_translator",
-    "transaction_classifier",
     "portfolio_analysis",
     "chat",
+    "watchlist_scan",
+    "watchlist_discovery",
 )
 
 DEFAULT_SYSTEM_PROMPTS: dict[str, str] = {
@@ -57,11 +58,6 @@ DEFAULT_SYSTEM_PROMPTS: dict[str, str] = {
         "  \"asset_type_fallback\": \"thai_stock\"\n"
         "}"
     ),
-    "transaction_classifier": (
-        "You are a financial asset classifier. Given a symbol, exchange, and currency, "
-        "return the most appropriate asset_type from: us_stock, thai_stock, th_fund, etf, crypto, gold, cash. "
-        "Respond with a single word only."
-    ),
     "portfolio_analysis": (
         "You are a portfolio analyst. Analyze the user's portfolio allocation, performance, and risk. "
         "Provide concise, actionable insights. Be specific with numbers. Use Thai Baht (THB) as base currency."
@@ -71,19 +67,42 @@ DEFAULT_SYSTEM_PROMPTS: dict[str, str] = {
         "Answer questions about the user's portfolio clearly and concisely. "
         "When you don't know something, say so."
     ),
+    "watchlist_scan": (
+        "You are a financial analyst evaluating an asset as a potential buy opportunity. "
+        "The user does not currently hold this asset. Analyze the recent price history and research context. "
+        "Respond ONLY with valid JSON in this exact format:\n"
+        "{\"verdict\": \"BUY\" | \"SELL\" | \"HOLD\", \"suggested_price\": <number or null>, "
+        "\"reasoning\": \"<2-3 sentence explanation>\"}\n"
+        "Do not include any text outside the JSON object."
+    ),
+    "watchlist_discovery": (
+        "You are a portfolio advisor. Based on the user's current holdings, suggest assets they should consider watching. "
+        "Respond ONLY with a valid JSON array in this exact format:\n"
+        "[{\"symbol\": \"<TICKER>\", \"verdict\": \"BUY\" | \"SELL\" | \"HOLD\", "
+        "\"suggested_price\": <number or null>, \"reasoning\": \"<2-3 sentences>\"}]\n"
+        "Suggest exactly 3 to 5 assets not already in the portfolio or watchlist. "
+        "Do not include any text outside the JSON array."
+    ),
 }
 
 HUMAN_PROMPTS: dict[str, str] = {
     "import_translator": "File format: {file_format}\nHeaders/keys: {headers}\n\nSample rows (first 5):\n{sample_rows}",
-    "transaction_classifier": (
-        "Symbol: {symbol}\nExchange: {exchange}\nCurrency: {currency}\n"
-        "What is the asset_type?"
-    ),
     "portfolio_analysis": (
         "Portfolio summary:\n{summary}\n\nAllocation:\n{allocation}\n\n"
         "Provide 3-5 key insights."
     ),
     "chat": "{message}",
+    "watchlist_scan": (
+        "Asset: {symbol}\n\n"
+        "Recent price history (last 10 days):\n{prices_txt}\n\n"
+        "Research context:\n{rag_context}\n\n"
+        "Should I buy this asset? Provide your JSON verdict."
+    ),
+    "watchlist_discovery": (
+        "Current portfolio holdings:\n{holdings_txt}\n\n"
+        "Already on watchlist (exclude these):\n{watchlist_txt}\n\n"
+        "Suggest 3-5 assets worth watching based on the portfolio above. Respond with JSON array."
+    ),
 }
 
 

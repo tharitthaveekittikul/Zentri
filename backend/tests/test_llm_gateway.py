@@ -16,13 +16,6 @@ def test_human_prompt_has_placeholders():
     assert "{sample_rows}" in prompt
 
 
-def test_human_prompt_classifier_has_placeholders():
-    prompt = HUMAN_PROMPTS["transaction_classifier"]
-    assert "{symbol}" in prompt
-    assert "{exchange}" in prompt
-    assert "{currency}" in prompt
-
-
 @pytest.mark.asyncio
 async def test_get_call_log_detail_404_for_unknown_id(auth_client):
     fake_id = "00000000-0000-0000-0000-000000000000"

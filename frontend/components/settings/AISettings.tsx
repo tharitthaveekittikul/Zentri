@@ -52,9 +52,10 @@ const PROVIDER_OPTIONS: { value: Provider; label: string }[] = [
 
 const FEATURE_KEYS = [
   "import_translator",
-  "transaction_classifier",
   "portfolio_analysis",
   "chat",
+  "watchlist_scan",
+  "watchlist_discovery",
 ];
 
 type FeatureEdit = {
