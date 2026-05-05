@@ -78,11 +78,11 @@ services:
     environment:
       - IS_PERSISTENT=TRUE
     healthcheck:
-      test: ["CMD-SHELL", "python3 -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v2/heartbeat')\""]
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/localhost/8000 && printf \"GET /api/v2/heartbeat HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n\" >&3 && head -1 <&3 | grep -q 200'"]
       interval: 10s
       timeout: 10s
-      retries: 15
-      start_period: 60s
+      retries: 10
+      start_period: 30s
 
   ollama:
     image: ollama/ollama
