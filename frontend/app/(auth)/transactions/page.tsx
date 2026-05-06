@@ -118,13 +118,13 @@ export default function TransactionsPage() {
   };
 
   return (
-    <div className="p-6 space-y-4">
+    <div className="space-y-4">
       <h1 className="text-2xl font-bold">Transactions</h1>
 
       {loading ? (
         <p className="text-muted-foreground">Loading...</p>
       ) : (
-        <div className="rounded-md border">
+        <div className="rounded-md border overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>

@@ -157,12 +157,12 @@ export default function AIUsagePage() {
     : ["all"];
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6">
       <h1 className="text-xl font-semibold">AI Usage</h1>
 
       {summary && (
         <>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <Card>
               <CardHeader className="pb-1">
                 <CardTitle className="text-sm">Total Spend</CardTitle>
@@ -240,6 +240,7 @@ export default function AIUsagePage() {
             </Select>
           </div>
 
+          <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
@@ -315,6 +316,7 @@ export default function AIUsagePage() {
               )}
             </TableBody>
           </Table>
+          </div>
         </TabsContent>
 
         <TabsContent value="call-logs" className="pt-2">
@@ -323,6 +325,7 @@ export default function AIUsagePage() {
               Refresh
             </Button>
           </div>
+          <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
@@ -370,6 +373,7 @@ export default function AIUsagePage() {
               )}
             </TableBody>
           </Table>
+          </div>
         </TabsContent>
       </Tabs>
 

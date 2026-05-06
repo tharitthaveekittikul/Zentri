@@ -219,6 +219,10 @@ html:root.dark {
   ::view-transition-new(root) {
     animation: none !important;
   }
+
+  .nav-title-in {
+    animation: none !important;
+  }
 }
 
 @keyframes icon-spin-in {
@@ -229,6 +233,17 @@ html:root.dark {
   to {
     transform: rotate(0deg) scale(1);
     opacity: 1;
+  }
+}
+
+@keyframes nav-title-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -245,5 +260,22 @@ html:root.dark {
       background: var(--background);
       box-shadow: none;
     }
+  }
+
+  /* Safe-area utilities for iOS notch / home indicator */
+  /* Floating bar: 62px height + 14px bottom offset + 14px extra clearance */
+  .pb-safe-tab {
+    padding-bottom: calc(90px + env(safe-area-inset-bottom));
+  }
+
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  /* Prevent double-tap zoom on interactive elements — iOS UX */
+  button,
+  a,
+  [role="button"] {
+    touch-action: manipulation;
   }
 }

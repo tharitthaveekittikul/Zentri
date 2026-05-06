@@ -45,7 +45,7 @@ export default function PipelinePage() {
 
   if (isLoading) {
     return (
-      <div className="p-6 space-y-4">
+      <div className="space-y-4">
         <h1 className="text-2xl font-bold">Pipeline Monitor</h1>
         <p className="text-muted-foreground">Loading...</p>
       </div>
@@ -53,7 +53,7 @@ export default function PipelinePage() {
   }
 
   return (
-    <div className="p-6 space-y-4">
+    <div className="space-y-4">
       <div>
         <h1 className="text-2xl font-bold">Pipeline Monitor</h1>
         <p className="text-muted-foreground text-sm">

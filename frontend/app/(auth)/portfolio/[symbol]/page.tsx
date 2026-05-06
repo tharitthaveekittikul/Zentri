@@ -71,7 +71,7 @@ export default function AssetDetailPage() {
       : null;
 
   return (
-    <div className="p-6 flex flex-col gap-6 max-w-5xl mx-auto">
+    <div className="flex flex-col gap-6 max-w-5xl mx-auto">
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold">{symbol.toUpperCase()}</h1>

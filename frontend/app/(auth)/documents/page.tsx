@@ -107,8 +107,8 @@ export default function DocumentsPage() {
   }
 
   return (
-    <div className="p-6 space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-xl font-semibold">Document Library</h1>
         <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
           <DialogTrigger>
@@ -170,6 +170,7 @@ export default function DocumentsPage() {
         className="max-w-xs"
       />
 
+      <div className="overflow-x-auto">
       <Table>
         <TableHeader>
           <TableRow>
@@ -226,6 +227,7 @@ export default function DocumentsPage() {
           )}
         </TableBody>
       </Table>
+      </div>
     </div>
   );
 }

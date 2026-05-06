@@ -63,7 +63,7 @@ export default function BackupPage() {
   }
 
   return (
-    <div className="max-w-xl mx-auto space-y-6 p-6">
+    <div className="max-w-xl mx-auto space-y-6">
       <div>
         <h1 className="text-xl font-semibold">Backup &amp; Restore</h1>
         <p className="text-sm text-muted-foreground mt-1">

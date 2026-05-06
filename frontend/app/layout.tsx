@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { Toaster } from "@/components/ui/sonner";
@@ -17,6 +17,12 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Zentri — Personal Financial OS",
   description: "Privacy-first financial operating system",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

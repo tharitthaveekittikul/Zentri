@@ -192,8 +192,8 @@ export default function DividendsPage() {
   const allEvents = calendar.months.flatMap((m) => m.events);
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">Dividend Calendar</h1>
         <Button variant="outline" size="sm" onClick={handleRefresh} disabled={refreshing}>
           <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`} />
@@ -214,7 +214,7 @@ export default function DividendsPage() {
                 No upcoming dividends. Click Refresh to fetch data.
               </p>
             ) : (
-              <div className="rounded-md border">
+              <div className="rounded-md border overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>

@@ -200,7 +200,7 @@ export default function SettingsPage() {
               <CardTitle>Display</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex gap-4 items-end">
+              <div className="flex flex-col sm:flex-row gap-4 sm:items-end">
                 <div className="flex-1">
                   <label className="text-sm font-medium mb-1 block">Primary Currency</label>
                   <select
@@ -247,7 +247,7 @@ export default function SettingsPage() {
               <CardTitle>Profile</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex gap-4 items-end">
+              <div className="flex flex-col sm:flex-row gap-4 sm:items-end">
                 <div className="flex-1">
                   <label className="text-sm font-medium mb-1 block">Date of Birth</label>
                   <Input

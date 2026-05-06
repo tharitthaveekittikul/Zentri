@@ -39,7 +39,7 @@ const toolNavItems = navItems.slice(5);
 export function Sidebar() {
   const pathname = usePathname();
   return (
-    <aside className="w-56 border-r border-sidebar-border glass-chrome flex flex-col py-4 h-full">
+    <aside className="hidden md:flex w-56 border-r border-sidebar-border glass-chrome flex-col py-4 h-full">
       <div className="px-5 mb-5">
         <span className="text-sm font-semibold tracking-widest uppercase text-foreground">Zentri</span>
       </div>

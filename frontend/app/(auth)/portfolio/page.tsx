@@ -82,9 +82,9 @@ export default function PortfolioPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-start sm:items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold tracking-tight">Portfolio</h1>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap justify-end">
           <Link
             href="/import"
             className="inline-flex items-center justify-center h-9 px-5 rounded-full bg-primary text-primary-foreground text-sm font-medium transition-all duration-150 hover:opacity-85 active:scale-[0.97]"

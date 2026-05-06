@@ -275,10 +275,10 @@ export default function WatchlistPage() {
   };
 
   return (
-    <div className="p-6 space-y-8">
-      <div className="flex items-center justify-between">
+    <div className="space-y-8">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">Watchlist</h1>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button
             variant="outline"
             size="sm"
@@ -316,7 +316,7 @@ export default function WatchlistPage() {
           Discover New for AI suggestions.
         </p>
       ) : (
-        <div className="rounded-md border">
+        <div className="rounded-md border overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
