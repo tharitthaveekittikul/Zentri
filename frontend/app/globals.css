@@ -58,34 +58,37 @@ html:root.dark {
 }
 
 :root {
-  /* ── Base palette (light) — pure monochrome iOS ── */
-  --background: oklch(0.95 0 0);
+  /* ── Base palette (light) — iOS blue-gray ── */
+  --background: oklch(0.955 0.006 264);
   --foreground: oklch(0.11 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.11 0 0);
-  --popover: oklch(1 0 0 / 90%);
+  --popover: oklch(1 0 0 / 94%);
   --popover-foreground: oklch(0.11 0 0);
   --primary: oklch(0.11 0 0);
   --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.93 0 0);
+  --secondary: oklch(0.925 0.004 264);
   --secondary-foreground: oklch(0.11 0 0);
-  --muted: oklch(0.93 0 0);
+  --muted: oklch(0.925 0.004 264);
   --muted-foreground: oklch(0.48 0 0);
-  --accent: oklch(0.93 0 0);
+  --accent: oklch(0.925 0.004 264);
   --accent-foreground: oklch(0.11 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.88 0 0);
-  --input: oklch(0.88 0 0);
+  --border: oklch(0 0 0 / 8%);
+  --input: oklch(0 0 0 / 8%);
   --ring: oklch(0.11 0 0);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.72 0 0);
   --chart-3: oklch(0.556 0 0);
   --chart-4: oklch(0.439 0 0);
   --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
+  --radius: 0.75rem;
+
+  /* ── Card ambient shadow (light) ── */
+  --card-shadow: 0 1px 4px oklch(0 0 0 / 5%), 0 6px 20px oklch(0 0 0 / 5%);
 
   /* ── Sidebar glass (light) ── */
-  --sidebar: oklch(1 0 0 / 65%);
+  --sidebar: oklch(1 0 0 / 68%);
   --sidebar-foreground: oklch(0.48 0 0);
   --sidebar-primary: oklch(0.11 0 0);
   --sidebar-primary-foreground: oklch(1 0 0);
@@ -94,56 +97,69 @@ html:root.dark {
   --sidebar-border: oklch(0.11 0 0 / 8%);
   --sidebar-ring: oklch(0.11 0 0);
 
+  /* ── Signal colors (light) ── */
+  --signal-gain-bg: oklch(0.95 0.05 145 / 12%);
+  --signal-gain-text: oklch(0.35 0.10 145);
+  --signal-loss-bg: oklch(0.577 0.245 27.325 / 8%);
+
   /* ── Glass tokens (light) ── */
   --glass-blur: 32px;
-  --glass-saturate: 180%;
-  --glass-bg: oklch(1 0 0 / 65%);
+  --glass-saturate: 200%;
+  --glass-bg: oklch(1 0 0 / 68%);
   --glass-border: oklch(0.11 0 0 / 8%);
-  --glass-specular: oklch(1 0 0 / 70%);
+  --glass-specular: oklch(1 0 0 / 72%);
 }
 
 .dark {
-  /* ── Base palette (dark) — premium carbon, not pure black ── */
-  --background: oklch(0.145 0.004 255);
-  --foreground: oklch(0.96 0 0);
-  --card: oklch(0.185 0.003 255);
-  --card-foreground: oklch(0.96 0 0);
-  --popover: oklch(0.185 0.003 255 / 94%);
-  --popover-foreground: oklch(0.96 0 0);
-  --primary: oklch(0.96 0 0);
-  --primary-foreground: oklch(0.145 0.004 255);
-  --secondary: oklch(0.22 0.003 255);
-  --secondary-foreground: oklch(0.96 0 0);
-  --muted: oklch(0.22 0.003 255);
-  --muted-foreground: oklch(0.58 0 0);
-  --accent: oklch(0.24 0.003 255);
-  --accent-foreground: oklch(0.96 0 0);
+  /* ── Base palette (dark) — true black iOS ── */
+  --background: oklch(0 0 0);
+  --foreground: oklch(0.97 0 0);
+  --card: oklch(0.13 0 0);
+  --card-foreground: oklch(0.97 0 0);
+  --popover: oklch(0.13 0 0 / 94%);
+  --popover-foreground: oklch(0.97 0 0);
+  --primary: oklch(0.97 0 0);
+  --primary-foreground: oklch(0.05 0 0);
+  --secondary: oklch(0.18 0 0);
+  --secondary-foreground: oklch(0.97 0 0);
+  --muted: oklch(0.18 0 0);
+  --muted-foreground: oklch(0.60 0 0);
+  --accent: oklch(0.20 0 0);
+  --accent-foreground: oklch(0.97 0 0);
   --destructive: oklch(0.65 0.22 25);
-  --border: oklch(1 0 0 / 9%);
-  --input: oklch(1 0 0 / 11%);
-  --ring: oklch(0.96 0 0);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 12%);
+  --ring: oklch(0.97 0 0);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.72 0 0);
   --chart-3: oklch(0.556 0 0);
   --chart-4: oklch(0.439 0 0);
   --chart-5: oklch(0.269 0 0);
 
-  /* ── Sidebar glass (dark carbon) ── */
-  --sidebar: oklch(1 0 0 / 6%);
-  --sidebar-foreground: oklch(0.58 0 0);
-  --sidebar-primary: oklch(0.96 0 0);
-  --sidebar-primary-foreground: oklch(0.145 0.004 255);
-  --sidebar-accent: oklch(1 0 0 / 7%);
-  --sidebar-accent-foreground: oklch(0.96 0 0);
-  --sidebar-border: oklch(1 0 0 / 9%);
-  --sidebar-ring: oklch(0.96 0 0);
+  /* ── Card ambient shadow (dark) ── */
+  --card-shadow: 0 1px 0 oklch(1 0 0 / 5%), 0 4px 24px oklch(0 0 0 / 55%);
 
-  /* ── Glass tokens (dark carbon) ── */
+  /* ── Signal colors (dark) ── */
+  --signal-gain-bg: oklch(0.75 0.15 145 / 10%);
+  --signal-gain-text: oklch(0.78 0.15 145);
+  --signal-loss-bg: oklch(0.65 0.22 25 / 10%);
+
+  /* ── Sidebar glass (dark true black) ── */
+  --sidebar: oklch(1 0 0 / 7%);
+  --sidebar-foreground: oklch(0.60 0 0);
+  --sidebar-primary: oklch(0.97 0 0);
+  --sidebar-primary-foreground: oklch(0.05 0 0);
+  --sidebar-accent: oklch(1 0 0 / 8%);
+  --sidebar-accent-foreground: oklch(0.97 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.97 0 0);
+
+  /* ── Glass tokens (dark true black) ── */
   --glass-blur: 32px;
-  --glass-saturate: 180%;
-  --glass-bg: oklch(1 0 0 / 6%);
-  --glass-border: oklch(1 0 0 / 9%);
-  --glass-specular: oklch(1 0 0 / 15%);
+  --glass-saturate: 200%;
+  --glass-bg: oklch(1 0 0 / 7%);
+  --glass-border: oklch(1 0 0 / 10%);
+  --glass-specular: oklch(1 0 0 / 18%);
 }
 
 @layer base {
@@ -178,15 +194,23 @@ html:root.dark {
     border-color: var(--glass-border) !important;
   }
 
+  /* Floating card surface — ambient shadow on all card-like elements */
+  [data-slot="card"],
+  .card-surface {
+    box-shadow: var(--card-shadow);
+  }
+
   /* Theme switch — smooth cross-fade on key surfaces */
   body,
   .glass-chrome,
   [data-slot="card"],
+  .card-surface,
   main {
     transition:
       background-color 250ms cubic-bezier(0.16, 1, 0.3, 1),
       border-color 200ms cubic-bezier(0.16, 1, 0.3, 1),
-      color 200ms cubic-bezier(0.16, 1, 0.3, 1);
+      color 200ms cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 250ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   @media (prefers-reduced-motion: reduce) {

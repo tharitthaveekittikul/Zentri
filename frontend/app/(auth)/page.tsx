@@ -9,6 +9,7 @@ import { AllocationDonut } from "@/components/overview/AllocationDonut";
 import { HoldingsSnapshot, SnapshotHolding } from "@/components/overview/HoldingsSnapshot";
 import { Skeleton } from "@/components/ui/skeleton";
 import { NetWorthChart } from "@/components/net-worth-chart";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 export default function OverviewPage() {
   const { data: summary, isLoading: summaryLoading } = useQuery({
@@ -41,6 +42,7 @@ export default function OverviewPage() {
 
   return (
     <div className="flex flex-col gap-6 max-w-7xl mx-auto">
+      <PageHeader title="Overview" />
       {summaryLoading ? (
         <Skeleton className="h-20 w-full rounded-2xl" />
       ) : summary ? (
@@ -49,11 +51,11 @@ export default function OverviewPage() {
 
       <NetWorthChart privacyMode={false} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-        <div className="lg:col-span-3 bg-card rounded-2xl border border-border p-5 overflow-hidden">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
+        <div className="lg:col-span-3 bg-card card-surface rounded-2xl border border-border p-5 overflow-hidden">
           <PerformanceChart />
         </div>
-        <div className="lg:col-span-2 bg-card rounded-2xl border border-border p-5 overflow-hidden">
+        <div className="lg:col-span-2 bg-card card-surface rounded-2xl border border-border p-5 overflow-hidden">
           <AllocationDonut allocation={allocation} />
         </div>
       </div>

@@ -425,7 +425,7 @@ export function HoldingsTable({
       </div>
 
       {/* Table */}
-      <div className="rounded-2xl border border-border overflow-x-auto">
+      <div className="bg-card card-surface rounded-2xl border border-border overflow-x-auto">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((hg) => (

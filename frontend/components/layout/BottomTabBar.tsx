@@ -36,8 +36,7 @@ export function BottomTabBar() {
       >
         <div className="flex items-center h-[62px] px-1">
           {tabs.map(({ href, label, icon: Icon }) => {
-            const isActive =
-              pathname.startsWith(href);
+            const isActive = pathname.startsWith(href);
             return (
               <Link
                 key={href}
@@ -48,12 +47,11 @@ export function BottomTabBar() {
                   isActive ? "text-foreground" : "text-muted-foreground"
                 )}
               >
-                {/* Icon with active fill */}
                 <div
                   className={cn(
-                    "flex items-center justify-center w-9 h-[26px] rounded-[10px]",
+                    "flex items-center justify-center w-14 h-[28px] rounded-full",
                     "transition-all duration-200",
-                    isActive ? "bg-foreground/[0.09]" : ""
+                    isActive ? "bg-foreground/10" : ""
                   )}
                 >
                   <Icon
@@ -61,7 +59,6 @@ export function BottomTabBar() {
                     strokeWidth={isActive ? 2.25 : 1.5}
                   />
                 </div>
-                {/* Label */}
                 <span
                   className={cn(
                     "text-[10px] leading-none tracking-[0.01em] transition-all duration-150",

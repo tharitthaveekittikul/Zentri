@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { PrivacyValue } from "@/components/ui/PrivacyValue";
 import { api } from "@/lib/api";
 import { VerdictCard } from "@/components/analysis/VerdictCard";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 const RANGES = ["1W", "1M", "3M", "1Y"] as const;
 type Range = (typeof RANGES)[number];
@@ -72,6 +73,7 @@ export default function AssetDetailPage() {
 
   return (
     <div className="flex flex-col gap-6 max-w-5xl mx-auto">
+      <PageHeader title="Asset" />
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold">{symbol.toUpperCase()}</h1>

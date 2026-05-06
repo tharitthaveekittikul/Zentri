@@ -27,6 +27,7 @@ import {
   IpoCalendarEvent,
   IpoAnalysisResult,
 } from "@/lib/services/events";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 const MONTH_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
@@ -315,8 +316,8 @@ export default function EventsPage() {
 
   return (
     <div className="space-y-4 p-4 md:p-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Events</h1>
+      <PageHeader title="Events" />
+      <div className="flex items-center justify-end">
         <Button variant="outline" size="sm" onClick={handleRefresh} disabled={refreshing}>
           <RefreshCw className={`h-4 w-4 mr-1 ${refreshing ? "animate-spin" : ""}`} />
           Refresh

@@ -28,6 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Pencil, Trash2 } from "lucide-react";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 type TransactionRow = {
   id: string;
@@ -119,7 +120,7 @@ export default function TransactionsPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold">Transactions</h1>
+      <PageHeader title="Transactions" />
 
       {loading ? (
         <p className="text-muted-foreground">Loading...</p>

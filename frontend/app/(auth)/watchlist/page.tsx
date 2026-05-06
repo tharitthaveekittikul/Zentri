@@ -45,6 +45,7 @@ import {
   type WatchlistItem,
   type WatchlistSuggestion,
 } from "@/lib/services/watchlist";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 const VERDICT_STYLE: Record<string, string> = {
   BUY: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
@@ -276,8 +277,8 @@ export default function WatchlistPage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold">Watchlist</h1>
+      <PageHeader title="Watchlist" />
+      <div className="flex flex-wrap items-center justify-end gap-3">
         <div className="flex flex-wrap gap-2">
           <Button
             variant="outline"

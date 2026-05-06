@@ -18,6 +18,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { exportSystem, importSystem } from "@/lib/services/system";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 export default function BackupPage() {
   const [exporting, setExporting] = useState(false);
@@ -64,12 +65,10 @@ export default function BackupPage() {
 
   return (
     <div className="max-w-xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold">Backup &amp; Restore</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Export all your data to a JSON file or restore from a previous backup.
-        </p>
-      </div>
+      <PageHeader title="Backup" />
+      <p className="text-sm text-muted-foreground">
+        Export all your data to a JSON file or restore from a previous backup.
+      </p>
 
       {/* Security warning */}
       <div className="rounded-lg border border-amber-400 bg-amber-50 dark:bg-amber-950/30 px-4 py-3 text-sm text-amber-800 dark:text-amber-300">

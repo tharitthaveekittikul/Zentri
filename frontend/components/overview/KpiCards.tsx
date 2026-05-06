@@ -19,21 +19,27 @@ function KpiCard({ label, value, pct, direction = "neutral" }: CardProps) {
 
   return (
     <div
-      className={cn(
-        "bg-card border border-border rounded-2xl p-5",
-        isPositive && "border-l-2 border-l-emerald-500",
-        isNegative && "border-l-2 border-l-destructive"
-      )}
+      className={cn("card-surface border border-border rounded-2xl p-5")}
+      style={{
+        backgroundColor: isPositive
+          ? "var(--signal-gain-bg)"
+          : isNegative
+            ? "var(--signal-loss-bg)"
+            : "var(--card)",
+      }}
     >
       <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-2">
         {label}
       </p>
       <p
-        className={cn(
-          "text-2xl font-semibold font-mono tabular-nums",
-          isPositive && "text-emerald-600 dark:text-emerald-400",
-          isNegative && "text-destructive"
-        )}
+        className={cn("text-2xl font-semibold font-mono tabular-nums")}
+        style={{
+          color: isPositive
+            ? "var(--signal-gain-text)"
+            : isNegative
+              ? "var(--destructive)"
+              : undefined,
+        }}
       >
         <PrivacyValue value={value.primary} />
         {pct && (

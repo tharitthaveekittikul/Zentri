@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchJobs, type PipelineJob } from "@/lib/services/pipeline";
 import { JobsTable } from "@/components/pipeline/JobsTable";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 export default function PipelinePage() {
   const { data: initialJobs = [], isLoading } = useQuery({
@@ -46,7 +47,7 @@ export default function PipelinePage() {
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <h1 className="text-2xl font-bold">Pipeline Monitor</h1>
+        <PageHeader title="Pipeline" />
         <p className="text-muted-foreground">Loading...</p>
       </div>
     );
@@ -54,12 +55,10 @@ export default function PipelinePage() {
 
   return (
     <div className="space-y-4">
-      <div>
-        <h1 className="text-2xl font-bold">Pipeline Monitor</h1>
-        <p className="text-muted-foreground text-sm">
-          Live price fetch job status. Updates every 3 seconds via SSE.
-        </p>
-      </div>
+      <PageHeader title="Pipeline" />
+      <p className="text-muted-foreground text-sm">
+        Live price fetch job status. Updates every 3 seconds via SSE.
+      </p>
       <JobsTable jobs={jobs} />
     </div>
   );

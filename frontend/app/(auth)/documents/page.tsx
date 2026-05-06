@@ -28,6 +28,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { api } from "@/lib/api";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 interface Document {
   id: string;
@@ -108,8 +109,8 @@ export default function DocumentsPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-xl font-semibold">Document Library</h1>
+      <PageHeader title="Documents" />
+      <div className="flex flex-wrap items-center justify-end gap-3">
         <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
           <DialogTrigger>
             <Button>Upload PDF</Button>

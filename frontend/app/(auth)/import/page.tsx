@@ -10,6 +10,7 @@ import {
   confirmImport,
   uploadFile,
 } from "@/lib/services/import-pipeline";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 type Step = "idle" | "uploading" | "review" | "confirming" | "done";
 
@@ -101,7 +102,7 @@ export default function ImportPage() {
 
   return (
     <div className="flex flex-col items-center justify-center gap-6 py-16 px-6">
-      <h1 className="text-2xl font-bold">Import Transactions</h1>
+      <PageHeader title="Import" />
       <p className="text-muted-foreground text-center max-w-md">
         Upload a CSV or JSON file. If the headers match the canonical format they
         import directly. Other formats are translated by AI.

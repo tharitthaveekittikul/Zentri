@@ -35,6 +35,7 @@ import {
 } from "recharts";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 interface Summary {
   total_cost_usd: number;
@@ -158,7 +159,7 @@ export default function AIUsagePage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold">AI Usage</h1>
+      <PageHeader title="AI Usage" />
 
       {summary && (
         <>

@@ -21,7 +21,7 @@ export function SummaryBar({ summary }: Props) {
   const dailyPositive = Number(summary.daily_change) >= 0;
 
   return (
-    <div className="flex flex-wrap gap-8 items-center px-6 py-5 bg-card rounded-2xl border border-border">
+    <div className="flex flex-wrap gap-8 items-center px-6 py-5 bg-card card-surface rounded-2xl border border-border">
       <div>
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Portfolio Value</p>
         <p className="text-3xl font-semibold tabular-nums tracking-tight font-mono">

@@ -23,7 +23,7 @@ export function HoldingsSnapshot({ holdings }: Props) {
   const { format } = useDualCurrency();
 
   return (
-    <div className="bg-card rounded-2xl border border-border overflow-hidden">
+    <div className="bg-card card-surface rounded-2xl border border-border overflow-hidden">
       <table className="w-full text-sm">
         <thead>
           <tr className="bg-muted/50">

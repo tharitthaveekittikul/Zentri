@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import { Info } from "lucide-react";
 import { usePrivacyStore } from "@/store/privacy";
 import { api } from "@/lib/api";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 function InfoTooltip({ content }: { content: React.ReactNode }) {
   return (
@@ -82,24 +83,22 @@ export default function PortfolioPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-start sm:items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold tracking-tight">Portfolio</h1>
-        <div className="flex items-center gap-2 flex-wrap justify-end">
-          <Link
-            href="/import"
-            className="inline-flex items-center justify-center h-9 px-5 rounded-full bg-primary text-primary-foreground text-sm font-medium transition-all duration-150 hover:opacity-85 active:scale-[0.97]"
-          >
-            Import
-          </Link>
-          <AddTransactionDialog
-            primaryCurrency={displayCurrency}
-            onAdded={refresh}
-          />
-          <AddHoldingDialog
-            primaryCurrency={displayCurrency}
-            onAdded={refresh}
-          />
-        </div>
+      <PageHeader title="Portfolio" />
+      <div className="flex items-center gap-2 flex-wrap">
+        <Link
+          href="/import"
+          className="inline-flex items-center justify-center h-9 px-5 rounded-full bg-primary text-primary-foreground text-sm font-medium transition-all duration-150 hover:opacity-85 active:scale-[0.97]"
+        >
+          Import
+        </Link>
+        <AddTransactionDialog
+          primaryCurrency={displayCurrency}
+          onAdded={refresh}
+        />
+        <AddHoldingDialog
+          primaryCurrency={displayCurrency}
+          onAdded={refresh}
+        />
       </div>
 
       <div className="grid grid-cols-2 gap-4">

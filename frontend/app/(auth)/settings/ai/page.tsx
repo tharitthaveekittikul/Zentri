@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 interface CallLog {
   id: string;
@@ -54,7 +55,7 @@ export default function AIUsagePage() {
 
   return (
     <div className="space-y-6 max-w-4xl">
-      <h1 className="text-2xl font-bold">AI Usage</h1>
+      <PageHeader title="AI & LLM" />
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card>

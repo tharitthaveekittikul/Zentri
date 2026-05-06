@@ -11,6 +11,7 @@ import { AISettings } from "@/components/settings/AISettings";
 import { getProfile, saveProfile, type ProfileSettings } from "@/lib/services/auth";
 import { Switch } from "@/components/ui/switch";
 import { usePrivacyStore } from "@/store/privacy";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 interface HardwareRecommendation {
   can_run_local_llm: boolean;
@@ -145,7 +146,7 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-6 max-w-2xl">
-      <h1 className="text-2xl font-bold">Settings</h1>
+      <PageHeader title="Settings" />
 
       <Tabs defaultValue="general">
         <TabsList>
