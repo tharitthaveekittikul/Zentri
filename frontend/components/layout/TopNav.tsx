@@ -45,71 +45,74 @@ export function TopNav() {
   }
 
   return (
-    <header className="h-14 border-b border-[var(--glass-border)] glass-chrome flex items-center px-3 gap-2">
-      {/* Search pill */}
-      <button
-        onClick={() => setOpen(true)}
-        className="flex flex-1 items-center gap-2 h-9 px-3 rounded-full bg-muted/60 hover:bg-muted transition-colors text-left min-w-0"
-        title="Search (⌘K)"
-      >
-        <Search className="h-[15px] w-[15px] text-muted-foreground shrink-0" />
-        <span className="text-sm text-muted-foreground flex-1 truncate">
-          Search...
-        </span>
-        <kbd className="hidden sm:flex items-center text-[11px] text-muted-foreground/60 font-mono bg-background/60 px-1.5 py-0.5 rounded-md border border-border/40 shrink-0">
-          ⌘K
-        </kbd>
-      </button>
-
-      {/* Action buttons */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-9 w-9 shrink-0"
-        onClick={toggle}
-        title="Toggle privacy mode"
-      >
-        {isPrivate ? (
-          <EyeOff className="h-[18px] w-[18px]" />
-        ) : (
-          <Eye className="h-[18px] w-[18px]" />
-        )}
-      </Button>
-      <Button
-        ref={toggleRef}
-        variant="ghost"
-        size="icon"
-        className="h-9 w-9 shrink-0 relative"
-        onClick={toggleTheme}
-        title={
-          resolvedTheme === "dark"
-            ? "Switch to light mode"
-            : "Switch to dark mode"
-        }
-      >
-        <span
-          key={resolvedTheme}
-          style={{
-            animation: "icon-spin-in 1500ms cubic-bezier(0.16,1,0.3,1) both",
-            display: "flex",
-          }}
+    <header className="bg-transparent pt-4 px-4 shrink-0">
+      {/* Card wrapper — mirrors the sidebar card */}
+      <div className="bg-white dark:bg-slate-900 rounded-[24px] border border-slate-200/60 dark:border-slate-800 flex items-center px-5 h-16 gap-3">
+        {/* Search pill — tinted so it reads against the white card */}
+        <button
+          onClick={() => setOpen(true)}
+          className="flex flex-1 items-center gap-3 h-10 px-4 rounded-full bg-slate-100/70 dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-left min-w-0"
+          title="Search (⌘K)"
         >
-          {resolvedTheme === "dark" ? (
-            <Sun className="h-[18px] w-[18px]" />
+          <Search className="h-[15px] w-[15px] text-slate-400 shrink-0" strokeWidth={1.5} />
+          <span className="text-sm text-slate-400 flex-1 truncate">
+            Search assets, pages...
+          </span>
+          <kbd className="hidden sm:flex items-center text-[11px] text-slate-400/60 font-mono bg-white dark:bg-slate-700 px-1.5 py-0.5 rounded-md border border-slate-200/60 dark:border-slate-600 shrink-0">
+            ⌘K
+          </kbd>
+        </button>
+
+        {/* Action buttons */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-9 w-9 shrink-0 rounded-full"
+          onClick={toggle}
+          title="Toggle privacy mode"
+        >
+          {isPrivate ? (
+            <EyeOff className="h-[17px] w-[17px]" strokeWidth={1.5} />
           ) : (
-            <Moon className="h-[18px] w-[18px]" />
+            <Eye className="h-[17px] w-[17px]" strokeWidth={1.5} />
           )}
-        </span>
-      </Button>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-9 w-9 shrink-0"
-        onClick={handleLogout}
-        title="Log out"
-      >
-        <LogOut className="h-[18px] w-[18px]" />
-      </Button>
+        </Button>
+        <Button
+          ref={toggleRef}
+          variant="ghost"
+          size="icon"
+          className="h-9 w-9 shrink-0 relative rounded-full"
+          onClick={toggleTheme}
+          title={
+            resolvedTheme === "dark"
+              ? "Switch to light mode"
+              : "Switch to dark mode"
+          }
+        >
+          <span
+            key={resolvedTheme}
+            style={{
+              animation: "icon-spin-in 1500ms cubic-bezier(0.16,1,0.3,1) both",
+              display: "flex",
+            }}
+          >
+            {resolvedTheme === "dark" ? (
+              <Sun className="h-[17px] w-[17px]" strokeWidth={1.5} />
+            ) : (
+              <Moon className="h-[17px] w-[17px]" strokeWidth={1.5} />
+            )}
+          </span>
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-9 w-9 shrink-0 rounded-full"
+          onClick={handleLogout}
+          title="Log out"
+        >
+          <LogOut className="h-[17px] w-[17px]" strokeWidth={1.5} />
+        </Button>
+      </div>
     </header>
   );
 }

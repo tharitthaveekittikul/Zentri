@@ -412,3 +412,96 @@ Glass panel. `position: sticky` or `fixed`. Uses `.glass-chrome`.
 - **Don't** nest cards.
 - **Don't** use gamified color pulses, confetti, or visual urgency signals.
 - **Don't** use Bloomberg-style data density — synthesize, don't dump.
+
+## 10. Bento Grid Layout
+
+The primary layout pattern for all dashboard and overview pages. Modular cards of varying width and height on a shared column grid — the arrangement communicates priority without needing visual decoration.
+
+### Grid System
+
+- **Columns:** 4 on LG (≥1024px), 2 on SM (≥640px), 1 on mobile.
+- **Gap:** 16px (`gap-4`) between all cells.
+- **Rows:** auto-sized by content. No fixed row heights. Cards establish their own minimum height via `min-h-*`.
+- **Implementation:** CSS Grid with Tailwind `grid-cols-4` + `col-span-*` and `row-span-*` utilities. Use CSS Grid's auto-placement rather than absolute positioning.
+
+```tsx
+<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+  <div className="sm:col-span-2 lg:col-span-2 lg:row-span-2">Hero</div>
+  <div>Card</div>
+  <div>Card</div>
+  <div className="hidden lg:block lg:col-span-2">Card</div>
+  ...
+</div>
+```
+
+### Cell Sizing Conventions
+
+| Cell role | Col span (LG) | Typical min-height |
+|---|---|---|
+| Hero KPI | 2 | 192px (`min-h-48`) |
+| Secondary KPI | 1 | 144px (`min-h-36`) |
+| Paired secondary (fills hero row 2) | 2 | 144px (`min-h-36`) |
+| Wide chart | 3 | auto (chart defines height) |
+| Narrow chart / ring | 1 | auto |
+| Full-width chart row | 2 | auto |
+| List / table | 2 | auto |
+
+### Hero Card Pattern
+
+The primary KPI card uses a near-black background (`oklch(0.09 0 0)`) to anchor the grid. This is the one place a card surface intentionally breaks from the floating white card convention — it is the page's visual weight.
+
+Rules for the hero card:
+- **Background:** `oklch(0.09 0 0)` — darker than the card surface, distinct from the body in both modes.
+- **Text:** All values explicitly colored `oklch(0.97 0 0)`. Secondary/muted text at `oklch(0.97 0 0 / 38–45%)`. Do not use CSS variable `--muted-foreground` — it resolves to a dark color in light mode.
+- **Drill icon:** `ArrowUpRight` at top-right, `oklch(0.97 0 0 / 20%)` — present but quiet.
+- **Subtle ring:** Optional decorative circle (fully rounded div) at `opacity-[0.04]` — adds depth without decoration.
+- **Divider:** Thin border `oklch(0.97 0 0 / 8%)` separating the primary metric from secondary context (e.g., cost basis).
+- **Typography:** Display scale — `clamp(1.75rem, 3vw, 2.5rem)`, weight 600, tracking `-0.02em`, Geist Mono.
+- **Shadow:** Keep `card-surface` class for ambient shadow — the hero card still floats.
+
+```tsx
+<div
+  className="card-surface rounded-2xl p-6 flex flex-col justify-between"
+  style={{ background: "oklch(0.09 0 0)" }}
+>
+  <div className="flex justify-between">
+    <p style={{ color: "oklch(0.97 0 0 / 40%)" }}>Label</p>
+    <ArrowUpRight style={{ color: "oklch(0.97 0 0 / 20%)" }} />
+  </div>
+  <p style={{ color: "oklch(0.97 0 0)", fontSize: "clamp(1.75rem, 3vw, 2.5rem)", fontWeight: 600 }}>
+    {value}
+  </p>
+</div>
+```
+
+### Signal KPI Cards
+
+P&L and Daily Change cards use the signal color system as their background tint:
+- **Positive:** `background-color: var(--signal-gain-bg)`. Value text: `var(--signal-gain-text)`.
+- **Negative:** `background-color: var(--signal-loss-bg)`. Value text: `var(--destructive)`.
+- **Neutral (Cost, etc.):** `var(--card)` background, `var(--foreground)` text.
+
+The tinted background is a semantic affordance — it lets the user read direction without reading the number. Always pair with the text label (`Total P&L`, `Today`) and the numeric sign (`+` / `-`).
+
+### Drill Icon
+
+Every card that navigates to a detail page carries an `ArrowUpRight` icon (16×16 or 14×14) in the top-right corner at low opacity (`text-muted-foreground/35` or explicit `oklch(0.97 0 0 / 20%)` on dark cards). It signals interactivity without demanding attention. Cards that are not interactive omit the icon entirely.
+
+### Card Padding
+
+- Standard content cards: 20px (`p-5`).
+- Hero card: 24px (`p-6`) — more breath for the primary metric.
+- Compact variants (inside wider layout cards): 16px (`p-4`).
+
+### Responsive Collapse
+
+On SM (2 cols), the hero spans both columns (`sm:col-span-2`). Paired secondary cards that are LG-only (`hidden lg:block`) are omitted — SM users see the hero + the two signal KPI cards stacked.
+
+On mobile (1 col), all cards stack vertically. The hero card's `min-h-48` ensures it still reads as the anchor.
+
+### What Not To Do
+
+- **Don't** make all cards the same size. Uniform grids eliminate the hierarchy the bento pattern creates.
+- **Don't** add colored borders or side stripes to differentiate cards — use background tints (signal cards) or the hero dark treatment instead.
+- **Don't** nest a card inside another card's padding. Holdings lists and chart containers are direct grid children, not wrapped.
+- **Don't** use more than one hero card per view. Two dark anchors cancel each other out.
