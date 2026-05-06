@@ -308,7 +308,7 @@ async def get_portfolio_summary(
     total_secondary = total_primary * sec_rate if sec_rate is not None else None
 
     return {
-        "holdings_count": len(rows),
+        "holdings_count": sum(1 for r in rows if float(r.get("outstanding_shares") or 0) >= 1e-6),
         "total_cost": total_primary,
         "total_cost_secondary": total_secondary,
         "primary_currency": currency_primary,

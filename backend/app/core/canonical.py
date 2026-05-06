@@ -18,6 +18,19 @@ CANONICAL_ASSET_TYPES = frozenset(
 
 _OPERATORS = {"/": _op.truediv, "*": _op.mul, "+": _op.add, "-": _op.sub}
 
+_TYPE_ALIASES: dict[str, str] = {
+    "sel": "SELL",
+    "buy": "BUY",
+    "rew": "REWARD",
+    "rwd": "REWARD",
+    "div": "DIVIDEND",
+    "dvd": "DIVIDEND",
+    "divi": "DIVIDEND",
+    "fee": "FEE",
+    "trf": "TRANSFER",
+    "xfr": "TRANSFER",
+}
+
 _ASSET_TYPE_ALIASES: dict[str, str] = {
     "stock": "thai_stock",
     "us stock": "us_stock",
@@ -164,6 +177,11 @@ def apply_template(rows: list[dict], template: dict) -> list[dict]:
                     break
 
         normalized["asset_type"] = _classify_row_asset_type(raw, asset_type_rules, fallback)
+
+        # Normalize type: expand abbreviations (e.g. LLM "sel" → "SELL")
+        if "type" in normalized and normalized["type"] is not None:
+            t = str(normalized["type"]).strip().upper()
+            normalized["type"] = _TYPE_ALIASES.get(t.lower(), t)
 
         # Normalize trade_date to dd/mm/yyyy
         if "trade_date" in normalized:

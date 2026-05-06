@@ -80,6 +80,7 @@ async def trigger_job(
         "price_fetch_crypto": "job_fetch_prices_crypto",
         "price_fetch_gold": "job_fetch_price_gold",
         "price_fetch_benchmark": "job_fetch_benchmark_prices",
+        "snapshot_net_worth": "job_snapshot_net_worth",
     }
     if job_type not in job_fn_map:
         raise HTTPException(status_code=400, detail=f"Job type '{job_type}' cannot be triggered manually")

@@ -30,6 +30,16 @@ import { Trash2, Pencil, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { HoldingRow } from "@/lib/services/portfolio";
 import { PrivacyValue } from "@/components/ui/PrivacyValue";
 import { EditHoldingDialog } from "./EditHoldingDialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Props {
   holdings: HoldingRow[];
@@ -54,10 +64,11 @@ export function HoldingsTable({
   const [pageIndex, setPageIndex] = useState(0);
   const [editHolding, setEditHolding] = useState<HoldingRow | null>(null);
   const [editOpen, setEditOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<HoldingRow | null>(null);
 
-  // Filter out cash assets — shown in a separate section
+  // Filter out cash assets and zero-share positions
   const nonCashHoldings = useMemo(
-    () => holdings.filter((h) => h.asset_type !== "cash"),
+    () => holdings.filter((h) => h.asset_type !== "cash" && Number(h.outstanding_shares) >= 1e-6),
     [holdings],
   );
 
@@ -343,7 +354,7 @@ export function HoldingsTable({
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => onDelete(row.original.id)}
+            onClick={() => setDeleteTarget(row.original)}
           >
             <Trash2 className="h-4 w-4 text-destructive" />
           </Button>
@@ -504,6 +515,36 @@ export function HoldingsTable({
         onOpenChange={setEditOpen}
         onUpdated={onUpdated}
       />
+
+      <AlertDialog
+        open={deleteTarget !== null}
+        onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete holding?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently remove{" "}
+              <span className="font-semibold">{deleteTarget?.symbol}</span> from
+              your portfolio. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (deleteTarget) {
+                  onDelete(deleteTarget.id);
+                  setDeleteTarget(null);
+                }
+              }}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

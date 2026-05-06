@@ -6,6 +6,7 @@ import json
 import re
 from typing import Any
 
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.canonical import CANONICAL_FIELDS, apply_template
@@ -58,8 +59,17 @@ def _extract_rows_by_path(data: Any, json_path: str | None) -> list[dict]:
             if isinstance(item, dict):
                 nested = item.get(json_path)
                 if isinstance(nested, list):
-                    outer = {k: v for k, v in item.items()
-                             if k != json_path and not isinstance(v, (list, dict))}
+                    outer: dict = {}
+                    for k, v in item.items():
+                        if k == json_path:
+                            continue
+                        if isinstance(v, dict):
+                            # Flatten one level of sibling dicts (e.g. summary.exchange_rate)
+                            for sk, sv in v.items():
+                                if not isinstance(sv, (list, dict)):
+                                    outer[sk] = sv
+                        elif not isinstance(v, list):
+                            outer[k] = v  # direct scalars override flattened dict fields
                     for inner in nested:
                         if isinstance(inner, dict):
                             rows.append({**outer, **inner})
@@ -84,8 +94,36 @@ async def translate_via_llm(
     headers: list[str],
     sample_rows: list[dict],
 ) -> dict:
+    from app.models.llm_call_log import LLMCallLog
+
+    # Check for a cached mapping from a previous successful LLM call for the same headers
+    headers_marker = f"Headers/keys: {headers!s}"
+    cached = (await db.execute(
+        select(LLMCallLog)
+        .where(
+            LLMCallLog.user_id == user_id,
+            LLMCallLog.feature_key == "import_translator",
+            LLMCallLog.prompt_in.contains(headers_marker),
+            LLMCallLog.response_out.isnot(None),
+        )
+        .order_by(LLMCallLog.created_at.desc())
+        .limit(1)
+    )).scalar_one_or_none()
+
+    if cached:
+        try:
+            raw = cached.response_out.strip()
+            if raw.startswith("```"):
+                raw = re.sub(r"^```[a-z]*\n?", "", raw)
+                raw = re.sub(r"\n?```$", "", raw)
+            mapping = json.loads(raw)
+            logger.info("LLM cache hit: reusing previous import_translator mapping (log id=%s)", cached.id)
+            return mapping
+        except Exception:
+            logger.warning("LLM cache hit but response_out was invalid JSON — falling through to LLM call")
+
     gw = LLMGateway(db)
-    raw = await gw.complete(
+    result = await gw.complete(
         feature_key="import_translator",
         user_id=user_id,
         variables={
@@ -94,10 +132,7 @@ async def translate_via_llm(
             "sample_rows": json.dumps(sample_rows[:5], ensure_ascii=False),
         },
     )
-    if isinstance(raw, str):
-        raw = raw.strip()
-    else:
-        raw = str(raw).strip()
+    raw = result.content.strip()
 
     if raw.startswith("```"):
         raw = re.sub(r"^```[a-z]*\n?", "", raw)
