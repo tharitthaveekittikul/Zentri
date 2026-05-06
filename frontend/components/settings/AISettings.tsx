@@ -100,7 +100,9 @@ function ModelCombobox({
           !value && "text-muted-foreground",
         )}
       >
-        <span className="flex-1 text-left truncate">{value || "Select model..."}</span>
+        <span className="flex-1 text-left truncate">
+          {value || "Select model..."}
+        </span>
         <ChevronDownIcon className="size-4 text-muted-foreground shrink-0" />
       </button>
       {open && (
@@ -145,12 +147,26 @@ export function AISettings() {
   const [addStatus, setAddStatus] = useState<string | null>(null);
 
   const [actionStates, setActionStates] = useState<
-    Record<string, { testing?: boolean; refreshing?: boolean; removing?: boolean; error?: string }>
+    Record<
+      string,
+      {
+        testing?: boolean;
+        refreshing?: boolean;
+        removing?: boolean;
+        error?: string;
+      }
+    >
   >({});
 
-  const [featureEdits, setFeatureEdits] = useState<Record<string, FeatureEdit>>({});
-  const [featureSaving, setFeatureSaving] = useState<Record<string, boolean>>({});
-  const [featureErrors, setFeatureErrors] = useState<Record<string, string>>({});
+  const [featureEdits, setFeatureEdits] = useState<Record<string, FeatureEdit>>(
+    {},
+  );
+  const [featureSaving, setFeatureSaving] = useState<Record<string, boolean>>(
+    {},
+  );
+  const [featureErrors, setFeatureErrors] = useState<Record<string, string>>(
+    {},
+  );
 
   useEffect(() => {
     listProviderConfigs()
@@ -177,7 +193,12 @@ export function AISettings() {
 
   function setProviderAction(
     id: string,
-    patch: { testing?: boolean; refreshing?: boolean; removing?: boolean; error?: string },
+    patch: {
+      testing?: boolean;
+      refreshing?: boolean;
+      removing?: boolean;
+      error?: string;
+    },
   ) {
     setActionStates((prev) => ({ ...prev, [id]: { ...prev[id], ...patch } }));
   }
@@ -186,7 +207,11 @@ export function AISettings() {
     setFeatureEdits((prev) => ({
       ...prev,
       [featureKey]: {
-        ...(prev[featureKey] ?? { provider_config_id: "", model: "", system_prompt: "" }),
+        ...(prev[featureKey] ?? {
+          provider_config_id: "",
+          model: "",
+          system_prompt: "",
+        }),
         ...patch,
       },
     }));
@@ -281,11 +306,15 @@ export function AISettings() {
       }
       setFeatures((prev) => {
         const exists = prev.find((f) => f.feature_key === featureKey);
-        if (exists) return prev.map((f) => (f.feature_key === featureKey ? updated : f));
+        if (exists)
+          return prev.map((f) => (f.feature_key === featureKey ? updated : f));
         return [...prev, updated];
       });
     } catch (e) {
-      setFeatureErrors((prev) => ({ ...prev, [featureKey]: (e as Error).message }));
+      setFeatureErrors((prev) => ({
+        ...prev,
+        [featureKey]: (e as Error).message,
+      }));
     } finally {
       setFeatureSaving((prev) => ({ ...prev, [featureKey]: false }));
     }
@@ -296,10 +325,15 @@ export function AISettings() {
     if (!existing) return;
     try {
       const updated = await resetPrompt(existing.id);
-      setFeatures((prev) => prev.map((f) => (f.feature_key === featureKey ? updated : f)));
+      setFeatures((prev) =>
+        prev.map((f) => (f.feature_key === featureKey ? updated : f)),
+      );
       updateEdit(featureKey, { system_prompt: updated.system_prompt });
     } catch (e) {
-      setFeatureErrors((prev) => ({ ...prev, [featureKey]: (e as Error).message }));
+      setFeatureErrors((prev) => ({
+        ...prev,
+        [featureKey]: (e as Error).message,
+      }));
     }
   }
 
@@ -314,7 +348,9 @@ export function AISettings() {
           {loadingProviders ? (
             <p className="text-sm text-muted-foreground">Loading...</p>
           ) : providers.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No providers configured yet.</p>
+            <p className="text-sm text-muted-foreground">
+              No providers configured yet.
+            </p>
           ) : (
             providers.map((p) => {
               const state = actionStates[p.id] ?? {};
@@ -322,7 +358,9 @@ export function AISettings() {
                 <div key={p.id} className="border rounded-lg p-3 space-y-2">
                   <div className="flex items-center justify-between gap-2 flex-wrap">
                     <div className="flex items-center gap-2">
-                      <span className="font-medium capitalize">{p.provider}</span>
+                      <span className="font-medium capitalize">
+                        {p.provider}
+                      </span>
                       <Badge variant={p.is_connected ? "default" : "secondary"}>
                         {p.is_connected ? "Connected" : "Not connected"}
                       </Badge>
@@ -360,9 +398,13 @@ export function AISettings() {
                     </div>
                   </div>
                   {p.host_url && (
-                    <p className="text-xs text-muted-foreground">Host: {p.host_url}</p>
+                    <p className="text-xs text-muted-foreground">
+                      Host: {p.host_url}
+                    </p>
                   )}
-                  {state.error && <p className="text-xs text-destructive">{state.error}</p>}
+                  {state.error && (
+                    <p className="text-xs text-destructive">{state.error}</p>
+                  )}
                 </div>
               );
             })
@@ -456,11 +498,17 @@ export function AISettings() {
               const models = getModelsForProvider(edit.provider_config_id);
               const saving = featureSaving[featureKey] ?? false;
               const error = featureErrors[featureKey];
-              const hasExisting = features.some((f) => f.feature_key === featureKey);
-              const providerNoModels = !!edit.provider_config_id && models.length === 0;
+              const hasExisting = features.some(
+                (f) => f.feature_key === featureKey,
+              );
+              const providerNoModels =
+                !!edit.provider_config_id && models.length === 0;
 
               return (
-                <div key={featureKey} className="space-y-3 border rounded-lg p-4">
+                <div
+                  key={featureKey}
+                  className="space-y-3 border rounded-lg p-4"
+                >
                   <p className="text-sm font-semibold">
                     {FEATURE_LABELS[featureKey] ?? featureKey}
                   </p>
@@ -471,16 +519,28 @@ export function AISettings() {
                       <Select
                         value={edit.provider_config_id}
                         onValueChange={(v) =>
-                          updateEdit(featureKey, { provider_config_id: v ?? "", model: "" })
+                          updateEdit(featureKey, {
+                            provider_config_id: v ?? "",
+                            model: "",
+                          })
                         }
                       >
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select provider..." />
+                          <SelectValue placeholder="Select provider...">
+                            {edit.provider_config_id
+                              ? (PROVIDER_OPTIONS.find(
+                                  (opt) =>
+                                    opt.value ===
+                                    providers.find((p) => p.id === edit.provider_config_id)?.provider
+                                )?.label ??
+                                providers.find((p) => p.id === edit.provider_config_id)?.provider)
+                              : undefined}
+                          </SelectValue>
                         </SelectTrigger>
                         <SelectContent>
                           {providers.map((p) => (
                             <SelectItem key={p.id} value={p.id}>
-                              <span className="capitalize">{p.provider}</span>
+                              {PROVIDER_OPTIONS.find((opt) => opt.value === p.provider)?.label ?? p.provider}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -498,7 +558,9 @@ export function AISettings() {
                           models={models}
                           value={edit.model}
                           onChange={(v) => updateEdit(featureKey, { model: v })}
-                          disabled={!edit.provider_config_id || models.length === 0}
+                          disabled={
+                            !edit.provider_config_id || models.length === 0
+                          }
                         />
                       )}
                     </div>
@@ -510,7 +572,9 @@ export function AISettings() {
                       rows={3}
                       value={edit.system_prompt}
                       onChange={(e) =>
-                        updateEdit(featureKey, { system_prompt: e.target.value })
+                        updateEdit(featureKey, {
+                          system_prompt: e.target.value,
+                        })
                       }
                     />
                   </div>
@@ -520,7 +584,9 @@ export function AISettings() {
                   <div className="flex gap-2">
                     <Button
                       size="sm"
-                      disabled={saving || !edit.provider_config_id || !edit.model}
+                      disabled={
+                        saving || !edit.provider_config_id || !edit.model
+                      }
                       onClick={() => handleSaveFeature(featureKey)}
                     >
                       {saving ? "Saving..." : "Save"}

@@ -9,8 +9,9 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import { setupAccount, saveProfile, type HardwareRecommendation } from "@/lib/services/auth";
+import { importSystem } from "@/lib/services/system";
 
-type Step = "account" | "profile" | "hardware" | "llm";
+type Step = "account" | "restore" | "profile" | "hardware" | "llm";
 
 export default function SetupPage() {
   const router = useRouter();
@@ -21,6 +22,7 @@ export default function SetupPage() {
   const [birthDate, setBirthDate] = useState("");
   const [planToAge, setPlanToAge] = useState("85");
   const [loading, setLoading] = useState(false);
+  const [restoreError, setRestoreError] = useState<string | null>(null);
 
   async function handleCreateAccount(e: React.FormEvent) {
     e.preventDefault();
@@ -33,7 +35,7 @@ export default function SetupPage() {
         return;
       }
       setHardware(result.hardware);
-      setStep("profile");
+      setStep("restore");
     } finally {
       setLoading(false);
     }
@@ -62,8 +64,8 @@ export default function SetupPage() {
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle>Welcome to Zentri</CardTitle>
-            <p className="text-sm text-muted-foreground">Step 1 of 4 — Create your account</p>
-            <Progress value={25} className="mt-2" />
+            <p className="text-sm text-muted-foreground">Step 1 of 5 — Create your account</p>
+            <Progress value={20} className="mt-2" />
           </CardHeader>
           <CardContent>
             <form onSubmit={handleCreateAccount} className="space-y-4">
@@ -91,14 +93,75 @@ export default function SetupPage() {
     );
   }
 
+  if (step === "restore") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle>Restore from backup?</CardTitle>
+            <p className="text-sm text-muted-foreground">Step 2 of 5 — Optional</p>
+            <Progress value={40} className="mt-2" />
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              If you have a Zentri backup file, upload it now to restore all your
+              data and skip the remaining setup steps.
+            </p>
+            {restoreError && (
+              <p className="text-sm text-destructive">{restoreError}</p>
+            )}
+            <div className="flex gap-2">
+              <div className="flex-1">
+                <label className="w-full">
+                  <input
+                    type="file"
+                    accept=".json"
+                    className="hidden"
+                    disabled={loading}
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      setLoading(true);
+                      setRestoreError(null);
+                      try {
+                        await importSystem(file);
+                        router.push("/");
+                      } catch (err) {
+                        setRestoreError((err as Error).message || "Restore failed");
+                      } finally {
+                        setLoading(false);
+                        e.target.value = "";
+                      }
+                    }}
+                  />
+                  <Button className="w-full" disabled={loading}>
+                    {loading ? "Restoring..." : "Upload backup file"}
+                  </Button>
+                </label>
+              </div>
+              <Button
+                variant="outline"
+                className="flex-1"
+                disabled={loading}
+                onClick={() => { setRestoreError(null); setStep("profile"); }}
+              >
+                Start fresh
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   if (step === "profile") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle>Your Profile</CardTitle>
-            <p className="text-sm text-muted-foreground">Step 2 of 4 — Optional</p>
-            <Progress value={50} className="mt-2" />
+            <p className="text-sm text-muted-foreground">Step 3 of 5 — Optional</p>
+            <Progress value={60} className="mt-2" />
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-xs text-muted-foreground">
@@ -143,8 +206,8 @@ export default function SetupPage() {
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle>Hardware Detected</CardTitle>
-            <p className="text-sm text-muted-foreground">Step 3 of 4</p>
-            <Progress value={75} className="mt-2" />
+            <p className="text-sm text-muted-foreground">Step 4 of 5</p>
+            <Progress value={80} className="mt-2" />
           </CardHeader>
           <CardContent className="space-y-4">
             {hardware ? (
@@ -181,7 +244,7 @@ export default function SetupPage() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Setup Complete</CardTitle>
-          <p className="text-sm text-muted-foreground">Step 4 of 4</p>
+          <p className="text-sm text-muted-foreground">Step 5 of 5</p>
           <Progress value={100} className="mt-2" />
         </CardHeader>
         <CardContent className="space-y-4">

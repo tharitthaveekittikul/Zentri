@@ -66,4 +66,11 @@ export const api = {
   patch: (path: string, body: unknown) =>
     fetchWithAuth(path, { method: "PATCH", body: JSON.stringify(body) }),
   delete: (path: string) => fetchWithAuth(path, { method: "DELETE" }),
+  postForm: (path: string, body: FormData): Promise<Response> => {
+    const token =
+      typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+    const headers: Record<string, string> = {};
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    return fetch(`${API_BASE}${path}`, { method: "POST", body, headers });
+  },
 };

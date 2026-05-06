@@ -15,6 +15,7 @@ import {
   Bot,
   Settings,
   Upload,
+  HardDrive,
 } from "lucide-react";
 
 const navItems = [
@@ -29,6 +30,7 @@ const navItems = [
   { href: "/import", label: "Import", icon: Upload },
   { href: "/ai-usage", label: "AI Usage", icon: Bot },
   { href: "/settings", label: "Settings", icon: Settings },
+  { href: "/settings/backup", label: "Backup", icon: HardDrive },
 ];
 
 const mainNavItems = navItems.slice(0, 5);
