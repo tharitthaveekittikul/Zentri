@@ -23,7 +23,7 @@ const navItems = [
   { href: "/portfolio", label: "Portfolio", icon: Briefcase },
   { href: "/watchlist", label: "Watchlist", icon: Star },
   { href: "/net-worth", label: "Net Worth", icon: TrendingUp },
-  { href: "/dividends", label: "Dividends", icon: CalendarDays },
+  { href: "/events", label: "Events", icon: CalendarDays },
   { href: "/transactions", label: "Transactions", icon: Receipt },
   { href: "/documents", label: "Documents", icon: FileText },
   { href: "/pipeline", label: "Pipeline", icon: Activity },

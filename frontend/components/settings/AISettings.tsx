@@ -56,6 +56,7 @@ const FEATURE_KEYS = [
   "chat",
   "watchlist_scan",
   "watchlist_discovery",
+  "ipo_analysis",
 ];
 
 type FeatureEdit = {

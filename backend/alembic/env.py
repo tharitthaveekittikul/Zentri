@@ -9,6 +9,8 @@ from app.core.database import Base
 from app.models import user  # noqa: F401 — ensure models are imported
 from app.models import llm_call_log  # noqa: F401
 from app.models import exchange_rate_cache  # noqa: F401
+from app.models import ipo_event  # noqa: F401
+from app.models import ai_analysis  # noqa: F401
 
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)

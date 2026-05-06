@@ -38,6 +38,7 @@ FEATURE_KEYS = (
     "chat",
     "watchlist_scan",
     "watchlist_discovery",
+    "ipo_analysis",
 )
 
 DEFAULT_SYSTEM_PROMPTS: dict[str, str] = {
@@ -98,6 +99,15 @@ DEFAULT_SYSTEM_PROMPTS: dict[str, str] = {
         "Suggest exactly 3 to 5 assets not already in the portfolio or watchlist. "
         "Do not include any text outside the JSON array."
     ),
+    "ipo_analysis": (
+        "You are a financial analyst specializing in IPO evaluations. "
+        "Given IPO data, assess whether to Buy, Watch, or Skip this offering. "
+        "Provide a suggested entry price and concise reasoning. "
+        "Respond ONLY with valid JSON in this exact format:\n"
+        "{\"verdict\": \"BUY\" | \"WATCH\" | \"SKIP\", \"suggested_price\": <number or null>, "
+        "\"reasoning\": \"<2-3 sentence explanation>\"}\n"
+        "Do not include any text outside the JSON object."
+    ),
 }
 
 HUMAN_PROMPTS: dict[str, str] = {
@@ -117,6 +127,17 @@ HUMAN_PROMPTS: dict[str, str] = {
         "Current portfolio holdings:\n{holdings_txt}\n\n"
         "Already on watchlist (exclude these):\n{watchlist_txt}\n\n"
         "Suggest 3-5 assets worth watching based on the portfolio above. Respond with JSON array."
+    ),
+    "ipo_analysis": (
+        "Analyze this upcoming IPO and provide an investment recommendation.\n\n"
+        "Symbol: {symbol}\n"
+        "Company: {company_name}\n"
+        "Sector: {sector}\n"
+        "IPO Date: {ipo_date}\n"
+        "Expected Price Range: {price_low} - {price_high} USD\n"
+        "Business Description: {description}\n"
+        "Market Cap: {market_cap}\n"
+        "Trailing P/E: {pe_ratio}"
     ),
 }
 

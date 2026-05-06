@@ -16,6 +16,7 @@ export const FEATURE_LABELS: Record<string, string> = {
   chat: "Chat Assistant",
   watchlist_scan: "Watchlist Scanner",
   watchlist_discovery: "Watchlist Discovery",
+  ipo_analysis: "IPO Analysis",
 };
 
 export async function listFeatureConfigs(): Promise<FeatureLLMConfig[]> {
