@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { getLatestBalance, CashBalance } from "@/lib/services/cash-balance";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, Copy } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -113,9 +113,20 @@ export function CashAccountsSection() {
                       {asset.symbol}
                     </CardTitle>
                     {asset.metadata_?.account_number && (
-                      <p className="text-xs text-muted-foreground">
-                        {asset.metadata_.account_number}
-                      </p>
+                      <div className="flex items-center gap-1">
+                        <p className="text-xs text-muted-foreground">
+                          {asset.metadata_.account_number}
+                        </p>
+                        <button
+                          className="text-muted-foreground hover:text-foreground transition-colors"
+                          onClick={() => {
+                            navigator.clipboard.writeText(asset.metadata_!.account_number!);
+                            toast.success("Account number copied");
+                          }}
+                        >
+                          <Copy className="h-3 w-3" />
+                        </button>
+                      </div>
                     )}
                   </div>
                   <div className="flex gap-1">
