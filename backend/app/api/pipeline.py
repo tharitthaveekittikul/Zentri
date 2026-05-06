@@ -81,6 +81,8 @@ async def trigger_job(
         "price_fetch_gold": "job_fetch_price_gold",
         "price_fetch_benchmark": "job_fetch_benchmark_prices",
     }
+    if job_type not in job_fn_map:
+        raise HTTPException(status_code=400, detail=f"Job type '{job_type}' cannot be triggered manually")
     fn_name = job_fn_map[job_type]
     job = await redis.enqueue_job(fn_name)
     await redis.aclose()
@@ -105,6 +107,19 @@ async def pipeline_stream(
                     "started_at": log.started_at.isoformat(),
                     "finished_at": log.finished_at.isoformat() if log.finished_at else None,
                     "error_message": log.error_message,
+                    "steps": [
+                        {
+                            "id": str(s.id),
+                            "pipeline_log_id": str(s.pipeline_log_id),
+                            "step_name": s.step_name,
+                            "status": s.status,
+                            "started_at": s.started_at.isoformat(),
+                            "finished_at": s.finished_at.isoformat() if s.finished_at else None,
+                            "metadata": s.step_metadata,
+                            "error_message": s.error_message,
+                        }
+                        for s in log.steps
+                    ],
                 }
                 for log in logs
             ]

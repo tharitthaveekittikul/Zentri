@@ -11,7 +11,7 @@ from app.models.user import User
 from app.models.watchlist_item import WatchlistItem
 from app.models.watchlist_suggestion import WatchlistSuggestion
 from app.services.llm_gateway import LLMGateway
-from app.services.pipeline import create_log, finish_log
+from app.services.pipeline import create_log, finish_log, create_step, finish_step
 
 logger = get_logger(__name__)
 
@@ -46,6 +46,8 @@ async def job_discover_watchlist(ctx: dict, user_id: str) -> dict:
             if not user:
                 raise ValueError(f"User {user_id} not found")
 
+            # Step 1: load_portfolio
+            step_load = await create_step(db, log.id, "load_portfolio")
             holdings_rows = (await db.execute(
                 select(Holding, Asset)
                 .join(Asset, Holding.asset_id == Asset.id)
@@ -73,24 +75,45 @@ async def job_discover_watchlist(ctx: dict, user_id: str) -> dict:
                     )
                 )).scalars().all()
             )
+            await finish_step(db, step_load, success=True, metadata={
+                "holdings": len(holdings_rows),
+                "watchlist": len(watchlist_rows),
+            })
 
+            # Step 2: llm_call
+            step_llm = await create_step(db, log.id, "llm_call")
             gateway = LLMGateway(db)
-            content = await gateway.complete(
+            llm_result = await gateway.complete(
                 "watchlist_discovery",
                 user.id,
                 {"holdings_txt": holdings_txt, "watchlist_txt": watchlist_txt},
             )
-            logger.info("LLM watchlist_discovery response received, length=%d", len(content))
+            logger.info("LLM watchlist_discovery response received, length=%d", len(llm_result.content))
+            await finish_step(db, step_llm, success=True, metadata={
+                "tokens_in": llm_result.tokens_in,
+                "tokens_out": llm_result.tokens_out,
+                "cost_usd": llm_result.cost_usd,
+                "cost_thb": llm_result.cost_thb,
+                "exchange_rate": llm_result.exchange_rate,
+                "model": llm_result.model,
+                "provider": llm_result.provider,
+                "prompt": llm_result.prompt,
+                "response": llm_result.content,
+            })
 
-            parsed = _parse_discovery_response(content)
+            parsed = _parse_discovery_response(llm_result.content)
             if parsed is None:
-                raise ValueError(f"LLM returned malformed JSON: {content[:200]}")
+                raise ValueError(f"LLM returned malformed JSON: {llm_result.content[:200]}")
 
+            # Step 3: save_suggestions
+            step_save = await create_step(db, log.id, "save_suggestions")
             saved = 0
+            skipped = 0
             for item in parsed:
                 sym = item["symbol"].upper()
                 if sym in portfolio_symbols or sym in watchlist_symbols or sym in pending_symbols:
                     logger.debug("Skipping duplicate symbol: %s", sym)
+                    skipped += 1
                     continue
 
                 asset_row = (await db.execute(
@@ -110,6 +133,7 @@ async def job_discover_watchlist(ctx: dict, user_id: str) -> dict:
                 logger.debug("Queued suggestion: symbol=%s verdict=%s", sym, item["verdict"])
 
             await db.commit()
+            await finish_step(db, step_save, success=True, metadata={"saved": saved, "skipped": skipped})
             await finish_log(db, log, success=True)
             logger.info("watchlist_discover done: %d suggestions saved", saved)
             return {"suggestions_saved": saved}

@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.core.logging import get_logger
 from app.models.document import Document
-from app.services.pipeline import create_log, finish_log
+from app.services.pipeline import create_log, finish_log, create_step, finish_step
 from app.services.rag_service import add_chunks, get_or_create_collection
 
 logger = get_logger(__name__)
@@ -35,12 +35,25 @@ async def job_ingest_document(ctx: dict, document_id: str) -> dict:
             doc.status = "processing"
             await db.commit()
 
+            current_step = None
+
+            # Step 1: load_document
+            current_step = await create_step(db, log.id, "load_document")
             import fitz
+            import os
             pdf = fitz.open(doc.file_path)
             full_text = "\n".join(page.get_text() for page in pdf)
             pdf.close()
+            file_size = os.path.getsize(doc.file_path) if os.path.exists(doc.file_path) else 0
+            await finish_step(db, current_step, success=True, metadata={
+                "filename": doc.file_path.split("/")[-1],
+                "size_bytes": file_size,
+            })
 
+            # Step 2: chunk_text
+            current_step = await create_step(db, log.id, "chunk_text")
             chunks = _recursive_chunk(full_text)
+            await finish_step(db, current_step, success=True, metadata={"chunks": len(chunks)})
 
             asset_symbol = None
             if doc.asset_id:
@@ -49,6 +62,8 @@ async def job_ingest_document(ctx: dict, document_id: str) -> dict:
                 asset = a_result.scalar_one_or_none()
                 asset_symbol = asset.symbol if asset else None
 
+            # Step 3: embed_store
+            current_step = await create_step(db, log.id, "embed_store")
             collection = get_or_create_collection(asset_symbol)
             metadatas = [
                 {"document_id": document_id, "chunk_index": i, "asset_symbol": asset_symbol or "global"}
@@ -56,6 +71,7 @@ async def job_ingest_document(ctx: dict, document_id: str) -> dict:
             ]
             ids = [f"{document_id}_{i}" for i in range(len(chunks))]
             add_chunks(collection, chunks, metadatas, ids)
+            await finish_step(db, current_step, success=True, metadata={"embedded": len(chunks)})
 
             doc.status = "done"
             doc.chunk_count = len(chunks)
@@ -67,6 +83,8 @@ async def job_ingest_document(ctx: dict, document_id: str) -> dict:
             return {"chunks": len(chunks)}
         except Exception as e:
             logger.exception("ingest_document failed id=%s: %s", document_id, e)
+            if current_step is not None:
+                await finish_step(db, current_step, success=False, error=str(e))
             doc.status = "failed"
             doc.error_msg = str(e)
             await db.commit()

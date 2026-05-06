@@ -8,7 +8,8 @@ from app.core.logging import get_logger
 from app.models.ai_analysis import AIAnalysis
 from app.models.llm_conversation import LLMConversation
 from app.services.llm_service import get_llm_provider
-from app.services.pipeline import create_log, finish_log
+from app.services.pipeline import create_log, finish_log, create_step, finish_step
+from app.services.exchange_rate import get_current_usd_thb
 from app.services.rag_service import get_or_create_collection, search
 
 logger = get_logger(__name__)
@@ -25,11 +26,14 @@ async def job_run_analysis(ctx: dict, symbol: str) -> dict:
     SessionLocal: async_sessionmaker = ctx["session_factory"]
     async with SessionLocal() as db:
         log = await create_log(db, "run_analysis")
+        current_step = None
         try:
             from app.models.asset import Asset
             from app.models.holding import Holding
             from app.models.price import Price
 
+            # Step 1: load_asset
+            current_step = await create_step(db, log.id, "load_asset")
             a_result = await db.execute(select(Asset).where(Asset.symbol == symbol.upper()))
             asset = a_result.scalar_one_or_none()
             if not asset:
@@ -46,10 +50,18 @@ async def job_run_analysis(ctx: dict, symbol: str) -> dict:
                 .limit(90)
             )
             prices = p_result.scalars().all()
+            await finish_step(db, current_step, success=True, metadata={
+                "symbol": symbol.upper(),
+                "holdings": len(holdings),
+                "price_days": len(prices),
+            })
 
+            # Step 2: rag_retrieval
+            current_step = await create_step(db, log.id, "rag_retrieval")
             collection = get_or_create_collection(symbol)
             rag_chunks = search(collection, query=f"{symbol} financial analysis earnings revenue")
             rag_context = "\n\n---\n\n".join(rag_chunks) if rag_chunks else "No documents available."
+            await finish_step(db, current_step, success=True, metadata={"chunks_found": len(rag_chunks)})
 
             holdings_txt = "\n".join(
                 f"- {h.quantity} units @ avg cost {h.avg_cost}" for h in holdings
@@ -76,6 +88,8 @@ Provide your BUY/SELL/HOLD verdict as JSON."""
                 {"role": "user", "content": user_prompt},
             ]
 
+            # Step 3: llm_call
+            current_step = await create_step(db, log.id, "llm_call")
             llm = await get_llm_provider(db)
             resp = await llm.complete(messages)
             parsed = _parse_verdict(resp.content)
@@ -89,6 +103,22 @@ Provide your BUY/SELL/HOLD verdict as JSON."""
                     raise ValueError(f"LLM returned malformed JSON after retry: {resp2.content[:200]}")
                 resp = resp2
 
+            usd_thb = await get_current_usd_thb(db)
+            cost_thb = float(resp.cost_usd) * float(usd_thb) if usd_thb else 0.0
+            await finish_step(db, current_step, success=True, metadata={
+                "tokens_in": resp.tokens_in,
+                "tokens_out": resp.tokens_out,
+                "cost_usd": float(resp.cost_usd),
+                "cost_thb": cost_thb,
+                "exchange_rate": float(usd_thb) if usd_thb else 0.0,
+                "model": getattr(llm, "model", "unknown"),
+                "provider": type(llm).__name__.replace("Provider", "").lower(),
+                "prompt": user_prompt,
+                "response": resp.content,
+            })
+
+            # Step 4: save_analysis
+            current_step = await create_step(db, log.id, "save_analysis")
             analysis = AIAnalysis(
                 asset_id=asset.id,
                 job_id=str(log.id),
@@ -113,11 +143,17 @@ Provide your BUY/SELL/HOLD verdict as JSON."""
                 ))
 
             await db.commit()
+            await finish_step(db, current_step, success=True, metadata={
+                "verdict": parsed["verdict"],
+                "analysis_id": str(analysis.id),
+            })
             await finish_log(db, log, success=True)
             logger.info("run_analysis done symbol=%s verdict=%s", symbol, parsed["verdict"])
             return {"verdict": parsed["verdict"], "analysis_id": str(analysis.id)}
         except Exception as e:
             logger.exception("run_analysis failed symbol=%s: %s", symbol, e)
+            if current_step is not None:
+                await finish_step(db, current_step, success=False, error=str(e))
             await finish_log(db, log, success=False, error_message=str(e))
             raise
 

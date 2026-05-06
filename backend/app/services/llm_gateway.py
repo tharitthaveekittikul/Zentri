@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import uuid
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 
 import httpx
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -16,6 +17,20 @@ from app.services.user_context import get_user_age_context
 from sqlalchemy import select
 
 logger = get_logger(__name__)
+
+
+@dataclass
+class LLMGatewayResult:
+    content: str
+    prompt: str
+    tokens_in: int
+    tokens_out: int
+    cost_usd: float
+    cost_thb: float
+    exchange_rate: float
+    model: str
+    provider: str
+
 
 FEATURE_KEYS = (
     "import_translator",
@@ -285,7 +300,7 @@ class LLMGateway:
     def __init__(self, db: AsyncSession):
         self._db = db
 
-    async def complete(self, feature_key: str, user_id: uuid.UUID, variables: dict) -> str:
+    async def complete(self, feature_key: str, user_id: uuid.UUID, variables: dict) -> LLMGatewayResult:
         from app.models.llm_call_log import LLMCallLog
 
         config = await self._get_feature_config(feature_key, user_id)
@@ -326,7 +341,17 @@ class LLMGateway:
 
         logger.info("LLM logged: tokens_in=%d tokens_out=%d cost_usd=%.6f",
                     response.tokens_in, response.tokens_out, response.cost_usd)
-        return response.content
+        return LLMGatewayResult(
+            content=response.content,
+            prompt=human,
+            tokens_in=response.tokens_in,
+            tokens_out=response.tokens_out,
+            cost_usd=float(response.cost_usd),
+            cost_thb=cost_thb,
+            exchange_rate=float(usd_thb) if usd_thb else 0.0,
+            model=config.model,
+            provider=provider.provider,
+        )
 
     async def _get_feature_config(self, feature_key: str, user_id: uuid.UUID) -> FeatureLLMConfig:
         result = await self._db.execute(

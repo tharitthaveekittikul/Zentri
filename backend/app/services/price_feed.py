@@ -67,7 +67,7 @@ async def _upsert_benchmark_prices(db: AsyncSession, rows: list[dict]) -> int:
 # US Stocks
 # ---------------------------------------------------------------------------
 
-async def fetch_us_prices(db: AsyncSession) -> int:
+async def fetch_us_prices(db: AsyncSession) -> dict:
     """Fetch latest daily OHLCV for all us_stock assets via yfinance."""
     result = await db.execute(
         select(Asset).where(Asset.asset_type == "us_stock")
@@ -75,7 +75,7 @@ async def fetch_us_prices(db: AsyncSession) -> int:
     assets = list(result.scalars().all())
     if not assets:
         logger.info("fetch_us_prices: no us_stock assets found")
-        return 0
+        return {"inserted": 0, "symbols": 0, "tickers": []}
 
     symbols = [a.symbol for a in assets]
     asset_map = {a.symbol: a.id for a in assets}
@@ -85,9 +85,12 @@ async def fetch_us_prices(db: AsyncSession) -> int:
     def _fetch():
         tickers = yf.Tickers(" ".join(symbols))
         rows = []
+        fetched = []
         for sym, asset_id in asset_map.items():
             try:
                 hist = tickers.tickers[sym].history(period="5d", interval="1d")
+                if not hist.empty:
+                    fetched.append(sym)
                 for ts, row in hist.iterrows():
                     rows.append({
                         "asset_id": asset_id,
@@ -100,12 +103,12 @@ async def fetch_us_prices(db: AsyncSession) -> int:
                     })
             except Exception as e:
                 logger.warning("fetch_us_prices: failed for %s: %s", sym, e)
-        return rows
+        return rows, fetched
 
-    rows = await asyncio.get_event_loop().run_in_executor(None, _fetch)
+    rows, fetched_symbols = await asyncio.get_event_loop().run_in_executor(None, _fetch)
     inserted = await _upsert_prices(db, rows)
-    logger.info("fetch_us_prices: upserted %d rows", inserted)
-    return inserted
+    logger.info("fetch_us_prices: upserted %d rows for %d symbols", inserted, len(fetched_symbols))
+    return {"table": "prices", "inserted": inserted, "symbols": len(fetched_symbols), "tickers": fetched_symbols}
 
 
 # ---------------------------------------------------------------------------
@@ -115,7 +118,7 @@ async def fetch_us_prices(db: AsyncSession) -> int:
 COINGECKO_API = "https://api.coingecko.com/api/v3"
 
 
-async def fetch_crypto_prices(db: AsyncSession) -> int:
+async def fetch_crypto_prices(db: AsyncSession) -> dict:
     """Fetch latest prices for all crypto assets via CoinGecko.
 
     Expects asset.metadata_['coingecko_id'] to be set (e.g. 'bitcoin', 'ethereum').
@@ -127,7 +130,7 @@ async def fetch_crypto_prices(db: AsyncSession) -> int:
     assets = list(result.scalars().all())
     if not assets:
         logger.info("fetch_crypto_prices: no crypto assets found")
-        return 0
+        return {"inserted": 0, "coins": []}
 
     coin_map: dict[str, object] = {}
     for a in assets:
@@ -138,7 +141,7 @@ async def fetch_crypto_prices(db: AsyncSession) -> int:
             logger.warning("fetch_crypto_prices: asset %s missing coingecko_id in metadata", a.symbol)
 
     if not coin_map:
-        return 0
+        return {"inserted": 0, "coins": []}
 
     ids_param = ",".join(coin_map.keys())
     async with httpx.AsyncClient(timeout=30) as client:
@@ -151,30 +154,33 @@ async def fetch_crypto_prices(db: AsyncSession) -> int:
 
     now = datetime.now(timezone.utc)
     rows = []
+    coin_prices = {}
     for cg_id, price_data in data.items():
         asset = coin_map.get(cg_id)
         if not asset:
             continue
+        usd_price = price_data.get("usd")
+        coin_prices[asset.symbol] = usd_price
         rows.append({
             "asset_id": asset.id,
             "timestamp": now,
             "open": None,
             "high": None,
             "low": None,
-            "close": _to_decimal(price_data.get("usd")),
+            "close": _to_decimal(usd_price),
             "volume": None,
         })
 
     inserted = await _upsert_prices(db, rows)
     logger.info("fetch_crypto_prices: upserted %d rows", inserted)
-    return inserted
+    return {"table": "prices", "inserted": inserted, "coins": [f"{sym} ${price}" for sym, price in coin_prices.items()]}
 
 
 # ---------------------------------------------------------------------------
 # Gold
 # ---------------------------------------------------------------------------
 
-async def fetch_gold_price(db: AsyncSession) -> int:
+async def fetch_gold_price(db: AsyncSession) -> dict:
     """Fetch gold spot price via yfinance (GC=F futures as proxy)."""
     result = await db.execute(
         select(Asset).where(Asset.asset_type == "gold")
@@ -182,7 +188,7 @@ async def fetch_gold_price(db: AsyncSession) -> int:
     assets = list(result.scalars().all())
     if not assets:
         logger.info("fetch_gold_price: no gold assets found")
-        return 0
+        return {"inserted": 0}
 
     def _fetch():
         ticker = yf.Ticker("GC=F")
@@ -191,7 +197,9 @@ async def fetch_gold_price(db: AsyncSession) -> int:
     hist = await asyncio.get_event_loop().run_in_executor(None, _fetch)
     if hist.empty:
         logger.warning("fetch_gold_price: yfinance returned empty history for GC=F")
-        return 0
+        return {"inserted": 0}
+
+    latest_close = _to_decimal(hist.iloc[-1].get("Close")) if not hist.empty else None
 
     rows = []
     for a in assets:
@@ -208,7 +216,10 @@ async def fetch_gold_price(db: AsyncSession) -> int:
 
     inserted = await _upsert_prices(db, rows)
     logger.info("fetch_gold_price: upserted %d rows", inserted)
-    return inserted
+    result_meta = {"table": "prices", "inserted": inserted}
+    if latest_close is not None:
+        result_meta["latest_close"] = float(latest_close)
+    return result_meta
 
 
 # ---------------------------------------------------------------------------
@@ -253,4 +264,4 @@ async def fetch_benchmark_prices(db: AsyncSession) -> int:
 
     inserted = await _upsert_benchmark_prices(db, rows)
     logger.info("fetch_benchmark_prices: upserted %d rows", inserted)
-    return inserted
+    return {"table": "benchmark_prices", "inserted": inserted, "benchmarks": [bm.symbol for bm in benchmarks]}

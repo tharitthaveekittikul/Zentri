@@ -32,3 +32,32 @@ async def test_trigger_job_enqueues(auth_client):
         data = response.json()
         assert data["enqueued"] is True
         mock_redis.enqueue_job.assert_called_once_with("job_fetch_prices_us")
+
+
+@pytest.mark.asyncio
+async def test_create_and_finish_step(db):
+    from app.services.pipeline import create_log, create_step, finish_step
+
+    log = await create_log(db, "price_fetch_us")
+    step = await create_step(db, log.id, "fetch_and_store")
+    assert step.status == "running"
+    assert step.finished_at is None
+
+    finished = await finish_step(db, step, success=True, metadata={"inserted": 42})
+    assert finished.status == "done"
+    assert finished.step_metadata == {"inserted": 42}
+    assert finished.finished_at is not None
+
+
+@pytest.mark.asyncio
+async def test_list_logs_includes_steps(db):
+    from app.services.pipeline import create_log, create_step, list_logs
+
+    log = await create_log(db, "price_fetch_us")
+    await create_step(db, log.id, "fetch_and_store")
+
+    logs = await list_logs(db, limit=10)
+    assert any(str(l.id) == str(log.id) for l in logs)
+    matching = next(l for l in logs if str(l.id) == str(log.id))
+    assert len(matching.steps) == 1
+    assert matching.steps[0].step_name == "fetch_and_store"

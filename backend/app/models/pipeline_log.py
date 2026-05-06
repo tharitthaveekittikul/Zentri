@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 
 from sqlalchemy import DateTime, Enum, Text
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
 
@@ -35,3 +35,10 @@ class PipelineLog(Base):
         DateTime(timezone=True), nullable=True
     )
     error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    steps: Mapped[list["PipelineStep"]] = relationship(  # type: ignore[name-defined]
+        "PipelineStep",
+        back_populates="pipeline_log",
+        order_by="PipelineStep.started_at",
+        lazy="raise",
+    )

@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.core.logging import get_logger
-from app.services.pipeline import create_log, finish_log
+from app.services.pipeline import create_log, finish_log, create_step, finish_step
 from app.services.price_feed import (
     fetch_benchmark_prices,
     fetch_crypto_prices,
@@ -17,13 +17,16 @@ async def job_fetch_prices_us(ctx: dict) -> dict:
     SessionLocal: async_sessionmaker = ctx["session_factory"]
     async with SessionLocal() as db:
         log = await create_log(db, "price_fetch_us")
+        step = await create_step(db, log.id, "fetch_and_store")
         try:
-            count = await fetch_us_prices(db)
+            result = await fetch_us_prices(db)
+            await finish_step(db, step, success=True, metadata=result)
             await finish_log(db, log, success=True)
             await ctx["redis"].enqueue_job("job_check_watchlist_alerts", _job_id="watchlist_alert_check")
-            return {"inserted": count}
+            return {"inserted": result["inserted"]}
         except Exception as e:
             logger.exception("job_fetch_prices_us failed: %s", e)
+            await finish_step(db, step, success=False, error=str(e))
             await finish_log(db, log, success=False, error_message=str(e))
             raise
 
@@ -33,13 +36,16 @@ async def job_fetch_prices_crypto(ctx: dict) -> dict:
     SessionLocal: async_sessionmaker = ctx["session_factory"]
     async with SessionLocal() as db:
         log = await create_log(db, "price_fetch_crypto")
+        step = await create_step(db, log.id, "fetch_and_store")
         try:
-            count = await fetch_crypto_prices(db)
+            result = await fetch_crypto_prices(db)
+            await finish_step(db, step, success=True, metadata=result)
             await finish_log(db, log, success=True)
             await ctx["redis"].enqueue_job("job_check_watchlist_alerts", _job_id="watchlist_alert_check")
-            return {"inserted": count}
+            return {"inserted": result["inserted"]}
         except Exception as e:
             logger.exception("job_fetch_prices_crypto failed: %s", e)
+            await finish_step(db, step, success=False, error=str(e))
             await finish_log(db, log, success=False, error_message=str(e))
             raise
 
@@ -49,13 +55,16 @@ async def job_fetch_price_gold(ctx: dict) -> dict:
     SessionLocal: async_sessionmaker = ctx["session_factory"]
     async with SessionLocal() as db:
         log = await create_log(db, "price_fetch_gold")
+        step = await create_step(db, log.id, "fetch_and_store")
         try:
-            count = await fetch_gold_price(db)
+            result = await fetch_gold_price(db)
+            await finish_step(db, step, success=True, metadata=result)
             await finish_log(db, log, success=True)
             await ctx["redis"].enqueue_job("job_check_watchlist_alerts", _job_id="watchlist_alert_check")
-            return {"inserted": count}
+            return {"inserted": result["inserted"]}
         except Exception as e:
             logger.exception("job_fetch_price_gold failed: %s", e)
+            await finish_step(db, step, success=False, error=str(e))
             await finish_log(db, log, success=False, error_message=str(e))
             raise
 
@@ -65,11 +74,14 @@ async def job_fetch_benchmark_prices(ctx: dict) -> dict:
     SessionLocal: async_sessionmaker = ctx["session_factory"]
     async with SessionLocal() as db:
         log = await create_log(db, "price_fetch_benchmark")
+        step = await create_step(db, log.id, "fetch_and_store")
         try:
-            count = await fetch_benchmark_prices(db)
+            result = await fetch_benchmark_prices(db)
+            await finish_step(db, step, success=True, metadata=result)
             await finish_log(db, log, success=True)
-            return {"inserted": count}
+            return {"inserted": result["inserted"]}
         except Exception as e:
             logger.exception("job_fetch_benchmark_prices failed: %s", e)
+            await finish_step(db, step, success=False, error=str(e))
             await finish_log(db, log, success=False, error_message=str(e))
             raise

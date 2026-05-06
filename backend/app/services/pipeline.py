@@ -3,9 +3,11 @@ from datetime import datetime, timezone
 
 from sqlalchemy import select, desc
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.core.logging import get_logger
 from app.models.pipeline_log import PipelineLog
+from app.models.pipeline_step import PipelineStep
 
 logger = get_logger(__name__)
 
@@ -42,15 +44,56 @@ async def finish_log(
     return log
 
 
+async def create_step(
+    db: AsyncSession, pipeline_log_id: uuid.UUID, step_name: str
+) -> PipelineStep:
+    step = PipelineStep(
+        pipeline_log_id=pipeline_log_id,
+        step_name=step_name,
+        status="running",
+        started_at=datetime.now(timezone.utc),
+    )
+    db.add(step)
+    await db.commit()
+    await db.refresh(step)
+    logger.info("pipeline step started step=%s log_id=%s", step_name, pipeline_log_id)
+    return step
+
+
+async def finish_step(
+    db: AsyncSession,
+    step: PipelineStep,
+    *,
+    success: bool,
+    metadata: dict | None = None,
+    error: str | None = None,
+) -> PipelineStep:
+    step.status = "done" if success else "failed"
+    step.finished_at = datetime.now(timezone.utc)
+    step.step_metadata = metadata
+    step.error_message = error
+    await db.commit()
+    await db.refresh(step)
+    logger.info(
+        "pipeline step finished step=%s status=%s", step.step_name, step.status
+    )
+    return step
+
+
 async def list_logs(db: AsyncSession, limit: int = 50) -> list[PipelineLog]:
     result = await db.execute(
-        select(PipelineLog).order_by(desc(PipelineLog.started_at)).limit(limit)
+        select(PipelineLog)
+        .options(selectinload(PipelineLog.steps))
+        .order_by(desc(PipelineLog.started_at))
+        .limit(limit)
     )
     return list(result.scalars().all())
 
 
 async def get_log(db: AsyncSession, log_id: uuid.UUID) -> PipelineLog | None:
     result = await db.execute(
-        select(PipelineLog).where(PipelineLog.id == log_id)
+        select(PipelineLog)
+        .options(selectinload(PipelineLog.steps))
+        .where(PipelineLog.id == log_id)
     )
     return result.scalar_one_or_none()
