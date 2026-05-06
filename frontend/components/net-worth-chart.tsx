@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   createChart,
   AreaSeries,
@@ -10,6 +11,7 @@ import {
 } from "lightweight-charts";
 import { TrendingUp } from "lucide-react";
 import { fetchNetWorthTimeline, type NetWorthPoint } from "@/lib/services/overview";
+import { fetchExchangeRate } from "@/lib/services/settings";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useDualCurrency } from "@/hooks/useDualCurrency";
 
@@ -18,6 +20,17 @@ type Range = (typeof RANGES)[number];
 
 export function NetWorthChart({ privacyMode }: { privacyMode: boolean }) {
   const { primaryCurrency } = useDualCurrency();
+
+  const { data: usdToPrimary } = useQuery({
+    queryKey: ["exchange-rate", "USD", primaryCurrency],
+    queryFn: () => fetchExchangeRate("USD", primaryCurrency),
+    enabled: primaryCurrency !== "USD",
+    staleTime: 60 * 60 * 1000,
+  });
+
+  const conversionRate =
+    primaryCurrency === "USD" ? 1 : usdToPrimary ? Number(usdToPrimary.rate) : null;
+
   const containerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const valueSeriesRef = useRef<ISeriesApi<"Area"> | null>(null);
@@ -66,6 +79,7 @@ export function NetWorthChart({ privacyMode }: { privacyMode: boolean }) {
   }, []);
 
   useEffect(() => {
+    if (conversionRate === null) return;
     setLoading(true);
     fetchNetWorthTimeline(range)
       .then((points) => {
@@ -73,11 +87,11 @@ export function NetWorthChart({ privacyMode }: { privacyMode: boolean }) {
         if (!valueSeriesRef.current || !costSeriesRef.current) return;
         const valueData = points.map((p) => ({
           time: p.date,
-          value: parseFloat(p.value_usd),
+          value: parseFloat(p.value_usd) * conversionRate,
         }));
         const costData = points.map((p) => ({
           time: p.date,
-          value: parseFloat(p.cost_usd),
+          value: parseFloat(p.cost_usd) * conversionRate,
         }));
         valueSeriesRef.current.setData(valueData);
         costSeriesRef.current.setData(costData);
@@ -85,21 +99,22 @@ export function NetWorthChart({ privacyMode }: { privacyMode: boolean }) {
       })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [range]);
+  }, [range, conversionRate]);
 
   const latest = data[data.length - 1];
-  const currentValue = latest ? parseFloat(latest.value_usd) : 0;
-  const currentCost = latest ? parseFloat(latest.cost_usd) : 0;
+  const rate = conversionRate ?? 1;
+  const currentValue = latest ? parseFloat(latest.value_usd) * rate : 0;
+  const currentCost = latest ? parseFloat(latest.cost_usd) * rate : 0;
   const pnl = currentValue - currentCost;
   const pnlPct = currentCost > 0 ? (pnl / currentCost) * 100 : 0;
 
   const fmt = (v: number) =>
     privacyMode
-      ? "***"
+      ? `****** ${primaryCurrency}`
       : `${v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${primaryCurrency}`;
 
   const fmtPnl = () => {
-    if (privacyMode) return "***";
+    if (privacyMode) return `****** ${primaryCurrency}`;
     const sign = pnl >= 0 ? "+" : "";
     return `${sign}${fmt(pnl)} (${pnl >= 0 ? "+" : ""}${pnlPct.toFixed(2)}%)`;
   };

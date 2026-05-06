@@ -46,6 +46,8 @@ import {
   type WatchlistSuggestion,
 } from "@/lib/services/watchlist";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { useDualCurrency } from "@/hooks/useDualCurrency";
+import { DualCurrencyAmount } from "@/components/ui/DualCurrencyAmount";
 
 const VERDICT_STYLE: Record<string, string> = {
   BUY: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
@@ -174,6 +176,7 @@ function AddDialog({
 
 export default function WatchlistPage() {
   const router = useRouter();
+  const { formatNative } = useDualCurrency();
   const [items, setItems] = useState<WatchlistItem[]>([]);
   const [suggestions, setSuggestions] = useState<WatchlistSuggestion[]>([]);
   const [loading, setLoading] = useState(true);
@@ -342,12 +345,16 @@ export default function WatchlistPage() {
                   </TableCell>
                   <TableCell className="text-right">
                     {item.current_price
-                      ? `$${parseFloat(item.current_price).toFixed(2)}`
+                      ? <DualCurrencyAmount
+                          value={formatNative(item.current_price, item.currency)}
+                        />
                       : "—"}
                   </TableCell>
                   <TableCell className="text-right">
                     {item.target_price
-                      ? `$${parseFloat(item.target_price).toFixed(2)}`
+                      ? <DualCurrencyAmount
+                          value={formatNative(item.target_price, item.currency)}
+                        />
                       : "—"}
                   </TableCell>
                   <TableCell className="text-right">
@@ -379,7 +386,9 @@ export default function WatchlistPage() {
                   </TableCell>
                   <TableCell className="text-right">
                     {item.ai_suggested_price
-                      ? `$${parseFloat(item.ai_suggested_price).toFixed(2)}`
+                      ? <DualCurrencyAmount
+                          value={formatNative(item.ai_suggested_price, item.currency ?? "USD")}
+                        />
                       : "—"}
                   </TableCell>
                   <TableCell className="text-xs text-muted-foreground">

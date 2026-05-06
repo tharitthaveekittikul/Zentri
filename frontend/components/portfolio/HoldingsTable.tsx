@@ -29,6 +29,7 @@ import {
 import { Trash2, Pencil, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { HoldingRow } from "@/lib/services/portfolio";
 import { PrivacyValue } from "@/components/ui/PrivacyValue";
+import { usePrivacyStore } from "@/store/privacy";
 import { EditHoldingDialog } from "./EditHoldingDialog";
 import {
   AlertDialog,
@@ -105,6 +106,7 @@ export function HoldingsTable({
     val: string | null | undefined;
     nativeCurrency: string;
   }) {
+    const { isPrivate } = usePrivacyStore();
     if (val == null) return <span>—</span>;
     const num = Number(val);
     const native = nativeCurrency.toUpperCase();
@@ -127,7 +129,21 @@ export function HoldingsTable({
       primaryVal = num / primaryToSecondaryRate;
       secondaryVal = num;
     } else {
+      if (isPrivate) return <span>****** {nativeCurrency}</span>;
       return <span>{fmt(num, nativeCurrency)}</span>;
+    }
+
+    if (isPrivate) {
+      return (
+        <span>
+          ****** {primaryCurrency}
+          {secondaryCurrency && (
+            <span className="block text-xs text-muted-foreground">
+              ≈ ****** {secondaryCurrency}
+            </span>
+          )}
+        </span>
+      );
     }
 
     return (

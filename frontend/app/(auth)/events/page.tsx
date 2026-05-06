@@ -28,6 +28,8 @@ import {
   IpoAnalysisResult,
 } from "@/lib/services/events";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { useDualCurrency } from "@/hooks/useDualCurrency";
+import { DualCurrencyAmount } from "@/components/ui/DualCurrencyAmount";
 
 const MONTH_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
@@ -197,7 +199,7 @@ function IpoPanel({
             <span className="text-muted-foreground">Price Range</span>
             <span>
               {event.price_low && event.price_high
-                ? `$${event.price_low} – $${event.price_high}`
+                ? `${event.price_low} – ${event.price_high} USD`
                 : "N/A"}
             </span>
           </div>
@@ -258,6 +260,7 @@ function IpoPanel({
 }
 
 export default function EventsPage() {
+  const { formatNative } = useDualCurrency();
   const [allEvents, setAllEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -386,10 +389,18 @@ export default function EventsPage() {
                   </TableCell>
                   <TableCell>{ev.event_date}</TableCell>
                   <TableCell className="text-muted-foreground">
-                    {ev.event_type === "dividend"
-                      ? `$${parseFloat((ev as DividendCalendarEvent).amount_per_share).toFixed(4)}/sh`
-                      : (ev as IpoCalendarEvent).price_low
-                      ? `$${(ev as IpoCalendarEvent).price_low}–$${(ev as IpoCalendarEvent).price_high}`
+                    {ev.event_type === "dividend" ? (
+                      <span className="flex items-center gap-1">
+                        <DualCurrencyAmount
+                          value={formatNative(
+                            (ev as DividendCalendarEvent).amount_per_share,
+                            (ev as DividendCalendarEvent).currency
+                          )}
+                        />
+                        <span className="text-muted-foreground">/sh</span>
+                      </span>
+                    ) : (ev as IpoCalendarEvent).price_low
+                      ? `${(ev as IpoCalendarEvent).price_low}–${(ev as IpoCalendarEvent).price_high} USD`
                       : "N/A"}
                   </TableCell>
                   <TableCell>
@@ -416,7 +427,11 @@ export default function EventsPage() {
             <div className="flex justify-between">
               <span className="text-muted-foreground">Amount per share</span>
               <span className="font-medium">
-                {selectedDividend ? parseFloat(selectedDividend.amount_per_share).toFixed(4) : "—"} {selectedDividend?.currency}
+                {selectedDividend ? (
+                  <DualCurrencyAmount
+                    value={formatNative(selectedDividend.amount_per_share, selectedDividend.currency)}
+                  />
+                ) : "—"}
               </span>
             </div>
             <div className="space-y-1">
@@ -430,7 +445,12 @@ export default function EventsPage() {
             {confirmQty && selectedDividend && (
               <div className="flex justify-between font-semibold border-t pt-2">
                 <span>Total income</span>
-                <span>${(parseFloat(confirmQty) * parseFloat(selectedDividend.amount_per_share)).toFixed(2)} {selectedDividend.currency}</span>
+                <DualCurrencyAmount
+                  value={formatNative(
+                    parseFloat(confirmQty) * parseFloat(selectedDividend.amount_per_share),
+                    selectedDividend.currency
+                  )}
+                />
               </div>
             )}
           </div>

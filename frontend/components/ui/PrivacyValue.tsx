@@ -11,5 +11,5 @@ interface Props {
 
 export function PrivacyValue({ value, className }: Props) {
   const { isPrivate } = usePrivacyStore();
-  return <span className={cn(className)}>{isPrivate ? "••••" : value}</span>;
+  return <span className={cn(className)}>{isPrivate ? "******" : value}</span>;
 }

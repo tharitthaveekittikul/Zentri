@@ -13,6 +13,8 @@ import { PrivacyValue } from "@/components/ui/PrivacyValue";
 import { api } from "@/lib/api";
 import { VerdictCard } from "@/components/analysis/VerdictCard";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { useDualCurrency } from "@/hooks/useDualCurrency";
+import { DualCurrencyAmount } from "@/components/ui/DualCurrencyAmount";
 
 const RANGES = ["1W", "1M", "3M", "1Y"] as const;
 type Range = (typeof RANGES)[number];
@@ -39,6 +41,9 @@ export default function AssetDetailPage() {
   const asset = assets.find(
     (a) => a.symbol.toUpperCase() === symbol.toUpperCase(),
   );
+
+  const { formatNative } = useDualCurrency();
+  const assetCurrency = asset?.currency ?? "USD";
 
   const { data: history, isLoading: historyLoading } = useQuery({
     queryKey: ["asset-history", symbol, range],
@@ -83,10 +88,8 @@ export default function AssetDetailPage() {
           {latestBar && (
             <>
               <p className="text-2xl font-semibold">
-                <PrivacyValue
-                  value={`$${Number(latestBar.close).toLocaleString("en-US", {
-                    minimumFractionDigits: 2,
-                  })}`}
+                <DualCurrencyAmount
+                  value={formatNative(latestBar.close, assetCurrency)}
                 />
               </p>
               {dailyChange != null && dailyChangePct != null && (
@@ -175,14 +178,14 @@ export default function AssetDetailPage() {
                     {Number(tx.quantity).toFixed(6)}
                   </td>
                   <td className="p-3 text-right">
-                    <PrivacyValue
-                      value={`$${Number(tx.price).toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                      })}`}
+                    <DualCurrencyAmount
+                      value={formatNative(tx.price, assetCurrency)}
                     />
                   </td>
                   <td className="p-3 text-right">
-                    <PrivacyValue value={`$${Number(tx.fee).toFixed(2)}`} />
+                    <DualCurrencyAmount
+                      value={formatNative(tx.fee, assetCurrency)}
+                    />
                   </td>
                   <td className="p-3 text-muted-foreground capitalize">
                     {tx.source}

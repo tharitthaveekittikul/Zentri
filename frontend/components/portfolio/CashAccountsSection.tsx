@@ -19,7 +19,8 @@ import {
 import { AddCashAccountDialog } from "./AddCashAccountDialog";
 import { UpdateCashBalanceDialog } from "./UpdateCashBalanceDialog";
 import { EditCashAccountDialog } from "./EditCashAccountDialog";
-import { PrivacyValue } from "@/components/ui/PrivacyValue";
+import { useDualCurrency } from "@/hooks/useDualCurrency";
+import { DualCurrencyAmount } from "@/components/ui/DualCurrencyAmount";
 import { toast } from "sonner";
 
 interface CashAsset {
@@ -46,6 +47,7 @@ export function CashAccountsSection() {
   const [deleteTarget, setDeleteTarget] = useState<CashAsset | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const { formatNative } = useDualCurrency();
 
   const load = useCallback(async () => {
     const res = await api.get("/api/v1/assets");
@@ -156,16 +158,15 @@ export function CashAccountsSection() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-3 px-5 pb-5">
-                <div className="text-2xl font-semibold font-mono tabular-nums tracking-tight">
-                  <PrivacyValue
-                    value={
-                      latest
-                        ? `${Number(latest.balance).toLocaleString(undefined, {
-                            minimumFractionDigits: 2,
-                          })} ${asset.currency}`
-                        : "—"
-                    }
-                  />
+                <div className="text-2xl font-semibold tracking-tight">
+                  {latest ? (
+                    <DualCurrencyAmount
+                      value={formatNative(latest.balance, asset.currency)}
+                      primaryClassName="text-2xl font-semibold"
+                    />
+                  ) : (
+                    <span className="font-mono tabular-nums">—</span>
+                  )}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   {latest

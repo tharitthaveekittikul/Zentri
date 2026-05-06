@@ -29,12 +29,15 @@ import {
 } from "@/components/ui/select";
 import { Pencil, Trash2 } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { useDualCurrency } from "@/hooks/useDualCurrency";
+import { DualCurrencyAmount } from "@/components/ui/DualCurrencyAmount";
 
 type TransactionRow = {
   id: string;
   asset_id: string;
   symbol: string;
   asset_type: string;
+  currency?: string;
   platform: string | null;
   type: string;
   quantity: string;
@@ -55,6 +58,7 @@ const TYPE_COLORS: Record<string, string> = {
 };
 
 export default function TransactionsPage() {
+  const { formatNative } = useDualCurrency();
   const [transactions, setTransactions] = useState<TransactionRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [editTarget, setEditTarget] = useState<TransactionRow | null>(null);
@@ -169,10 +173,14 @@ export default function TransactionsPage() {
                     {parseFloat(tx.quantity).toLocaleString()}
                   </TableCell>
                   <TableCell className="text-right">
-                    {parseFloat(tx.price).toFixed(2)}
+                    <DualCurrencyAmount
+                      value={formatNative(tx.price, tx.currency ?? "USD")}
+                    />
                   </TableCell>
                   <TableCell className="text-right">
-                    {parseFloat(tx.fee).toFixed(2)}
+                    <DualCurrencyAmount
+                      value={formatNative(tx.fee, tx.currency ?? "USD")}
+                    />
                   </TableCell>
                   <TableCell className="text-muted-foreground text-sm">
                     {tx.platform ?? "—"}

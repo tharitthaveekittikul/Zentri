@@ -37,8 +37,11 @@ export function TopNav() {
       return;
     }
 
-    (document as Document & { startViewTransition: (cb: () => void | Promise<void>) => void })
-      .startViewTransition(() => setTheme(newTheme));
+    (
+      document as Document & {
+        startViewTransition: (cb: () => void | Promise<void>) => void;
+      }
+    ).startViewTransition(() => setTheme(newTheme));
   }
 
   return (
@@ -50,15 +53,27 @@ export function TopNav() {
         title="Search (⌘K)"
       >
         <Search className="h-[15px] w-[15px] text-muted-foreground shrink-0" />
-        <span className="text-sm text-muted-foreground flex-1 truncate">Search...</span>
+        <span className="text-sm text-muted-foreground flex-1 truncate">
+          Search...
+        </span>
         <kbd className="hidden sm:flex items-center text-[11px] text-muted-foreground/60 font-mono bg-background/60 px-1.5 py-0.5 rounded-md border border-border/40 shrink-0">
           ⌘K
         </kbd>
       </button>
 
       {/* Action buttons */}
-      <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0" onClick={toggle} title="Toggle privacy mode">
-        {isPrivate ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-9 w-9 shrink-0"
+        onClick={toggle}
+        title="Toggle privacy mode"
+      >
+        {isPrivate ? (
+          <EyeOff className="h-[18px] w-[18px]" />
+        ) : (
+          <Eye className="h-[18px] w-[18px]" />
+        )}
       </Button>
       <Button
         ref={toggleRef}
@@ -66,11 +81,18 @@ export function TopNav() {
         size="icon"
         className="h-9 w-9 shrink-0 relative"
         onClick={toggleTheme}
-        title={resolvedTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+        title={
+          resolvedTheme === "dark"
+            ? "Switch to light mode"
+            : "Switch to dark mode"
+        }
       >
         <span
           key={resolvedTheme}
-          style={{ animation: "icon-spin-in 300ms cubic-bezier(0.16,1,0.3,1) both", display: "flex" }}
+          style={{
+            animation: "icon-spin-in 1500ms cubic-bezier(0.16,1,0.3,1) both",
+            display: "flex",
+          }}
         >
           {resolvedTheme === "dark" ? (
             <Sun className="h-[18px] w-[18px]" />
@@ -79,7 +101,13 @@ export function TopNav() {
           )}
         </span>
       </Button>
-      <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0" onClick={handleLogout} title="Log out">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-9 w-9 shrink-0"
+        onClick={handleLogout}
+        title="Log out"
+      >
         <LogOut className="h-[18px] w-[18px]" />
       </Button>
     </header>

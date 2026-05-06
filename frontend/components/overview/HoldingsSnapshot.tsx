@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { PrivacyValue } from "@/components/ui/PrivacyValue";
+import { DualCurrencyAmount } from "@/components/ui/DualCurrencyAmount";
 import { useDualCurrency } from "@/hooks/useDualCurrency";
 
 export interface SnapshotHolding {
@@ -52,19 +52,13 @@ export function HoldingsSnapshot({ holdings }: Props) {
                   </span>
                 </td>
                 <td className="px-4 py-2.5 text-right font-mono tabular-nums">
-                  <PrivacyValue value={Number(h.quantity).toFixed(4)} />
+                  {Number(h.quantity).toFixed(4)}
                 </td>
                 <td className="px-4 py-2.5 text-right font-mono tabular-nums">
-                  <div><PrivacyValue value={value.primary} /></div>
-                  {value.secondary && (
-                    <div className="text-xs text-muted-foreground"><PrivacyValue value={value.secondary} /></div>
-                  )}
+                  <DualCurrencyAmount value={format(h.current_value)} />
                 </td>
                 <td className="px-4 py-2.5 text-right font-mono tabular-nums">
-                  <div><PrivacyValue value={cost.primary} /></div>
-                  {cost.secondary && (
-                    <div className="text-xs text-muted-foreground"><PrivacyValue value={cost.secondary} /></div>
-                  )}
+                  <DualCurrencyAmount value={format(h.cost_basis)} />
                 </td>
                 <td
                   className={cn(
@@ -72,7 +66,7 @@ export function HoldingsSnapshot({ holdings }: Props) {
                     h.pnl_pct >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-destructive"
                   )}
                 >
-                  <PrivacyValue value={`${h.pnl_pct >= 0 ? "+" : ""}${h.pnl_pct.toFixed(2)}%`} />
+                  {`${h.pnl_pct >= 0 ? "+" : ""}${h.pnl_pct.toFixed(2)}%`}
                 </td>
               </tr>
             );

@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils";
 import { OverviewSummary } from "@/lib/services/overview";
 import { useDualCurrency, DualValue } from "@/hooks/useDualCurrency";
-import { PrivacyValue } from "@/components/ui/PrivacyValue";
+import { DualCurrencyAmount } from "@/components/ui/DualCurrencyAmount";
 
 interface CardProps {
   label: string;
@@ -31,31 +31,29 @@ function KpiCard({ label, value, pct, direction = "neutral" }: CardProps) {
       <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-2">
         {label}
       </p>
-      <p
-        className={cn("text-2xl font-semibold font-mono tabular-nums")}
-        style={{
-          color: isPositive
-            ? "var(--signal-gain-text)"
-            : isNegative
-              ? "var(--destructive)"
-              : undefined,
-        }}
-      >
-        <PrivacyValue value={value.primary} />
-        {pct && (
-          <span
-            className={cn(
-              "text-sm font-normal ml-2",
-              isColored ? "opacity-80" : "text-muted-foreground"
-            )}
-          >
-            <PrivacyValue value={pct} />
-          </span>
+      <DualCurrencyAmount
+        value={value}
+        primaryClassName={cn(
+          "text-2xl font-semibold font-mono tabular-nums",
+          isPositive && "text-[var(--signal-gain-text)]",
+          isNegative && "text-destructive"
         )}
-      </p>
-      {value.secondary && (
-        <p className="text-sm text-muted-foreground font-mono tabular-nums mt-0.5">
-          <PrivacyValue value={value.secondary} />
+      />
+      {pct && (
+        <p
+          className={cn(
+            "text-sm font-mono tabular-nums mt-1",
+            isColored ? "opacity-80" : "text-muted-foreground"
+          )}
+          style={{
+            color: isPositive
+              ? "var(--signal-gain-text)"
+              : isNegative
+                ? "var(--destructive)"
+                : undefined,
+          }}
+        >
+          {pct}
         </p>
       )}
     </div>

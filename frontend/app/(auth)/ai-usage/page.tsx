@@ -36,6 +36,8 @@ import {
 import { api } from "@/lib/api";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { useDualCurrency } from "@/hooks/useDualCurrency";
+import { DualCurrencyAmount } from "@/components/ui/DualCurrencyAmount";
 
 interface Summary {
   total_cost_usd: number;
@@ -153,6 +155,8 @@ export default function AIUsagePage() {
     setLoadingPayload(false);
   }
 
+  const { formatNative } = useDualCurrency();
+
   const providers = summary
     ? ["all", ...summary.by_provider.map((p) => p.provider)]
     : ["all"];
@@ -169,9 +173,10 @@ export default function AIUsagePage() {
                 <CardTitle className="text-sm">Total Spend</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-2xl font-bold">
-                  ${summary.total_cost_usd.toFixed(4)}
-                </p>
+                <DualCurrencyAmount
+                  value={formatNative(summary.total_cost_usd, "USD", 4)}
+                  primaryClassName="text-2xl font-bold"
+                />
               </CardContent>
             </Card>
             <Card>
@@ -179,9 +184,10 @@ export default function AIUsagePage() {
                 <CardTitle className="text-sm">This Month</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-2xl font-bold">
-                  ${summary.monthly_cost_usd.toFixed(4)}
-                </p>
+                <DualCurrencyAmount
+                  value={formatNative(summary.monthly_cost_usd, "USD", 4)}
+                  primaryClassName="text-2xl font-bold"
+                />
               </CardContent>
             </Card>
             <Card>
@@ -203,9 +209,9 @@ export default function AIUsagePage() {
                 <ResponsiveContainer width="100%" height={160}>
                   <BarChart data={summary.by_provider}>
                     <XAxis dataKey="provider" />
-                    <YAxis tickFormatter={(v) => `$${v}`} />
+                    <YAxis tickFormatter={(v) => formatNative(v, "USD", 6).primary} />
                     <Tooltip
-                      formatter={(v) => [`$${Number(v).toFixed(6)}`, "Cost"]}
+                      formatter={(v) => [formatNative(Number(v), "USD", 6).primary, "Cost"]}
                     />
                     <Bar dataKey="cost_usd" fill="#6366f1" />
                   </BarChart>
@@ -274,7 +280,9 @@ export default function AIUsagePage() {
                     <TableCell className="text-sm">{a.model}</TableCell>
                     <TableCell>{a.tokens_in.toLocaleString()}</TableCell>
                     <TableCell>{a.tokens_out.toLocaleString()}</TableCell>
-                    <TableCell>${a.cost_usd.toFixed(6)}</TableCell>
+                    <TableCell>
+                      <DualCurrencyAmount value={formatNative(a.cost_usd, "USD", 6)} />
+                    </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
                       {new Date(a.created_at).toLocaleString()}
                     </TableCell>
@@ -348,7 +356,9 @@ export default function AIUsagePage() {
                   <TableCell className="text-sm">{log.model}</TableCell>
                   <TableCell>{log.tokens_in.toLocaleString()}</TableCell>
                   <TableCell>{log.tokens_out.toLocaleString()}</TableCell>
-                  <TableCell>${log.cost_usd.toFixed(6)}</TableCell>
+                  <TableCell>
+                    <DualCurrencyAmount value={formatNative(log.cost_usd, "USD", 6)} />
+                  </TableCell>
                   <TableCell className="text-sm text-muted-foreground">
                     {new Date(log.created_at).toLocaleString()}
                   </TableCell>

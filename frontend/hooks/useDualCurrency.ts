@@ -6,6 +6,8 @@ import { fetchDisplaySettings, fetchExchangeRate } from "@/lib/services/settings
 export interface DualValue {
   primary: string;
   secondary: string | null;
+  primaryCurrency: string;
+  secondaryCurrency: string;
 }
 
 export function useDualCurrency() {
@@ -32,6 +34,7 @@ export function useDualCurrency() {
     });
   }
 
+  // Use when the value is already in primaryCurrency.
   function format(value: string | number): DualValue {
     const num = Number(value);
     const primary = `${fmt(num)} ${primaryCurrency}`;
@@ -42,7 +45,42 @@ export function useDualCurrency() {
       secondary = `≈ ${fmt(converted)} ${secondaryCurrency}`;
     }
 
-    return { primary, secondary };
+    return { primary, secondary, primaryCurrency, secondaryCurrency };
+  }
+
+  // Use when the value is in a native asset currency that may differ from primaryCurrency.
+  // Converts to primary (and secondary) if the native currency matches one of the two.
+  // Falls back to native currency label when no conversion is possible.
+  function formatNative(value: string | number, nativeCurrency: string, decimals = 2): DualValue {
+    const num = Number(value);
+    const native = nativeCurrency.toUpperCase();
+    const primary = primaryCurrency.toUpperCase();
+    const secondary = secondaryCurrency.toUpperCase();
+    const rate = rateData ? Number(rateData.rate) : null;
+
+    if (native === primary) {
+      const p = `${fmt(num, decimals)} ${primaryCurrency}`;
+      const s = rate ? `≈ ${fmt(num * rate, decimals)} ${secondaryCurrency}` : null;
+      return { primary: p, secondary: s, primaryCurrency, secondaryCurrency };
+    }
+
+    if (native === secondary && rate !== null && rate > 0) {
+      const primaryVal = num / rate;
+      return {
+        primary: `${fmt(primaryVal, decimals)} ${primaryCurrency}`,
+        secondary: `≈ ${fmt(num, decimals)} ${secondaryCurrency}`,
+        primaryCurrency,
+        secondaryCurrency,
+      };
+    }
+
+    // Unknown currency pair — show native only.
+    return {
+      primary: `${fmt(num, decimals)} ${nativeCurrency}`,
+      secondary: null,
+      primaryCurrency,
+      secondaryCurrency,
+    };
   }
 
   function formatPct(value: string | number): string {
@@ -50,5 +88,5 @@ export function useDualCurrency() {
     return `${num >= 0 ? "+" : ""}${fmt(num)}%`;
   }
 
-  return { format, formatPct, primaryCurrency, secondaryCurrency };
+  return { format, formatNative, formatPct, primaryCurrency, secondaryCurrency };
 }

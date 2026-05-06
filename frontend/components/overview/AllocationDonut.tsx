@@ -3,7 +3,7 @@
 import { PieChart as RechartsPieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { PieChart as PieChartIcon } from "lucide-react";
 import { AllocationItem } from "@/lib/services/overview";
-import { PrivacyValue } from "@/components/ui/PrivacyValue";
+import { DualCurrencyAmount } from "@/components/ui/DualCurrencyAmount";
 import { useDualCurrency } from "@/hooks/useDualCurrency";
 
 const COLORS = ["#6366f1", "#06b6d4", "#f59e0b", "#10b981", "#f43f5e", "#8b5cf6"];
@@ -50,17 +50,18 @@ export function AllocationDonut({ allocation }: Props) {
           </ResponsiveContainer>
           <div className="flex flex-col gap-1">
             {data.map((item, i) => (
-              <div key={item.name} className="flex items-center justify-between text-xs">
+              <div key={item.name} className="flex items-start justify-between text-xs">
                 <div className="flex items-center gap-1">
                   <div
-                    className="w-2 h-2 rounded-full"
+                    className="w-2 h-2 rounded-full mt-0.5"
                     style={{ background: COLORS[i % COLORS.length] }}
                   />
                   <span>{item.name}</span>
                 </div>
-                <span className="text-muted-foreground">
-                  <PrivacyValue value={`${format(item.rawValue).primary} (${item.value.toFixed(1)}%)`} />
-                </span>
+                <div className="text-right">
+                  <DualCurrencyAmount value={format(item.rawValue)} />
+                  <span className="block text-xs text-muted-foreground">{item.value.toFixed(1)}%</span>
+                </div>
               </div>
             ))}
           </div>
