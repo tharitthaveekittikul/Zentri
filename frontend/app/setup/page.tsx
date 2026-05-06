@@ -125,7 +125,7 @@ export default function SetupPage() {
                       setRestoreError(null);
                       try {
                         await importSystem(file);
-                        router.push("/");
+                        router.push("/overview");
                       } catch (err) {
                         setRestoreError((err as Error).message || "Restore failed");
                       } finally {
@@ -252,7 +252,7 @@ export default function SetupPage() {
             You can configure LLM providers and API keys in{" "}
             <strong>Settings → LLM Configuration</strong> after you log in.
           </p>
-          <Button onClick={() => router.push("/")} className="w-full">
+          <Button onClick={() => router.push("/overview")} className="w-full">
             Go to Dashboard
           </Button>
         </CardContent>

@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchOverviewSummary, fetchAllocation } from "@/lib/services/overview";
 import { fetchHoldings } from "@/lib/services/portfolio";
-import { SummaryBar } from "@/components/overview/SummaryBar";
+import { KpiCards } from "@/components/overview/KpiCards";
 import { PerformanceChart } from "@/components/overview/PerformanceChart";
 import { AllocationDonut } from "@/components/overview/AllocationDonut";
 import { HoldingsSnapshot, SnapshotHolding } from "@/components/overview/HoldingsSnapshot";
@@ -28,23 +28,29 @@ export default function OverviewPage() {
     queryFn: fetchHoldings,
   });
 
-  const snapshotHoldings: SnapshotHolding[] = holdings.map((h) => ({
-    symbol: h.symbol,
-    asset_type: h.asset_type,
-    quantity: h.outstanding_shares,
-    current_value: h.holding_value != null ? Number(h.holding_value) : Number(h.total_cost),
-    cost_basis: Number(h.total_cost),
-    pnl_pct: 0,
-  }));
-
-  const sorted = [...snapshotHoldings].sort((a, b) => b.current_value - a.current_value);
+  const snapshotHoldings: SnapshotHolding[] = holdings
+    .map((h) => ({
+      symbol: h.symbol,
+      asset_type: h.asset_type,
+      quantity: h.outstanding_shares,
+      current_value: h.holding_value != null ? Number(h.holding_value) : Number(h.total_cost),
+      cost_basis: Number(h.total_cost),
+      pnl_pct: h.holding_value != null && Number(h.total_cost) > 0
+        ? ((Number(h.holding_value) - Number(h.total_cost)) / Number(h.total_cost)) * 100
+        : 0,
+    }))
+    .sort((a, b) => b.current_value - a.current_value);
 
   return (
     <div className="flex flex-col gap-6 max-w-7xl mx-auto">
       {summaryLoading ? (
-        <Skeleton className="h-20 w-full rounded-2xl" />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[...Array(4)].map((_, i) => (
+            <Skeleton key={i} className="h-24 rounded-2xl" />
+          ))}
+        </div>
       ) : summary ? (
-        <SummaryBar summary={summary} />
+        <KpiCards summary={summary} />
       ) : null}
 
       <NetWorthChart privacyMode={false} />
@@ -59,8 +65,10 @@ export default function OverviewPage() {
       </div>
 
       <div>
-        <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-3">Holdings</h2>
-        <HoldingsSnapshot holdings={sorted} />
+        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-3">
+          Holdings
+        </p>
+        <HoldingsSnapshot holdings={snapshotHoldings} />
       </div>
     </div>
   );

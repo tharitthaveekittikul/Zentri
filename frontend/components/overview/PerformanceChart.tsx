@@ -11,6 +11,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { Activity } from "lucide-react";
 import { fetchPerformance } from "@/lib/services/overview";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -32,7 +33,7 @@ export function PerformanceChart() {
   }));
 
   return (
-    <div className="flex flex-col gap-2 h-full">
+    <div className="flex flex-col gap-2 min-h-[260px]">
       <div className="flex items-center justify-between">
         <p className="text-sm font-medium">Portfolio vs Benchmark</p>
         <Tabs value={range} onValueChange={(v) => setRange(v as Range)}>
@@ -45,31 +46,38 @@ export function PerformanceChart() {
           </TabsList>
         </Tabs>
       </div>
-      <ResponsiveContainer width="100%" height={220}>
-        <LineChart data={combined}>
-          <XAxis dataKey="date" tick={{ fontSize: 10 }} tickLine={false} />
-          <YAxis tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
-          <Tooltip formatter={(v) => `${Number(v).toFixed(1)}`} />
-          <Legend wrapperStyle={{ fontSize: 11 }} />
-          <Line
-            type="monotone"
-            dataKey="portfolio"
-            stroke="#6366f1"
-            dot={false}
-            strokeWidth={2}
-            name="Portfolio"
-          />
-          <Line
-            type="monotone"
-            dataKey="benchmark"
-            stroke="#94a3b8"
-            dot={false}
-            strokeWidth={1.5}
-            name="S&P500"
-            strokeDasharray="4 2"
-          />
-        </LineChart>
-      </ResponsiveContainer>
+      {combined.length === 0 ? (
+        <div className="h-52 flex flex-col items-center justify-center gap-2 text-muted-foreground">
+          <Activity className="h-6 w-6 opacity-30" />
+          <span className="text-xs">No performance data yet</span>
+        </div>
+      ) : (
+        <ResponsiveContainer width="100%" height={208}>
+          <LineChart data={combined}>
+            <XAxis dataKey="date" tick={{ fontSize: 10 }} tickLine={false} />
+            <YAxis tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
+            <Tooltip formatter={(v) => `${Number(v).toFixed(1)}`} />
+            <Legend wrapperStyle={{ fontSize: 11 }} />
+            <Line
+              type="monotone"
+              dataKey="portfolio"
+              stroke="#6366f1"
+              dot={false}
+              strokeWidth={2}
+              name="Portfolio"
+            />
+            <Line
+              type="monotone"
+              dataKey="benchmark"
+              stroke="#94a3b8"
+              dot={false}
+              strokeWidth={1.5}
+              name="S&P500"
+              strokeDasharray="4 2"
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      )}
     </div>
   );
 }

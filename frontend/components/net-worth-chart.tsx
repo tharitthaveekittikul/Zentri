@@ -8,13 +8,16 @@ import {
   type IChartApi,
   type ISeriesApi,
 } from "lightweight-charts";
+import { TrendingUp } from "lucide-react";
 import { fetchNetWorthTimeline, type NetWorthPoint } from "@/lib/services/overview";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useDualCurrency } from "@/hooks/useDualCurrency";
 
 const RANGES = ["1M", "3M", "6M", "1Y", "ALL"] as const;
 type Range = (typeof RANGES)[number];
 
 export function NetWorthChart({ privacyMode }: { privacyMode: boolean }) {
+  const { primaryCurrency } = useDualCurrency();
   const containerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const valueSeriesRef = useRef<ISeriesApi<"Area"> | null>(null);
@@ -93,7 +96,7 @@ export function NetWorthChart({ privacyMode }: { privacyMode: boolean }) {
   const fmt = (v: number) =>
     privacyMode
       ? "***"
-      : `$${v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      : `${v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${primaryCurrency}`;
 
   const fmtPnl = () => {
     if (privacyMode) return "***";
@@ -144,12 +147,20 @@ export function NetWorthChart({ privacyMode }: { privacyMode: boolean }) {
         </div>
       </CardHeader>
       <CardContent className="pt-0">
-        {loading && (
-          <div className="h-[280px] flex items-center justify-center text-muted-foreground text-sm">
-            Loading...
-          </div>
-        )}
-        <div ref={containerRef} className={loading ? "hidden" : "w-full"} />
+        <div className="h-64 w-full">
+          {loading && (
+            <div className="h-full flex items-center justify-center text-muted-foreground text-sm">
+              Loading...
+            </div>
+          )}
+          {!loading && data.length === 0 && (
+            <div className="h-full flex flex-col items-center justify-center gap-2 text-muted-foreground">
+              <TrendingUp className="h-6 w-6 opacity-30" />
+              <span className="text-xs">No net worth data yet</span>
+            </div>
+          )}
+          <div ref={containerRef} className={loading || data.length === 0 ? "hidden" : "w-full h-full"} />
+        </div>
       </CardContent>
     </Card>
   );

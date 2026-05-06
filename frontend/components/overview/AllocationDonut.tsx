@@ -1,8 +1,10 @@
 "use client";
 
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import { PieChart as RechartsPieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import { PieChart as PieChartIcon } from "lucide-react";
 import { AllocationItem } from "@/lib/services/overview";
 import { PrivacyValue } from "@/components/ui/PrivacyValue";
+import { useDualCurrency } from "@/hooks/useDualCurrency";
 
 const COLORS = ["#6366f1", "#06b6d4", "#f59e0b", "#10b981", "#f43f5e", "#8b5cf6"];
 
@@ -11,6 +13,7 @@ interface Props {
 }
 
 export function AllocationDonut({ allocation }: Props) {
+  const { format } = useDualCurrency();
   const data = allocation.map((a) => ({
     name: a.asset_type.replace("_", " ").toUpperCase(),
     value: Number(a.pct),
@@ -21,11 +24,14 @@ export function AllocationDonut({ allocation }: Props) {
     <div className="flex flex-col gap-2 h-full">
       <p className="text-sm font-medium">Allocation</p>
       {data.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No holdings with price data yet.</p>
+        <div className="h-40 flex flex-col items-center justify-center gap-2 text-muted-foreground">
+          <PieChartIcon className="h-6 w-6 opacity-30" />
+          <span className="text-xs">No allocation data yet</span>
+        </div>
       ) : (
         <>
-          <ResponsiveContainer width="100%" height={180}>
-            <PieChart>
+          <ResponsiveContainer width="100%" height={160}>
+            <RechartsPieChart>
               <Pie
                 data={data}
                 cx="50%"
@@ -40,7 +46,7 @@ export function AllocationDonut({ allocation }: Props) {
                 ))}
               </Pie>
               <Tooltip formatter={(v) => `${Number(v).toFixed(1)}%`} />
-            </PieChart>
+            </RechartsPieChart>
           </ResponsiveContainer>
           <div className="flex flex-col gap-1">
             {data.map((item, i) => (
@@ -53,11 +59,7 @@ export function AllocationDonut({ allocation }: Props) {
                   <span>{item.name}</span>
                 </div>
                 <span className="text-muted-foreground">
-                  <PrivacyValue
-                    value={`$${Number(item.rawValue).toLocaleString("en-US", {
-                      maximumFractionDigits: 0,
-                    })} (${item.value.toFixed(1)}%)`}
-                  />
+                  <PrivacyValue value={`${format(item.rawValue).primary} (${item.value.toFixed(1)}%)`} />
                 </span>
               </div>
             ))}

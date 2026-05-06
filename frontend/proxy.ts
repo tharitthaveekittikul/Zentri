@@ -8,6 +8,9 @@ export function proxy(request: NextRequest) {
     ?? request.headers.get("authorization")?.replace("Bearer ", "");
 
   if (PUBLIC_PATHS.some((p) => pathname.startsWith(p))) {
+    if (token && pathname.startsWith("/login")) {
+      return NextResponse.redirect(new URL("/overview", request.url));
+    }
     return NextResponse.next();
   }
 

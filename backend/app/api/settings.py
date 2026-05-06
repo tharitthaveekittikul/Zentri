@@ -11,6 +11,7 @@ from app.core.encryption import decrypt, encrypt
 from app.core.logging import get_logger
 from app.models.llm_settings import LLMSettings
 from app.models.user import User
+from app.services import exchange_rate as exchange_rate_service
 from app.services.hardware import detect_hardware
 from app.services.telegram import send_message as _send_telegram
 from app.services.user_context import get_user_age_context
@@ -281,3 +282,16 @@ async def update_privacy_settings(
     await db.commit()
     await db.refresh(current_user)
     return PrivacySettingsOut(privacy_mode=current_user.privacy_mode)
+
+
+@router.get("/exchange-rate")
+async def get_exchange_rate(
+    from_currency: str,
+    to_currency: str,
+    db: AsyncSession = Depends(get_db),
+    _: User = Depends(get_current_user),
+):
+    rate = await exchange_rate_service.get_rate(db, from_currency, to_currency)
+    if rate is None:
+        raise HTTPException(status_code=503, detail="Exchange rate unavailable")
+    return {"from": from_currency, "to": to_currency, "rate": str(rate)}

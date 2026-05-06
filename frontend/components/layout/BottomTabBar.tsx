@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 const tabs = [
-  { href: "/", label: "Overview", icon: LayoutDashboard },
+  { href: "/overview", label: "Overview", icon: LayoutDashboard },
   { href: "/portfolio", label: "Portfolio", icon: Briefcase },
   { href: "/watchlist", label: "Watchlist", icon: Star },
   { href: "/net-worth", label: "Net Worth", icon: TrendingUp },
@@ -37,7 +37,7 @@ export function BottomTabBar() {
         <div className="flex items-center h-[62px] px-1">
           {tabs.map(({ href, label, icon: Icon }) => {
             const isActive =
-              href === "/" ? pathname === "/" : pathname.startsWith(href);
+              pathname.startsWith(href);
             return (
               <Link
                 key={href}

@@ -24,7 +24,7 @@ export default function LoginPage() {
         toast.error(result.error);
         return;
       }
-      router.push("/");
+      router.push("/overview");
     } finally {
       setLoading(false);
     }
