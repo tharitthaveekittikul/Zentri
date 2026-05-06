@@ -1,12 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,78 +17,67 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
-import { createBalance } from "@/lib/services/cash-balance";
 
 const CURRENCIES = ["THB", "USD", "EUR", "GBP", "JPY", "SGD"];
 
-interface Props {
-  onAdded: () => void;
+interface CashAsset {
+  id: string;
+  symbol: string;
+  currency: string;
+  metadata_?: { account_number?: string };
 }
 
-export function AddCashAccountDialog({ onAdded }: Props) {
-  const [open, setOpen] = useState(false);
-  const [symbol, setSymbol] = useState("");
-  const [currency, setCurrency] = useState("THB");
-  const [balance, setBalance] = useState("");
-  const [accountNumber, setAccountNumber] = useState("");
+interface Props {
+  asset: CashAsset;
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  onEdited: () => void;
+}
+
+export function EditCashAccountDialog({ asset, open, onOpenChange, onEdited }: Props) {
+  const [symbol, setSymbol] = useState(asset.symbol);
+  const [currency, setCurrency] = useState(asset.currency);
+  const [accountNumber, setAccountNumber] = useState(
+    asset.metadata_?.account_number ?? ""
+  );
   const [loading, setLoading] = useState(false);
 
-  function reset() {
-    setSymbol("");
-    setCurrency("");
-    setBalance("");
-    setAccountNumber("");
-  }
+  useEffect(() => {
+    if (open) {
+      setSymbol(asset.symbol);
+      setCurrency(asset.currency);
+      setAccountNumber(asset.metadata_?.account_number ?? "");
+    }
+  }, [open, asset]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     try {
-      // 1. Create the cash asset
-      const assetRes = await api.post("/api/v1/assets", {
+      const res = await api.patch(`/api/v1/assets/${asset.id}`, {
         symbol: symbol.toUpperCase(),
-        asset_type: "cash",
         name: symbol.toUpperCase(),
-        currency: currency,
+        currency,
         metadata_: accountNumber ? { account_number: accountNumber } : {},
       });
-      if (!assetRes.ok) throw new Error("Failed to create account");
-      const asset = await assetRes.json();
-
-      // 2. Record initial balance snapshot
-      await createBalance(
-        asset.id,
-        parseFloat(balance),
-        new Date().toISOString().slice(0, 10),
-      );
-
-      toast.success(`${symbol.toUpperCase()} account added`);
-      setOpen(false);
-      reset();
-      onAdded();
+      if (!res.ok) throw new Error("Failed to update account");
+      toast.success("Account updated");
+      onOpenChange(false);
+      onEdited();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to add account");
+      toast.error(err instanceof Error ? err.message : "Failed to update account");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger
-        render={
-          <Button size="sm">
-            <Plus className="h-4 w-4 mr-1" />
-            Add Account
-          </Button>
-        }
-      />
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add Cash Account</DialogTitle>
+          <DialogTitle>Edit Account</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
@@ -124,19 +112,8 @@ export function AddCashAccountDialog({ onAdded }: Props) {
               placeholder="xxx-x-xxxxx-x"
             />
           </div>
-          <div className="space-y-1">
-            <Label>Initial Balance</Label>
-            <Input
-              type="number"
-              step="any"
-              value={balance}
-              onChange={(e) => setBalance(e.target.value)}
-              placeholder="0"
-              required
-            />
-          </div>
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Adding…" : "Add Account"}
+            {loading ? "Saving…" : "Save Changes"}
           </Button>
         </form>
       </DialogContent>

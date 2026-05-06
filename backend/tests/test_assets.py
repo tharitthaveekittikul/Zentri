@@ -50,3 +50,59 @@ async def test_asset_history_by_symbol(auth_client):
 async def test_asset_history_symbol_not_found(auth_client):
     res = await auth_client.get("/api/v1/assets/symbol/UNKNOWN/history?range=1M")
     assert res.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_patch_asset(auth_client):
+    create = await auth_client.post("/api/v1/assets", json={
+        "symbol": "SCB_THB", "asset_type": "cash", "name": "SCB_THB", "currency": "THB",
+        "metadata_": {"account_number": "111-1-11111-1"},
+    })
+    asset_id = create.json()["id"]
+
+    response = await auth_client.patch(f"/api/v1/assets/{asset_id}", json={
+        "symbol": "SCB_THB2",
+        "name": "SCB_THB2",
+        "currency": "THB",
+        "metadata_": {"account_number": "222-2-22222-2"},
+    })
+    assert response.status_code == 200
+    data = response.json()
+    assert data["symbol"] == "SCB_THB2"
+    assert data["metadata_"]["account_number"] == "222-2-22222-2"
+
+
+@pytest.mark.asyncio
+async def test_patch_asset_not_found(auth_client):
+    import uuid
+    response = await auth_client.patch(f"/api/v1/assets/{uuid.uuid4()}", json={"symbol": "X"})
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_delete_asset(auth_client):
+    create = await auth_client.post("/api/v1/assets", json={
+        "symbol": "KTB_THB", "asset_type": "cash", "name": "KTB_THB", "currency": "THB",
+    })
+    asset_id = create.json()["id"]
+
+    # Add a cash balance to verify cascade
+    await auth_client.post("/api/v1/cash-balances", json={
+        "asset_id": asset_id, "balance": 5000.0, "snapshot_date": "2026-05-06",
+    })
+
+    response = await auth_client.delete(f"/api/v1/assets/{asset_id}")
+    assert response.status_code == 204
+
+    get = await auth_client.get(f"/api/v1/assets/{asset_id}")
+    assert get.status_code == 404
+
+    balance = await auth_client.get(f"/api/v1/cash-balances/{asset_id}/latest")
+    assert balance.status_code != 200
+
+
+@pytest.mark.asyncio
+async def test_delete_asset_not_found(auth_client):
+    import uuid
+    response = await auth_client.delete(f"/api/v1/assets/{uuid.uuid4()}")
+    assert response.status_code == 404

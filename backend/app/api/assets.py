@@ -9,7 +9,7 @@ from app.api.deps import get_current_user
 from app.core.database import get_db
 from app.models.price import Price
 from app.models.user import User
-from app.schemas.asset import AssetCreate, AssetResponse
+from app.schemas.asset import AssetCreate, AssetResponse, AssetUpdate
 from app.schemas.price import PriceBar, PriceHistoryResponse
 from app.services import asset as asset_service
 
@@ -100,3 +100,29 @@ async def get_asset_price_history(
     )
     bars = list(result.scalars().all())
     return PriceHistoryResponse(asset_id=asset_id, bars=bars)
+
+
+@router.patch("/{asset_id}", response_model=AssetResponse)
+async def update_asset(
+    asset_id: uuid.UUID,
+    body: AssetUpdate,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    updated = await asset_service.update_asset(
+        db, current_user.id, asset_id, body.model_dump(exclude_none=True)
+    )
+    if updated is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Asset not found")
+    return updated
+
+
+@router.delete("/{asset_id}", status_code=204)
+async def delete_asset(
+    asset_id: uuid.UUID,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    deleted = await asset_service.delete_asset(db, current_user.id, asset_id)
+    if not deleted:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Asset not found")

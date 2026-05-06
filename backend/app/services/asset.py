@@ -55,3 +55,38 @@ async def get_asset(db: AsyncSession, user_id: uuid.UUID, asset_id: uuid.UUID) -
 async def get_all_assets(db: AsyncSession, user_id: uuid.UUID) -> list[Asset]:
     result = await db.execute(select(Asset).where(Asset.user_id == user_id))
     return list(result.scalars().all())
+
+
+async def update_asset(
+    db: AsyncSession,
+    user_id: uuid.UUID,
+    asset_id: uuid.UUID,
+    updates: dict[str, Any],
+) -> Asset | None:
+    asset = await get_asset(db, user_id, asset_id)
+    if asset is None:
+        return None
+    for field, value in updates.items():
+        setattr(asset, field, value)
+    await db.commit()
+    await db.refresh(asset)
+    logger.info("Asset updated: id=%s user=%s fields=%s", asset_id, user_id, list(updates.keys()))
+    return asset
+
+
+async def delete_asset(
+    db: AsyncSession,
+    user_id: uuid.UUID,
+    asset_id: uuid.UUID,
+) -> bool:
+    from sqlalchemy import delete as sql_delete
+    from app.models.cash_balance import CashBalance
+
+    asset = await get_asset(db, user_id, asset_id)
+    if asset is None:
+        return False
+    await db.execute(sql_delete(CashBalance).where(CashBalance.asset_id == asset_id))
+    await db.delete(asset)
+    await db.commit()
+    logger.info("Asset deleted: id=%s user=%s", asset_id, user_id)
+    return True
