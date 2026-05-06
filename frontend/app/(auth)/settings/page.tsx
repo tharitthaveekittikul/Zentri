@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AISettings } from "@/components/settings/AISettings";
 import { getProfile, saveProfile, type ProfileSettings } from "@/lib/services/auth";
+import { Switch } from "@/components/ui/switch";
+import { usePrivacyStore } from "@/store/privacy";
 
 interface HardwareRecommendation {
   can_run_local_llm: boolean;
@@ -32,6 +34,11 @@ export default function SettingsPage() {
   const [profile, setProfile] = useState<ProfileSettings | null>(null);
   const [birthDate, setBirthDate] = useState("");
   const [planToAge, setPlanToAge] = useState("85");
+  const { isPrivate: privacyMode, setPrivate } = usePrivacyStore();
+  const [telegramToken, setTelegramToken] = useState("");
+  const [telegramChatId, setTelegramChatId] = useState("");
+  const [telegramHasToken, setTelegramHasToken] = useState(false);
+  const [telegramTesting, setTelegramTesting] = useState(false);
 
   useEffect(() => {
     api
@@ -63,11 +70,65 @@ export default function SettingsPage() {
       .catch(() => null);
   }, []);
 
+  useEffect(() => {
+    api
+      .get("/api/v1/settings/privacy")
+      .then((r) => r.json())
+      .then((d) => setPrivate(d.privacy_mode))
+      .catch(() => null);
+  }, [setPrivate]);
+
+  useEffect(() => {
+    api
+      .get("/api/v1/settings/telegram")
+      .then((r) => r.json())
+      .then((d) => {
+        setTelegramChatId(d.chat_id ?? "");
+        setTelegramHasToken(d.has_token);
+      })
+      .catch(() => null);
+  }, []);
+
   async function saveCurrencyPrefs() {
     await api.patch("/api/v1/settings/display", {
       currency_primary: currencyPrimary,
       currency_secondary: currencySecondary,
     });
+  }
+
+  async function togglePrivacyMode(value: boolean) {
+    setPrivate(value);
+    try {
+      await api.patch("/api/v1/settings/privacy", { privacy_mode: value });
+    } catch {
+      setPrivate(!value);
+      toast.error("Failed to update privacy mode");
+    }
+  }
+
+  async function saveTelegramConfig() {
+    try {
+      const payload: Record<string, string> = { chat_id: telegramChatId };
+      if (telegramToken) payload.bot_token = telegramToken;
+      await api.put("/api/v1/settings/telegram", payload);
+      setTelegramHasToken(true);
+      setTelegramToken("");
+      toast.success("Telegram config saved");
+    } catch {
+      toast.error("Failed to save Telegram config");
+    }
+  }
+
+  async function testTelegram() {
+    setTelegramTesting(true);
+    try {
+      await api.post("/api/v1/settings/telegram/test", {});
+      toast.success("Test message sent — check your Telegram");
+    } catch {
+      toast.error("Telegram delivery failed — check your token and chat ID");
+    } finally {
+      setTelegramTesting(false);
+    }
   }
 
   async function saveProfileSettings() {
@@ -90,6 +151,7 @@ export default function SettingsPage() {
         <TabsList>
           <TabsTrigger value="general">General</TabsTrigger>
           <TabsTrigger value="ai">AI & LLM</TabsTrigger>
+          <TabsTrigger value="notifications">Notifications</TabsTrigger>
         </TabsList>
 
         <TabsContent value="general" className="space-y-6 mt-4">
@@ -229,10 +291,87 @@ export default function SettingsPage() {
               )}
             </CardContent>
           </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Privacy</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium">Privacy Mode</p>
+                  <p className="text-xs text-muted-foreground">
+                    Hide portfolio values across the app
+                  </p>
+                </div>
+                <Switch
+                  checked={privacyMode}
+                  onCheckedChange={togglePrivacyMode}
+                />
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="ai" className="mt-4">
           <AISettings />
+        </TabsContent>
+
+        <TabsContent value="notifications" className="space-y-6 mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Telegram Alerts</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="rounded-md bg-muted px-4 py-3 text-xs text-muted-foreground space-y-1">
+                <p className="font-medium text-foreground">How to set up</p>
+                <p>1. Open Telegram → search <span className="font-mono">@BotFather</span> → send <span className="font-mono">/newbot</span></p>
+                <p>2. Follow the prompts — copy the <strong>Bot Token</strong> it gives you</p>
+                <p>3. To get your <strong>Chat ID</strong>: message <span className="font-mono">@userinfobot</span> on Telegram — it replies with your ID</p>
+              </div>
+              <div className="space-y-3">
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Bot Token</label>
+                  <Input
+                    type="password"
+                    placeholder={telegramHasToken ? "••••••••" : "Enter bot token from @BotFather"}
+                    value={telegramToken}
+                    onChange={(e) => setTelegramToken(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Chat ID</label>
+                  <Input
+                    placeholder="e.g. 123456789"
+                    value={telegramChatId}
+                    onChange={(e) => setTelegramChatId(e.target.value)}
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={saveTelegramConfig}
+                    disabled={(!telegramToken && !telegramHasToken) || !telegramChatId}
+                    className="hover:bg-primary/90 active:scale-95 transition-all cursor-pointer"
+                  >
+                    Save
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={testTelegram}
+                    disabled={telegramTesting || !telegramHasToken}
+                    className="active:scale-95 transition-all cursor-pointer"
+                  >
+                    {telegramTesting ? "Sending…" : "Send Test Message"}
+                  </Button>
+                </div>
+                {telegramHasToken && (
+                  <p className="text-xs text-muted-foreground">
+                    Bot token saved. Enter a new token to replace it.
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>

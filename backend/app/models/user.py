@@ -2,7 +2,7 @@ import uuid
 from datetime import date, datetime, timezone
 from typing import Optional
 
-from sqlalchemy import Date, DateTime, Integer, String, Text
+from sqlalchemy import Boolean, Date, DateTime, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base
@@ -26,3 +26,4 @@ class User(Base):
     plan_to_age: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True, server_default="85")
     telegram_bot_token: Mapped[str | None] = mapped_column(Text(), nullable=True, default=None)
     telegram_chat_id: Mapped[str | None] = mapped_column(String(100), nullable=True, default=None)
+    privacy_mode: Mapped[bool] = mapped_column(Boolean(), nullable=False, default=False)

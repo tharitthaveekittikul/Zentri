@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.deps import get_current_user
 from app.core.database import get_db
 from app.core.encryption import decrypt, encrypt
+from app.core.logging import get_logger
 from app.models.llm_settings import LLMSettings
 from app.models.user import User
 from app.services.hardware import detect_hardware
@@ -15,6 +16,7 @@ from app.services.telegram import send_message as _send_telegram
 from app.services.user_context import get_user_age_context
 
 router = APIRouter(prefix="/settings", tags=["settings"])
+logger = get_logger(__name__)
 
 
 @router.get("/hardware")
@@ -200,7 +202,7 @@ async def update_profile_settings(
 
 
 class TelegramConfigIn(BaseModel):
-    bot_token: str
+    bot_token: str | None = None
     chat_id: str
 
 
@@ -225,7 +227,8 @@ async def save_telegram_config(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    current_user.telegram_bot_token = encrypt(body.bot_token)
+    if body.bot_token:
+        current_user.telegram_bot_token = encrypt(body.bot_token)
     current_user.telegram_chat_id = body.chat_id
     await db.commit()
     return TelegramConfigOut(chat_id=body.chat_id, has_token=True)
@@ -247,6 +250,34 @@ async def test_telegram(
             current_user.telegram_chat_id,
             "✅ <b>Zentri</b> — Test message received! Price alerts are configured correctly.",
         )
-    except Exception:
+    except Exception as exc:
+        logger.exception("test_telegram failed: %s", exc)
         raise HTTPException(status_code=502, detail="Telegram delivery failed — check bot token and chat ID")
     return {"ok": True}
+
+
+class PrivacySettingsOut(BaseModel):
+    privacy_mode: bool
+
+
+class PrivacySettingsIn(BaseModel):
+    privacy_mode: bool
+
+
+@router.get("/privacy", response_model=PrivacySettingsOut)
+async def get_privacy_settings(
+    current_user: User = Depends(get_current_user),
+):
+    return PrivacySettingsOut(privacy_mode=current_user.privacy_mode)
+
+
+@router.patch("/privacy", response_model=PrivacySettingsOut)
+async def update_privacy_settings(
+    body: PrivacySettingsIn,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    current_user.privacy_mode = body.privacy_mode
+    await db.commit()
+    await db.refresh(current_user)
+    return PrivacySettingsOut(privacy_mode=current_user.privacy_mode)
