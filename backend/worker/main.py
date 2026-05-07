@@ -17,6 +17,7 @@ from worker.jobs.price_fetch import (
     job_fetch_prices_thai_stock,
     job_fetch_prices_us,
 )
+from worker.jobs.dividend_alert import job_dividend_alert
 from worker.jobs.watchlist_alert import job_check_watchlist_alerts
 from worker.jobs.watchlist_discover import job_discover_watchlist
 from worker.jobs.watchlist_scan import job_scan_watchlist_batch, job_scan_watchlist_item
@@ -52,6 +53,7 @@ class WorkerSettings:
         job_snapshot_net_worth,
         job_fetch_dividends,
         job_fetch_ipos,
+        job_dividend_alert,
         job_check_watchlist_alerts,
         job_scan_watchlist_item,
         job_scan_watchlist_batch,
@@ -66,4 +68,5 @@ class WorkerSettings:
         cron(job_fetch_prices_th_fund, minute=0),           # every hour; guard checks hour==13 Bangkok
         cron(job_snapshot_net_worth, hour=1, minute=0),
         cron(job_fetch_dividends, weekday=0, hour=2, minute=0),
+        cron(job_dividend_alert, hour=6, minute=0),
     ]
