@@ -7,7 +7,9 @@ import {
   fetchHoldings,
   deleteHolding,
   fetchSummary,
+  type HoldingsParams,
 } from "@/lib/services/portfolio";
+import { useTableParams } from "@/hooks/useTableParams";
 import { HoldingsTable } from "@/components/portfolio/HoldingsTable";
 import { CashAccountsSection } from "@/components/portfolio/CashAccountsSection";
 import { AddHoldingDialog } from "@/components/portfolio/AddHoldingDialog";
@@ -43,6 +45,16 @@ export default function PortfolioPage() {
   const [primaryCurrency, setPrimaryCurrency] = useState("THB");
   const [secondaryCurrency, setSecondaryCurrency] = useState("USD");
 
+  const { get, getInt, setParam } = useTableParams();
+
+  const tableParams: HoldingsParams = {
+    search: get("search") || undefined,
+    platform: get("platform") || undefined,
+    asset_type: get("asset_type") || undefined,
+    page: getInt("page", 1),
+    page_size: getInt("page_size", 25),
+  };
+
   useEffect(() => {
     api
       .get("/api/v1/settings/display")
@@ -54,9 +66,15 @@ export default function PortfolioPage() {
       .catch(() => {});
   }, []);
 
-  const { data: holdings = [], isLoading } = useQuery({
-    queryKey: ["holdings"],
-    queryFn: fetchHoldings,
+  const { data: allHoldingsPage } = useQuery({
+    queryKey: ["holdings-all"],
+    queryFn: () => fetchHoldings({ page: 1, page_size: 1000 }),
+  });
+
+  const { data: holdingsPage, isFetching: holdingsFetching } = useQuery({
+    queryKey: ["holdings", tableParams],
+    queryFn: () => fetchHoldings(tableParams),
+    placeholderData: (prev) => prev,
   });
 
   const { data: summary } = useQuery({
@@ -76,6 +94,7 @@ export default function PortfolioPage() {
 
   const refresh = () => {
     qc.invalidateQueries({ queryKey: ["holdings"] });
+    qc.invalidateQueries({ queryKey: ["holdings-all"] });
     qc.invalidateQueries({ queryKey: ["portfolio-summary"] });
   };
 
@@ -151,16 +170,25 @@ export default function PortfolioPage() {
         </Card>
       </div>
 
-      <PlatformBreakdownCards holdings={holdings} />
+      <PlatformBreakdownCards holdings={allHoldingsPage?.items ?? []} />
 
-      {isLoading ? (
-        <Skeleton className="h-48 w-full" />
-      ) : (
+      {holdingsPage ? (
         <HoldingsTable
-          holdings={holdings}
+          data={holdingsPage}
+          params={{
+            search: tableParams.search ?? "",
+            platform: tableParams.platform ?? "",
+            asset_type: tableParams.asset_type ?? "",
+            page: tableParams.page ?? 1,
+            page_size: tableParams.page_size ?? 25,
+          }}
+          onParamChange={setParam}
           onDelete={(id) => deleteMutation.mutate(id)}
           onUpdated={refresh}
+          isFetching={holdingsFetching}
         />
+      ) : (
+        <Skeleton className="h-48 w-full" />
       )}
 
       <CashAccountsSection />

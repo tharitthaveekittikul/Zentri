@@ -26,7 +26,10 @@ async def test_list_holdings(auth_client, asset_id):
     await auth_client.post("/api/v1/portfolio/holdings", json={"asset_id": asset_id, "quantity": "10", "avg_cost_price": "150", "currency": "USD"})
     response = await auth_client.get("/api/v1/portfolio/holdings")
     assert response.status_code == 200
-    assert len(response.json()) == 1
+    # New — returns paginated response
+    data = response.json()
+    assert data["total"] == 1
+    assert len(data["items"]) == 1
 
 
 @pytest.mark.asyncio
@@ -51,7 +54,8 @@ async def test_list_transactions_for_asset(auth_client, asset_id):
     })
     response = await auth_client.get(f"/api/v1/portfolio/transactions?asset_id={asset_id}")
     assert response.status_code == 200
-    assert len(response.json()) == 1
+    data = response.json()
+    assert data["total"] == 1
 
 
 @pytest.mark.asyncio
@@ -101,7 +105,7 @@ async def test_delete_transaction(auth_client, asset_id):
     assert delete_res.status_code == 204
 
     list_res = await auth_client.get("/api/v1/portfolio/transactions")
-    assert all(t["id"] != tx_id for t in list_res.json())
+    assert all(t["id"] != tx_id for t in list_res.json()["items"])
 
 
 @pytest.mark.asyncio
@@ -120,7 +124,9 @@ async def test_list_transactions_includes_symbol(auth_client, asset_id):
     })
     res = await auth_client.get("/api/v1/portfolio/transactions")
     assert res.status_code == 200
-    assert res.json()[0]["symbol"] == "AAPL"
+    data = res.json()
+    assert data["total"] == 1
+    assert data["items"][0]["symbol"] == "AAPL"
 
 
 @pytest.mark.asyncio
@@ -142,3 +148,49 @@ async def test_add_holding_persists_metadata(auth_client):
     asset_res = await auth_client.get(f"/api/v1/assets/{asset_id}")
     assert asset_res.status_code == 200
     assert asset_res.json()["metadata_"]["coingecko_id"] == "bitcoin"
+
+
+@pytest.mark.asyncio
+async def test_list_holdings_paginated_search(auth_client, asset_id):
+    await auth_client.post("/api/v1/portfolio/holdings", json={
+        "asset_id": asset_id, "quantity": "10", "avg_cost_price": "150", "currency": "USD",
+    })
+    res = await auth_client.get("/api/v1/portfolio/holdings?search=AAPL")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["total"] == 1
+    assert len(data["items"]) == 1
+    assert data["items"][0]["symbol"] == "AAPL"
+
+@pytest.mark.asyncio
+async def test_list_holdings_paginated_no_match(auth_client, asset_id):
+    await auth_client.post("/api/v1/portfolio/holdings", json={
+        "asset_id": asset_id, "quantity": "10", "avg_cost_price": "150", "currency": "USD",
+    })
+    res = await auth_client.get("/api/v1/portfolio/holdings?search=NOTEXIST")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["total"] == 0
+    assert data["items"] == []
+
+@pytest.mark.asyncio
+async def test_list_transactions_paginated_search(auth_client, asset_id):
+    await auth_client.post("/api/v1/portfolio/transactions", json={
+        "asset_id": asset_id, "type": "buy", "quantity": "5",
+        "price": "155", "fee": "1", "executed_at": "2026-01-15T10:00:00Z",
+    })
+    res = await auth_client.get("/api/v1/portfolio/transactions?search=AAPL")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["total"] == 1
+    assert data["items"][0]["symbol"] == "AAPL"
+
+@pytest.mark.asyncio
+async def test_list_transactions_paginated_type_filter(auth_client, asset_id):
+    await auth_client.post("/api/v1/portfolio/transactions", json={
+        "asset_id": asset_id, "type": "buy", "quantity": "5",
+        "price": "155", "fee": "1", "executed_at": "2026-01-15T10:00:00Z",
+    })
+    res = await auth_client.get("/api/v1/portfolio/transactions?type=sell")
+    assert res.status_code == 200
+    assert res.json()["total"] == 0

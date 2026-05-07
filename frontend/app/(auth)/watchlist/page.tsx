@@ -8,6 +8,7 @@ import {
   Check,
   Plus,
   Scan,
+  Search,
   Sparkles,
   Trash2,
   X,
@@ -15,6 +16,14 @@ import {
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -43,11 +52,14 @@ import {
   scanItem,
   updateWatchlistItem,
   type WatchlistItem,
+  type WatchlistParams,
   type WatchlistSuggestion,
 } from "@/lib/services/watchlist";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { useDualCurrency } from "@/hooks/useDualCurrency";
 import { DualCurrencyAmount } from "@/components/ui/DualCurrencyAmount";
+import { useTableParams } from "@/hooks/useTableParams";
+import type { PaginatedResponse } from "@/lib/types";
 
 const VERDICT_STYLE: Record<string, string> = {
   BUY: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
@@ -177,7 +189,14 @@ function AddDialog({
 export default function WatchlistPage() {
   const router = useRouter();
   const { formatNative } = useDualCurrency();
-  const [items, setItems] = useState<WatchlistItem[]>([]);
+  const { get, getInt, setParam } = useTableParams();
+  const [itemsPage, setItemsPage] = useState<PaginatedResponse<WatchlistItem>>({
+    items: [],
+    total: 0,
+    page: 1,
+    page_size: 25,
+  });
+  const [searchInput, setSearchInput] = useState(get("search"));
   const [suggestions, setSuggestions] = useState<WatchlistSuggestion[]>([]);
   const [loading, setLoading] = useState(true);
   const [scanningAll, setScanningAll] = useState(false);
@@ -186,19 +205,58 @@ export default function WatchlistPage() {
   const [addOpen, setAddOpen] = useState(false);
 
   const fetchAll = useCallback(async () => {
+    const params: WatchlistParams = {
+      search: get("search") || undefined,
+      asset_type: get("asset_type") || undefined,
+      alert_status: get("alert_status") || undefined,
+      page: getInt("page", 1),
+      page_size: getInt("page_size", 25),
+    };
     setLoading(true);
     const [w, s] = await Promise.all([
-      listWatchlist().catch(() => []),
+      listWatchlist(params).catch(() => ({
+        items: [],
+        total: 0,
+        page: 1,
+        page_size: 25,
+      })),
       listSuggestions().catch(() => []),
     ]);
-    setItems(w);
+    setItemsPage(w as PaginatedResponse<WatchlistItem>);
     setSuggestions(s);
     setLoading(false);
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [get("search"), get("asset_type"), get("alert_status"), getInt("page", 1), getInt("page_size", 25)]);
 
+  // Re-fetch when URL params change
   useEffect(() => {
     fetchAll();
-  }, [fetchAll]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    get("search"),
+    get("asset_type"),
+    get("alert_status"),
+    getInt("page", 1),
+    getInt("page_size", 25),
+  ]);
+
+  // Sync local search from URL
+  useEffect(() => {
+    setSearchInput(get("search"));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [get("search")]);
+
+  // Debounce search → URL
+  useEffect(() => {
+    const t = setTimeout(() => {
+      const current = get("search");
+      if (searchInput !== current) {
+        setParam({ search: searchInput || null });
+      }
+    }, 300);
+    return () => clearTimeout(t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchInput]);
 
   const handleScanAll = async () => {
     setScanningAll(true);
@@ -281,6 +339,48 @@ export default function WatchlistPage() {
   return (
     <div className="space-y-8">
       <PageHeader title="Watchlist" />
+
+      {/* Filter bar */}
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="relative flex-1 min-w-[180px]">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            className="pl-8 h-9"
+            placeholder="Search symbol or name…"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+          />
+        </div>
+        <Select
+          value={get("asset_type") || "all"}
+          onValueChange={(v) => setParam({ asset_type: v === "all" ? null : v })}
+        >
+          <SelectTrigger className="h-9 w-[150px]">
+            <SelectValue placeholder="Asset Type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Types</SelectItem>
+            {["us_stock", "thai_stock", "crypto", "etf", "bond", "fund"].map((t) => (
+              <SelectItem key={t} value={t}>{t}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select
+          value={get("alert_status") || "all"}
+          onValueChange={(v) => setParam({ alert_status: v === "all" ? null : v })}
+        >
+          <SelectTrigger className="h-9 w-[150px]">
+            <SelectValue placeholder="Alert Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Statuses</SelectItem>
+            <SelectItem value="enabled">Enabled</SelectItem>
+            <SelectItem value="triggered">Triggered</SelectItem>
+            <SelectItem value="disabled">Disabled</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
       <div className="flex flex-wrap items-center justify-end gap-3">
         <div className="flex flex-wrap gap-2">
           <Button
@@ -314,7 +414,7 @@ export default function WatchlistPage() {
 
       {loading ? (
         <p className="text-muted-foreground">Loading…</p>
-      ) : items.length === 0 ? (
+      ) : itemsPage.items.length === 0 ? (
         <p className="text-muted-foreground text-sm">
           No items on your watchlist. Click Add to start watching an asset, or
           Discover New for AI suggestions.
@@ -335,7 +435,7 @@ export default function WatchlistPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {items.map((item) => (
+              {itemsPage.items.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell>
                     <div className="font-medium">{item.asset.symbol}</div>
@@ -448,6 +548,42 @@ export default function WatchlistPage() {
               ))}
             </TableBody>
           </Table>
+        </div>
+      )}
+
+      {/* Pagination */}
+      {itemsPage.total > 0 && (
+        <div className="flex items-center justify-between text-sm text-muted-foreground">
+          <span>
+            {`${(itemsPage.page - 1) * itemsPage.page_size + 1}–${Math.min(
+              itemsPage.page * itemsPage.page_size,
+              itemsPage.total,
+            )} of ${itemsPage.total}`}
+          </span>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setParam({ page: itemsPage.page - 1 }, false)}
+              disabled={itemsPage.page <= 1}
+            >
+              ← Prev
+            </Button>
+            <span className="flex items-center px-2">
+              Page {itemsPage.page} of{" "}
+              {Math.max(1, Math.ceil(itemsPage.total / itemsPage.page_size))}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setParam({ page: itemsPage.page + 1 }, false)}
+              disabled={
+                itemsPage.page >= Math.ceil(itemsPage.total / itemsPage.page_size)
+              }
+            >
+              Next →
+            </Button>
+          </div>
         </div>
       )}
 

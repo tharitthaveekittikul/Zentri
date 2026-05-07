@@ -1,8 +1,8 @@
 import uuid
-from datetime import date, datetime, timezone
+from datetime import date, datetime, time, timezone
 from decimal import Decimal
 
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logging import get_logger
@@ -123,6 +123,108 @@ async def list_holdings_with_assets(db: AsyncSession, user_id: uuid.UUID) -> lis
             "price_1d_change": price_1d_change,
         })
     return rows
+
+
+async def list_holdings_paginated(
+    db: AsyncSession,
+    user_id: uuid.UUID,
+    search: str | None = None,
+    platform: str | None = None,
+    asset_type: str | None = None,
+    page: int = 1,
+    page_size: int = 25,
+) -> tuple[list[dict], int]:
+    def _apply_filters(q):
+        if search:
+            q = q.where(or_(
+                Asset.symbol.ilike(f"%{search}%"),
+                Asset.name.ilike(f"%{search}%"),
+            ))
+        if platform:
+            q = q.where(Holding.platform == platform)
+        if asset_type:
+            q = q.where(Asset.asset_type == asset_type)
+        return q
+
+    count_q = _apply_filters(
+        select(func.count(Holding.id))
+        .select_from(Holding)
+        .join(Asset, Asset.id == Holding.asset_id)
+        .where(Holding.user_id == user_id)
+    )
+    total: int = (await db.execute(count_q)).scalar_one()
+
+    if total == 0:
+        return [], 0
+
+    max_page = (total + page_size - 1) // page_size
+    page = max(1, min(page, max_page))
+    offset = (page - 1) * page_size
+
+    data_q = _apply_filters(
+        select(Holding, Asset)
+        .join(Asset, Asset.id == Holding.asset_id)
+        .where(Holding.user_id == user_id)
+        .offset(offset)
+        .limit(page_size)
+    )
+    holdings_result = await db.execute(data_q)
+    holdings_raw = list(holdings_result.all())
+
+    if not holdings_raw:
+        return [], total
+
+    asset_ids = [asset.id for _, asset in holdings_raw]
+    ranked_sq = (
+        select(
+            Price.asset_id,
+            Price.close,
+            func.row_number().over(
+                partition_by=Price.asset_id,
+                order_by=Price.timestamp.desc(),
+            ).label("rn"),
+        )
+        .where(Price.asset_id.in_(asset_ids))
+        .subquery()
+    )
+    price_result = await db.execute(
+        select(ranked_sq.c.asset_id, ranked_sq.c.close, ranked_sq.c.rn)
+        .where(ranked_sq.c.rn <= 2)
+    )
+    price_map: dict[uuid.UUID, dict[int, Decimal]] = {}
+    for row in price_result:
+        price_map.setdefault(row.asset_id, {})[row.rn] = row.close
+
+    rows = []
+    for holding, asset in holdings_raw:
+        prices = price_map.get(asset.id, {})
+        latest_close = prices.get(1)
+        prev_close = prices.get(2)
+        total_cost = holding.quantity * holding.avg_cost_price
+        holding_value = holding.quantity * latest_close if latest_close else None
+        unrealized_pnl = (holding_value - total_cost) if holding_value is not None else None
+        price_1d_change = (
+            float((latest_close - prev_close) / prev_close * 100)
+            if latest_close and prev_close and prev_close != 0
+            else None
+        )
+        rows.append({
+            "id": holding.id,
+            "asset_id": holding.asset_id,
+            "symbol": asset.symbol,
+            "asset_type": asset.asset_type,
+            "currency": holding.currency,
+            "platform": holding.platform,
+            "purchased_at": holding.purchased_at,
+            "outstanding_shares": holding.quantity,
+            "cost_per_share": holding.avg_cost_price,
+            "total_cost": total_cost,
+            "current_price": latest_close,
+            "holding_value": holding_value,
+            "unrealized_pnl": unrealized_pnl,
+            "price_1d_change": price_1d_change,
+        })
+    return rows, total
 
 
 async def get_holding(db: AsyncSession, user_id: uuid.UUID, holding_id: uuid.UUID) -> Holding | None:
@@ -323,6 +425,84 @@ async def list_transactions_with_assets(
             "created_at": tx.created_at,
         })
     return rows
+
+
+async def list_transactions_paginated(
+    db: AsyncSession,
+    user_id: uuid.UUID,
+    search: str | None = None,
+    asset_id: uuid.UUID | None = None,
+    type_: str | None = None,
+    platform: str | None = None,
+    date_from: date | None = None,
+    date_to: date | None = None,
+    page: int = 1,
+    page_size: int = 25,
+) -> tuple[list[dict], int]:
+    def _apply_filters(q):
+        if search:
+            q = q.where(or_(
+                Asset.symbol.ilike(f"%{search}%"),
+                Asset.name.ilike(f"%{search}%"),
+            ))
+        if asset_id:
+            q = q.where(Transaction.asset_id == asset_id)
+        if type_:
+            q = q.where(Transaction.type == type_)
+        if platform:
+            q = q.where(Transaction.platform == platform)
+        if date_from:
+            q = q.where(
+                Transaction.executed_at >= datetime.combine(date_from, time.min).replace(tzinfo=timezone.utc)
+            )
+        if date_to:
+            q = q.where(
+                Transaction.executed_at <= datetime.combine(date_to, time.max).replace(tzinfo=timezone.utc)
+            )
+        return q
+
+    count_q = _apply_filters(
+        select(func.count(Transaction.id))
+        .select_from(Transaction)
+        .join(Asset, Asset.id == Transaction.asset_id)
+        .where(Transaction.user_id == user_id)
+    )
+    total: int = (await db.execute(count_q)).scalar_one()
+
+    if total == 0:
+        return [], 0
+
+    max_page = (total + page_size - 1) // page_size
+    page = max(1, min(page, max_page))
+    offset = (page - 1) * page_size
+
+    data_q = _apply_filters(
+        select(Transaction, Asset)
+        .join(Asset, Asset.id == Transaction.asset_id)
+        .where(Transaction.user_id == user_id)
+        .order_by(Transaction.executed_at.desc())
+        .offset(offset)
+        .limit(page_size)
+    )
+    result = await db.execute(data_q)
+
+    rows = []
+    for tx, asset in result.all():
+        rows.append({
+            "id": tx.id,
+            "asset_id": tx.asset_id,
+            "symbol": asset.symbol,
+            "asset_type": asset.asset_type,
+            "platform": tx.platform,
+            "type": tx.type,
+            "quantity": tx.quantity,
+            "price": tx.price,
+            "fee": tx.fee,
+            "source": tx.source,
+            "executed_at": tx.executed_at,
+            "created_at": tx.created_at,
+        })
+    return rows, total
 
 
 async def get_portfolio_summary(

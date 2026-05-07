@@ -24,12 +24,12 @@ export default function OverviewPage() {
     refetchInterval: 60_000,
   });
 
-  const { data: holdings = [] } = useQuery({
+  const { data: holdingsPage } = useQuery({
     queryKey: ["portfolio", "holdings"],
     queryFn: fetchHoldings,
   });
 
-  const snapshotHoldings: SnapshotHolding[] = holdings.map((h) => ({
+  const snapshotHoldings: SnapshotHolding[] = (holdingsPage?.items ?? []).map((h) => ({
     symbol: h.symbol,
     asset_type: h.asset_type,
     quantity: h.outstanding_shares,

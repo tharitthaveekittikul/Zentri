@@ -1,4 +1,5 @@
 import { api } from "@/lib/api";
+import { PaginatedResponse } from "@/lib/types";
 
 export interface HoldingRow {
   id: string;
@@ -77,6 +78,53 @@ export interface Transaction {
   created_at: string;
 }
 
+export interface TransactionRow {
+  id: string;
+  asset_id: string;
+  symbol: string;
+  asset_type: string;
+  currency?: string;
+  platform: string | null;
+  type: string;
+  quantity: string;
+  price: string;
+  fee: string;
+  source: string;
+  executed_at: string;
+  created_at: string;
+}
+
+export interface TransactionParams {
+  search?: string;
+  asset_id?: string;
+  type?: string;
+  platform?: string;
+  date_from?: string;
+  date_to?: string;
+  page?: number;
+  page_size?: number;
+}
+
+export async function fetchTransactions(
+  params: TransactionParams = {},
+): Promise<PaginatedResponse<TransactionRow>> {
+  const qs = new URLSearchParams();
+  if (params.search) qs.set("search", params.search);
+  if (params.asset_id) qs.set("asset_id", params.asset_id);
+  if (params.type) qs.set("type", params.type);
+  if (params.platform) qs.set("platform", params.platform);
+  if (params.date_from) qs.set("date_from", params.date_from);
+  if (params.date_to) qs.set("date_to", params.date_to);
+  if (params.page) qs.set("page", String(params.page));
+  if (params.page_size) qs.set("page_size", String(params.page_size));
+  const query = qs.toString();
+  const res = await api.get(
+    `/api/v1/portfolio/transactions${query ? `?${query}` : ""}`,
+  );
+  if (!res.ok) throw new Error("Failed to fetch transactions");
+  return res.json();
+}
+
 export interface AssetDetail {
   id: string;
   symbol: string;
@@ -147,8 +195,27 @@ export interface PortfolioSummary {
   exchange_rate_date: string | null;
 }
 
-export async function fetchHoldings(): Promise<HoldingRow[]> {
-  const res = await api.get("/api/v1/portfolio/holdings");
+export interface HoldingsParams {
+  search?: string;
+  platform?: string;
+  asset_type?: string;
+  page?: number;
+  page_size?: number;
+}
+
+export async function fetchHoldings(
+  params: HoldingsParams = {},
+): Promise<PaginatedResponse<HoldingRow>> {
+  const qs = new URLSearchParams();
+  if (params.search) qs.set("search", params.search);
+  if (params.platform) qs.set("platform", params.platform);
+  if (params.asset_type) qs.set("asset_type", params.asset_type);
+  if (params.page) qs.set("page", String(params.page));
+  if (params.page_size) qs.set("page_size", String(params.page_size));
+  const query = qs.toString();
+  const res = await api.get(
+    `/api/v1/portfolio/holdings${query ? `?${query}` : ""}`,
+  );
   if (!res.ok) throw new Error("Failed to fetch holdings");
   return res.json();
 }

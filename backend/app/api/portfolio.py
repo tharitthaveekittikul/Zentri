@@ -1,6 +1,7 @@
 import csv
 import io
 import uuid
+from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from fastapi.responses import StreamingResponse
@@ -10,6 +11,7 @@ from app.api.deps import get_current_user
 from app.core.database import get_db
 from app.models.user import User
 from app.models.asset import Asset
+from app.schemas.common import PaginatedResponse
 from app.schemas.holding import HoldingCreate, HoldingRow, HoldingUpdate, PortfolioSummary
 from app.schemas.transaction import ManualTransactionCreate, TransactionCreate, TransactionResponse, TransactionRow, TransactionUpdate
 from app.services import portfolio as portfolio_service
@@ -40,13 +42,25 @@ async def add_holding(
     )
 
 
-@router.get("/holdings", response_model=list[HoldingRow])
+@router.get("/holdings", response_model=PaginatedResponse[HoldingRow])
 async def list_holdings(
+    search: str | None = None,
+    platform: str | None = None,
+    asset_type: str | None = None,
+    page: int = 1,
+    page_size: int = 25,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    rows = await portfolio_service.list_holdings_with_assets(db, current_user.id)
-    return [HoldingRow(**r) for r in rows]
+    rows, total = await portfolio_service.list_holdings_paginated(
+        db, current_user.id,
+        search=search, platform=platform, asset_type=asset_type,
+        page=page, page_size=page_size,
+    )
+    return PaginatedResponse(
+        items=[HoldingRow(**r) for r in rows],
+        total=total, page=page, page_size=page_size,
+    )
 
 
 @router.delete("/holdings/{holding_id}", status_code=204)
@@ -114,13 +128,29 @@ async def add_transaction(
     )
 
 
-@router.get("/transactions", response_model=list[TransactionRow])
+@router.get("/transactions", response_model=PaginatedResponse[TransactionRow])
 async def list_transactions(
+    search: str | None = None,
     asset_id: uuid.UUID | None = None,
+    type: str | None = None,
+    platform: str | None = None,
+    date_from: date | None = None,
+    date_to: date | None = None,
+    page: int = 1,
+    page_size: int = 25,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    return await portfolio_service.list_transactions_with_assets(db, current_user.id, asset_id)
+    rows, total = await portfolio_service.list_transactions_paginated(
+        db, current_user.id,
+        search=search, asset_id=asset_id, type_=type,
+        platform=platform, date_from=date_from, date_to=date_to,
+        page=page, page_size=page_size,
+    )
+    return PaginatedResponse(
+        items=[TransactionRow(**r) for r in rows],
+        total=total, page=page, page_size=page_size,
+    )
 
 
 @router.patch("/transactions/{transaction_id}", response_model=TransactionResponse)

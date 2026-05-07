@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { api } from "@/lib/api";
 import {
   Table,
   TableBody,
@@ -27,26 +26,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Search, Trash2 } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { useDualCurrency } from "@/hooks/useDualCurrency";
 import { DualCurrencyAmount } from "@/components/ui/DualCurrencyAmount";
-
-type TransactionRow = {
-  id: string;
-  asset_id: string;
-  symbol: string;
-  asset_type: string;
-  currency?: string;
-  platform: string | null;
-  type: string;
-  quantity: string;
-  price: string;
-  fee: string;
-  source: string;
-  executed_at: string;
-  created_at: string;
-};
+import { useTableParams } from "@/hooks/useTableParams";
+import { api } from "@/lib/api";
+import {
+  fetchTransactions,
+  type TransactionRow,
+  type TransactionParams,
+} from "@/lib/services/portfolio";
+import type { PaginatedResponse } from "@/lib/types";
 
 const TYPE_COLORS: Record<string, string> = {
   buy: "bg-green-100 text-green-800",
@@ -59,24 +50,78 @@ const TYPE_COLORS: Record<string, string> = {
 
 export default function TransactionsPage() {
   const { formatNative } = useDualCurrency();
-  const [transactions, setTransactions] = useState<TransactionRow[]>([]);
+  const { get, getInt, setParam } = useTableParams();
+
+  const [data, setData] = useState<PaginatedResponse<TransactionRow>>({
+    items: [],
+    total: 0,
+    page: 1,
+    page_size: 25,
+  });
   const [loading, setLoading] = useState(true);
+  const [fetching, setFetching] = useState(false);
   const [editTarget, setEditTarget] = useState<TransactionRow | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<TransactionRow | null>(null);
   const [editForm, setEditForm] = useState<Partial<TransactionRow>>({});
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [searchInput, setSearchInput] = useState(get("search"));
 
-  const fetchTransactions = async () => {
-    setLoading(true);
-    const res = await api.get("/api/v1/portfolio/transactions");
-    if (res.ok) setTransactions(await res.json());
-    setLoading(false);
+  // Build params from URL
+  const params: TransactionParams = {
+    search: get("search") || undefined,
+    type: get("type") || undefined,
+    platform: get("platform") || undefined,
+    date_from: get("date_from") || undefined,
+    date_to: get("date_to") || undefined,
+    page: getInt("page", 1),
+    page_size: getInt("page_size", 25),
   };
 
+  // Fetch when URL params change
   useEffect(() => {
-    fetchTransactions();
-  }, []);
+    setFetching(true);
+    fetchTransactions(params)
+      .then(setData)
+      .finally(() => {
+        setLoading(false);
+        setFetching(false);
+      });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    get("search"),
+    get("type"),
+    get("platform"),
+    get("date_from"),
+    get("date_to"),
+    getInt("page", 1),
+    getInt("page_size", 25),
+  ]);
+
+  // Sync local search input from URL (e.g. browser back)
+  useEffect(() => {
+    setSearchInput(get("search"));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [get("search")]);
+
+  // Debounce search → URL
+  useEffect(() => {
+    const t = setTimeout(() => {
+      const current = get("search");
+      if (searchInput !== current) {
+        setParam({ search: searchInput || null });
+      }
+    }, 300);
+    return () => clearTimeout(t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchInput]);
+
+  const reload = () => {
+    setFetching(true);
+    fetchTransactions(params)
+      .then(setData)
+      .finally(() => setFetching(false));
+  };
 
   const openEdit = (tx: TransactionRow) => {
     setEditTarget(tx);
@@ -104,12 +149,12 @@ export default function TransactionsPage() {
           ? new Date(editForm.executed_at).toISOString()
           : undefined,
         platform: editForm.platform || null,
-      }
+      },
     );
     setSaving(false);
     if (res.ok) {
       setEditTarget(null);
-      fetchTransactions();
+      reload();
     }
   };
 
@@ -119,95 +164,199 @@ export default function TransactionsPage() {
     await api.delete(`/api/v1/portfolio/transactions/${deleteTarget.id}`);
     setDeleting(false);
     setDeleteTarget(null);
-    fetchTransactions();
+    reload();
   };
+
+  const totalPages = Math.max(1, Math.ceil(data.total / data.page_size));
+
+  // Derive unique platforms from current page for the platform dropdown
+  const platforms = Array.from(
+    new Set(data.items.map((t) => t.platform).filter(Boolean) as string[]),
+  );
 
   return (
     <div className="space-y-4">
       <PageHeader title="Transactions" />
 
+      {/* Filter bar */}
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="relative flex-1 min-w-[180px]">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            className="pl-8 h-9"
+            placeholder="Search symbol or name…"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+          />
+        </div>
+        <Select
+          value={get("type") || "all"}
+          onValueChange={(v) => setParam({ type: v === "all" ? null : v })}
+        >
+          <SelectTrigger className="h-9 w-[140px]">
+            <SelectValue placeholder="Type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Types</SelectItem>
+            {["buy", "sell", "dividend", "reward", "fee", "transfer"].map((t) => (
+              <SelectItem key={t} value={t}>
+                {t}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select
+          value={get("platform") || "all"}
+          onValueChange={(v) => setParam({ platform: v === "all" ? null : v })}
+        >
+          <SelectTrigger className="h-9 w-[140px]">
+            <SelectValue placeholder="Platform" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Platforms</SelectItem>
+            {platforms.map((p) => (
+              <SelectItem key={p} value={p}>
+                {p}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Input
+          type="date"
+          className="h-9 w-[150px]"
+          value={get("date_from")}
+          onChange={(e) => setParam({ date_from: e.target.value || null })}
+        />
+        <span className="text-muted-foreground text-sm">to</span>
+        <Input
+          type="date"
+          className="h-9 w-[150px]"
+          value={get("date_to")}
+          onChange={(e) => setParam({ date_to: e.target.value || null })}
+        />
+      </div>
+
       {loading ? (
         <p className="text-muted-foreground">Loading...</p>
       ) : (
-        <div className="rounded-md border overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Asset</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead className="text-right">Quantity</TableHead>
-                <TableHead className="text-right">Price</TableHead>
-                <TableHead className="text-right">Fee</TableHead>
-                <TableHead>Platform</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {transactions.length === 0 && (
+        <>
+          <div
+            className={`rounded-md border overflow-x-auto transition-opacity ${
+              fetching ? "opacity-60" : ""
+            }`}
+          >
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell
-                    colSpan={8}
-                    className="text-center text-muted-foreground py-8"
-                  >
-                    No transactions yet
-                  </TableCell>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Asset</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead className="text-right">Quantity</TableHead>
+                  <TableHead className="text-right">Price</TableHead>
+                  <TableHead className="text-right">Fee</TableHead>
+                  <TableHead>Platform</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              )}
-              {transactions.map((tx) => (
-                <TableRow key={tx.id}>
-                  <TableCell className="text-sm">
-                    {new Date(tx.executed_at).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell className="font-medium">{tx.symbol}</TableCell>
-                  <TableCell>
-                    <span
-                      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                        TYPE_COLORS[tx.type] ?? "bg-gray-100 text-gray-800"
-                      }`}
+              </TableHeader>
+              <TableBody>
+                {data.items.length === 0 && (
+                  <TableRow>
+                    <TableCell
+                      colSpan={8}
+                      className="text-center text-muted-foreground py-8"
                     >
-                      {tx.type}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {parseFloat(tx.quantity).toLocaleString()}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DualCurrencyAmount
-                      value={formatNative(tx.price, tx.currency ?? "USD")}
-                    />
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DualCurrencyAmount
-                      value={formatNative(tx.fee, tx.currency ?? "USD")}
-                    />
-                  </TableCell>
-                  <TableCell className="text-muted-foreground text-sm">
-                    {tx.platform ?? "—"}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => openEdit(tx)}
+                      No transactions found
+                    </TableCell>
+                  </TableRow>
+                )}
+                {data.items.map((tx) => (
+                  <TableRow key={tx.id}>
+                    <TableCell className="text-sm">
+                      {new Date(tx.executed_at).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell className="font-medium">{tx.symbol}</TableCell>
+                    <TableCell>
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                          TYPE_COLORS[tx.type] ?? "bg-gray-100 text-gray-800"
+                        }`}
                       >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setDeleteTarget(tx)}
-                      >
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+                        {tx.type}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {parseFloat(tx.quantity).toLocaleString()}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DualCurrencyAmount
+                        value={formatNative(tx.price, tx.currency ?? "USD")}
+                      />
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DualCurrencyAmount
+                        value={formatNative(tx.fee, tx.currency ?? "USD")}
+                      />
+                    </TableCell>
+                    <TableCell className="text-muted-foreground text-sm">
+                      {tx.platform ?? "—"}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => openEdit(tx)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setDeleteTarget(tx)}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Pagination */}
+          <div className="flex items-center justify-between text-sm text-muted-foreground">
+            <span>
+              {data.total > 0
+                ? `${(data.page - 1) * data.page_size + 1}–${Math.min(
+                    data.page * data.page_size,
+                    data.total,
+                  )} of ${data.total}`
+                : "0 results"}
+            </span>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setParam({ page: data.page - 1 }, false)}
+                disabled={data.page <= 1}
+              >
+                ← Prev
+              </Button>
+              <span className="flex items-center px-2">
+                Page {data.page} of {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setParam({ page: data.page + 1 }, false)}
+                disabled={data.page >= totalPages}
+              >
+                Next →
+              </Button>
+            </div>
+          </div>
+        </>
       )}
 
       {/* Edit Dialog */}

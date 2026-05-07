@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import and_, func, select
+from sqlalchemy import and_, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from arq.connections import RedisSettings, create_pool
@@ -18,6 +18,7 @@ from app.models.price import Price
 from app.models.user import User
 from app.models.watchlist_item import WatchlistItem
 from app.models.watchlist_suggestion import WatchlistSuggestion
+from app.schemas.common import PaginatedResponse
 from app.schemas.watchlist import (
     AssetSummary,
     WatchlistItemCreate,
@@ -100,80 +101,63 @@ async def _item_to_out(db: AsyncSession, item: WatchlistItem) -> WatchlistItemOu
     )
 
 
-@router.get("", response_model=list[WatchlistItemOut])
+@router.get("", response_model=PaginatedResponse[WatchlistItemOut])
 async def list_watchlist(
+    search: str | None = None,
+    asset_type: str | None = None,
+    alert_status: str | None = None,
+    page: int = 1,
+    page_size: int = 25,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    latest_ts = (
-        select(Price.asset_id, func.max(Price.timestamp).label("max_ts"))
-        .group_by(Price.asset_id)
-        .subquery("latest_ts")
-    )
-    stmt = (
-        select(WatchlistItem, Asset, Price)
-        .join(Asset, WatchlistItem.asset_id == Asset.id)
-        .outerjoin(latest_ts, WatchlistItem.asset_id == latest_ts.c.asset_id)
-        .outerjoin(
-            Price,
-            and_(
-                Price.asset_id == WatchlistItem.asset_id,
-                Price.timestamp == latest_ts.c.max_ts,
-            ),
-        )
+    base_q_count = (
+        select(func.count(WatchlistItem.id))
+        .select_from(WatchlistItem)
+        .join(Asset, Asset.id == WatchlistItem.asset_id)
         .where(WatchlistItem.user_id == current_user.id)
-        .order_by(WatchlistItem.created_at.desc())
     )
-    rows = (await db.execute(stmt)).all()
+    base_q_data = (
+        select(WatchlistItem)
+        .join(Asset, Asset.id == WatchlistItem.asset_id)
+        .where(WatchlistItem.user_id == current_user.id)
+    )
 
-    asset_ids = [row[1].id for row in rows]
-    analyses: dict[uuid.UUID, AIAnalysis] = {}
-    if asset_ids:
-        latest_a_ts = (
-            select(AIAnalysis.asset_id, func.max(AIAnalysis.created_at).label("max_ts"))
-            .where(AIAnalysis.asset_id.in_(asset_ids))
-            .group_by(AIAnalysis.asset_id)
-            .subquery("latest_a_ts")
-        )
-        for a in (
-            await db.execute(
-                select(AIAnalysis).join(
-                    latest_a_ts,
-                    and_(
-                        AIAnalysis.asset_id == latest_a_ts.c.asset_id,
-                        AIAnalysis.created_at == latest_a_ts.c.max_ts,
-                    ),
-                )
-            )
-        ).scalars().all():
-            analyses[a.asset_id] = a
+    if search:
+        flt = or_(Asset.symbol.ilike(f"%{search}%"), Asset.name.ilike(f"%{search}%"))
+        base_q_count = base_q_count.where(flt)
+        base_q_data = base_q_data.where(flt)
+    if asset_type:
+        base_q_count = base_q_count.where(Asset.asset_type == asset_type)
+        base_q_data = base_q_data.where(Asset.asset_type == asset_type)
+    if alert_status == "enabled":
+        flt = and_(WatchlistItem.alert_enabled.is_(True), WatchlistItem.alerted_at.is_(None))
+        base_q_count = base_q_count.where(flt)
+        base_q_data = base_q_data.where(flt)
+    elif alert_status == "triggered":
+        flt = WatchlistItem.alerted_at.isnot(None)
+        base_q_count = base_q_count.where(flt)
+        base_q_data = base_q_data.where(flt)
+    elif alert_status == "disabled":
+        flt = WatchlistItem.alert_enabled.is_(False)
+        base_q_count = base_q_count.where(flt)
+        base_q_data = base_q_data.where(flt)
 
-    out = []
-    for item, asset, price in rows:
-        current_price = price.close if price else None
-        pct = None
-        if current_price is not None and item.target_price:
-            pct = float((current_price - item.target_price) / item.target_price * 100)
-        analysis = analyses.get(asset.id)
-        out.append(
-            WatchlistItemOut(
-                id=item.id,
-                asset_id=item.asset_id,
-                target_price=item.target_price,
-                currency=item.currency,
-                notes=item.notes,
-                alert_enabled=item.alert_enabled,
-                alerted_at=item.alerted_at,
-                created_at=item.created_at,
-                asset=AssetSummary(id=asset.id, symbol=asset.symbol, name=asset.name, currency=asset.currency),
-                current_price=current_price,
-                pct_from_target=pct,
-                last_verdict=analysis.verdict if analysis else None,
-                ai_suggested_price=analysis.target_price if analysis else None,
-                last_scanned_at=analysis.created_at if analysis else None,
-            )
-        )
-    return out
+    total: int = (await db.execute(base_q_count)).scalar_one()
+
+    if total == 0:
+        return PaginatedResponse(items=[], total=0, page=1, page_size=page_size)
+
+    max_page = (total + page_size - 1) // page_size
+    page = max(1, min(page, max_page))
+    offset = (page - 1) * page_size
+
+    result = await db.execute(
+        base_q_data.order_by(WatchlistItem.created_at.desc()).offset(offset).limit(page_size)
+    )
+    db_items = list(result.scalars().all())
+    out_items = [await _item_to_out(db, item) for item in db_items]
+    return PaginatedResponse(items=out_items, total=total, page=page, page_size=page_size)
 
 
 @router.post("", response_model=WatchlistItemOut, status_code=201)

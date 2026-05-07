@@ -1,4 +1,5 @@
 import { api } from "@/lib/api";
+import { PaginatedResponse } from "@/lib/types";
 
 export interface WatchlistAsset {
   id: string;
@@ -35,8 +36,27 @@ export interface WatchlistSuggestion {
   created_at: string;
 }
 
-export async function listWatchlist(): Promise<WatchlistItem[]> {
-  const r = await api.get("/api/v1/watchlist");
+export interface WatchlistParams {
+  search?: string;
+  asset_type?: string;
+  alert_status?: string;
+  page?: number;
+  page_size?: number;
+}
+
+export async function listWatchlist(
+  params: WatchlistParams = {},
+): Promise<PaginatedResponse<WatchlistItem>> {
+  const qs = new URLSearchParams();
+  if (params.search) qs.set("search", params.search);
+  if (params.asset_type) qs.set("asset_type", params.asset_type);
+  if (params.alert_status) qs.set("alert_status", params.alert_status);
+  if (params.page) qs.set("page", String(params.page));
+  if (params.page_size) qs.set("page_size", String(params.page_size));
+  const query = qs.toString();
+  const r = await api.get(
+    `/api/v1/watchlist${query ? `?${query}` : ""}`,
+  );
   if (!r.ok) throw new Error("Failed to fetch watchlist");
   return r.json();
 }

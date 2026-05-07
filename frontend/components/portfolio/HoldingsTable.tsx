@@ -1,12 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   SortingState,
   useReactTable,
@@ -20,6 +19,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -27,8 +27,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Trash2, Pencil, ArrowUpDown, ArrowUp, ArrowDown, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import {
+  Trash2,
+  Pencil,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  ArrowUpRight,
+  ArrowDownRight,
+  Search,
+} from "lucide-react";
 import { HoldingRow } from "@/lib/services/portfolio";
+import { PaginatedResponse } from "@/lib/types";
 import { useDualCurrency } from "@/hooks/useDualCurrency";
 import { DualCurrencyAmount } from "@/components/ui/DualCurrencyAmount";
 import { EditHoldingDialog } from "./EditHoldingDialog";
@@ -43,42 +53,63 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
+interface TableParams {
+  search: string;
+  platform: string;
+  asset_type: string;
+  page: number;
+  page_size: number;
+}
+
 interface Props {
-  holdings: HoldingRow[];
+  data: PaginatedResponse<HoldingRow>;
+  params: TableParams;
+  onParamChange: (updates: Record<string, string | number | null>, resetPage?: boolean) => void;
   onDelete: (id: string) => void;
   onUpdated: () => void;
+  isFetching?: boolean;
 }
 
 const secondaryCls = "text-xs text-muted-foreground font-mono tabular-nums mt-0.5";
 
-export function HoldingsTable({ holdings, onDelete, onUpdated }: Props) {
+const ASSET_TYPES = ["us_stock", "thai_stock", "crypto", "etf", "bond", "fund"];
+
+export function HoldingsTable({
+  data,
+  params,
+  onParamChange,
+  onDelete,
+  onUpdated,
+  isFetching = false,
+}: Props) {
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [platformFilter, setPlatformFilter] = useState<string>("all");
-  const [pageSize, setPageSize] = useState(25);
-  const [pageIndex, setPageIndex] = useState(0);
+  const [searchInput, setSearchInput] = useState(params.search);
   const [editHolding, setEditHolding] = useState<HoldingRow | null>(null);
   const [editOpen, setEditOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<HoldingRow | null>(null);
 
   const { formatNative } = useDualCurrency();
 
-  const nonCashHoldings = useMemo(
-    () => holdings.filter((h) => h.asset_type !== "cash" && Number(h.outstanding_shares) >= 1e-6),
-    [holdings],
+  // Sync local search input from URL changes (e.g. browser back/forward)
+  useEffect(() => {
+    setSearchInput(params.search);
+  }, [params.search]);
+
+  // Debounce search input → URL (300ms)
+  useEffect(() => {
+    const t = setTimeout(() => {
+      if (searchInput !== params.search) {
+        onParamChange({ search: searchInput || null });
+      }
+    }, 300);
+    return () => clearTimeout(t);
+  }, [searchInput]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Derive unique platforms from current page for the platform dropdown
+  const platforms = useMemo(
+    () => Array.from(new Set(data.items.map((h) => h.platform).filter(Boolean) as string[])).sort(),
+    [data.items],
   );
-
-  const platforms = useMemo(() => {
-    const seen = new Set<string>();
-    for (const h of nonCashHoldings) {
-      if (h.platform) seen.add(h.platform);
-    }
-    return Array.from(seen).sort();
-  }, [nonCashHoldings]);
-
-  const filteredHoldings = useMemo(() => {
-    if (platformFilter === "all") return nonCashHoldings;
-    return nonCashHoldings.filter((h) => h.platform === platformFilter);
-  }, [nonCashHoldings, platformFilter]);
 
   function SortIcon({ isSorted }: { isSorted: false | "asc" | "desc" }) {
     if (!isSorted) return <ArrowUpDown className="ml-1 h-3 w-3 inline opacity-40" />;
@@ -296,71 +327,69 @@ export function HoldingsTable({ holdings, onDelete, onUpdated }: Props) {
   ];
 
   const table = useReactTable({
-    data: filteredHoldings,
+    data: data.items,
     columns,
-    state: { sorting, pagination: { pageIndex, pageSize } },
+    state: { sorting },
     onSortingChange: setSorting,
-    onPaginationChange: (updater) => {
-      const next =
-        typeof updater === "function"
-          ? updater({ pageIndex, pageSize })
-          : updater;
-      setPageIndex(next.pageIndex);
-      setPageSize(next.pageSize);
-    },
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    manualPagination: false,
   });
 
+  const totalPages = Math.max(1, Math.ceil(data.total / data.page_size));
+
   return (
-    <div className="space-y-2">
-      {/* Toolbar */}
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Platform:</span>
-          <Select
-            value={platformFilter}
-            onValueChange={(v) => {
-              if (v !== null) {
-                setPlatformFilter(v);
-                setPageIndex(0);
-              }
-            }}
-          >
-            <SelectTrigger className="h-8 w-[180px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Platforms</SelectItem>
-              {platforms.map((p) => (
-                <SelectItem key={p} value={p}>
-                  {p}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+    <div className="space-y-3">
+      {/* Filter bar */}
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="relative flex-1 min-w-[180px]">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            className="pl-8 h-9"
+            placeholder="Search symbol or name…"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+          />
         </div>
+        <Select
+          value={params.platform || "all"}
+          onValueChange={(v) => onParamChange({ platform: v === "all" ? null : v })}
+        >
+          <SelectTrigger className="h-9 w-[160px]">
+            <SelectValue placeholder="Platform" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Platforms</SelectItem>
+            {platforms.map((p) => (
+              <SelectItem key={p} value={p}>{p}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select
+          value={params.asset_type || "all"}
+          onValueChange={(v) => onParamChange({ asset_type: v === "all" ? null : v })}
+        >
+          <SelectTrigger className="h-9 w-[160px]">
+            <SelectValue placeholder="Asset Type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Types</SelectItem>
+            {ASSET_TYPES.map((t) => (
+              <SelectItem key={t} value={t}>{t}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">Rows:</span>
           <Select
-            value={String(pageSize)}
-            onValueChange={(v) => {
-              if (v !== null) {
-                setPageSize(Number(v));
-                setPageIndex(0);
-              }
-            }}
+            value={String(params.page_size)}
+            onValueChange={(v) => onParamChange({ page_size: Number(v), page: 1 }, false)}
           >
             <SelectTrigger className="h-8 w-[80px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               {[25, 50, 100].map((n) => (
-                <SelectItem key={n} value={String(n)}>
-                  {n}
-                </SelectItem>
+                <SelectItem key={n} value={String(n)}>{n}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -368,7 +397,7 @@ export function HoldingsTable({ holdings, onDelete, onUpdated }: Props) {
       </div>
 
       {/* Table */}
-      <div className="bg-card card-surface rounded-2xl border border-border overflow-x-auto">
+      <div className={`bg-card card-surface rounded-2xl border border-border overflow-x-auto transition-opacity ${isFetching ? "opacity-60" : ""}`}>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((hg) => (
@@ -400,7 +429,7 @@ export function HoldingsTable({ holdings, onDelete, onUpdated }: Props) {
                 <TableCell colSpan={columns.length} className="py-12">
                   <div className="flex flex-col items-center gap-2 text-muted-foreground">
                     <span className="text-2xl">📋</span>
-                    <span className="text-sm font-medium">No holdings yet</span>
+                    <span className="text-sm font-medium">No holdings found</span>
                     <span className="text-xs">
                       Add one above or import from the Import page.
                     </span>
@@ -415,23 +444,27 @@ export function HoldingsTable({ holdings, onDelete, onUpdated }: Props) {
       {/* Pagination */}
       <div className="flex items-center justify-between text-sm text-muted-foreground">
         <span>
-          Page {table.getState().pagination.pageIndex + 1} of{" "}
-          {Math.max(1, table.getPageCount())}
+          {data.total > 0
+            ? `${(params.page - 1) * params.page_size + 1}–${Math.min(params.page * params.page_size, data.total)} of ${data.total}`
+            : "0 results"}
         </span>
         <div className="flex gap-2">
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            onClick={() => onParamChange({ page: params.page - 1 }, false)}
+            disabled={params.page <= 1}
           >
             ← Prev
           </Button>
+          <span className="flex items-center px-2">
+            Page {params.page} of {totalPages}
+          </span>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            onClick={() => onParamChange({ page: params.page + 1 }, false)}
+            disabled={params.page >= totalPages}
           >
             Next →
           </Button>
