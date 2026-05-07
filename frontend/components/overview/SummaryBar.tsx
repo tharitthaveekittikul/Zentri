@@ -5,13 +5,14 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useDualCurrency } from "@/hooks/useDualCurrency";
 import { DualCurrencyAmount } from "@/components/ui/DualCurrencyAmount";
+import { ArrowUpRight, ArrowDownRight } from "lucide-react";
 
 interface Props {
   summary: OverviewSummary;
 }
 
 export function SummaryBar({ summary }: Props) {
-  const { format, formatPct } = useDualCurrency();
+  const { format, formatPnl, formatPct } = useDualCurrency();
   const pnlPositive = Number(summary.total_pnl) >= 0;
   const dailyPositive = Number(summary.daily_change) >= 0;
 
@@ -35,13 +36,14 @@ export function SummaryBar({ summary }: Props) {
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Total P&amp;L</p>
         <div className="flex items-center gap-2">
           <DualCurrencyAmount
-            value={format(summary.total_pnl)}
+            value={formatPnl(summary.total_pnl)}
             primaryClassName={cn(
               "text-base font-semibold",
               pnlPositive ? "text-emerald-600 dark:text-emerald-400" : "text-destructive"
             )}
           />
-          <Badge variant={pnlPositive ? "default" : "destructive"} className="text-xs font-mono tabular-nums self-start mt-0.5">
+          <Badge variant={pnlPositive ? "default" : "destructive"} className="text-xs font-mono tabular-nums self-start mt-0.5 inline-flex items-center gap-0.5">
+            {pnlPositive ? <ArrowUpRight className="h-3 w-3" strokeWidth={2.5} /> : <ArrowDownRight className="h-3 w-3" strokeWidth={2.5} />}
             {formatPct(summary.total_pnl_pct)}
           </Badge>
         </div>
@@ -50,13 +52,14 @@ export function SummaryBar({ summary }: Props) {
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Today</p>
         <div className="flex items-center gap-2">
           <DualCurrencyAmount
-            value={format(summary.daily_change)}
+            value={formatPnl(summary.daily_change)}
             primaryClassName={cn(
               "text-base font-semibold",
               dailyPositive ? "text-emerald-600 dark:text-emerald-400" : "text-destructive"
             )}
           />
-          <Badge variant={dailyPositive ? "default" : "destructive"} className="text-xs font-mono tabular-nums self-start mt-0.5">
+          <Badge variant={dailyPositive ? "default" : "destructive"} className="text-xs font-mono tabular-nums self-start mt-0.5 inline-flex items-center gap-0.5">
+            {dailyPositive ? <ArrowUpRight className="h-3 w-3" strokeWidth={2.5} /> : <ArrowDownRight className="h-3 w-3" strokeWidth={2.5} />}
             {formatPct(summary.daily_change_pct)}
           </Badge>
         </div>

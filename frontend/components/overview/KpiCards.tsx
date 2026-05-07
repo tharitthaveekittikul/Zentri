@@ -4,11 +4,13 @@ import { cn } from "@/lib/utils";
 import { OverviewSummary } from "@/lib/services/overview";
 import { useDualCurrency, DualValue } from "@/hooks/useDualCurrency";
 import { DualCurrencyAmount } from "@/components/ui/DualCurrencyAmount";
+import { ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { ReactNode } from "react";
 
 interface CardProps {
   label: string;
   value: DualValue;
-  pct?: string;
+  pct?: ReactNode;
   direction?: "positive" | "negative" | "neutral";
 }
 
@@ -65,7 +67,7 @@ interface Props {
 }
 
 export function KpiCards({ summary }: Props) {
-  const { format, formatPct } = useDualCurrency();
+  const { format, formatPnl, formatPct } = useDualCurrency();
 
   const pnlPositive = Number(summary.total_pnl) >= 0;
   const dailyPositive = Number(summary.daily_change) >= 0;
@@ -82,14 +84,14 @@ export function KpiCards({ summary }: Props) {
       />
       <KpiCard
         label="Total P&L"
-        value={format(summary.total_pnl)}
-        pct={formatPct(summary.total_pnl_pct)}
+        value={formatPnl(summary.total_pnl)}
+        pct={<span className="inline-flex items-center gap-0.5">{pnlPositive ? <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={2.5} /> : <ArrowDownRight className="h-3.5 w-3.5" strokeWidth={2.5} />}{formatPct(summary.total_pnl_pct)}</span>}
         direction={pnlPositive ? "positive" : "negative"}
       />
       <KpiCard
         label="Today"
-        value={format(summary.daily_change)}
-        pct={formatPct(summary.daily_change_pct)}
+        value={formatPnl(summary.daily_change)}
+        pct={<span className="inline-flex items-center gap-0.5">{dailyPositive ? <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={2.5} /> : <ArrowDownRight className="h-3.5 w-3.5" strokeWidth={2.5} />}{formatPct(summary.daily_change_pct)}</span>}
         direction={dailyPositive ? "positive" : "negative"}
       />
     </div>

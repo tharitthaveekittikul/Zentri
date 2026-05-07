@@ -1,4 +1,4 @@
-import { ArrowUpRight, TrendingUp, TrendingDown } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface BentoCardProps {
@@ -48,12 +48,11 @@ export function BentoCard({ title, value, trend, className, onClick }: BentoCard
             )}
           >
             {isPositive ? (
-              <TrendingUp className="h-3 w-3" strokeWidth={2} />
+              <ArrowUpRight className="h-3 w-3" strokeWidth={2} />
             ) : (
-              <TrendingDown className="h-3 w-3" strokeWidth={2} />
+              <ArrowDownRight className="h-3 w-3" strokeWidth={2} />
             )}
-            {isPositive ? "+" : ""}
-            {trend.toFixed(2)}%
+            {Math.abs(trend).toFixed(2)}%
           </span>
         </div>
       )}

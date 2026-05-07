@@ -26,9 +26,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Trash2, Pencil, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { Trash2, Pencil, ArrowUpDown, ArrowUp, ArrowDown, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { HoldingRow } from "@/lib/services/portfolio";
-import { PrivacyValue } from "@/components/ui/PrivacyValue";
 import { usePrivacyStore } from "@/store/privacy";
 import { EditHoldingDialog } from "./EditHoldingDialog";
 import {
@@ -102,9 +101,11 @@ export function HoldingsTable({
   function MoneyCell({
     val,
     nativeCurrency,
+    showSign = false,
   }: {
     val: string | null | undefined;
     nativeCurrency: string;
+    showSign?: boolean;
   }) {
     const { isPrivate } = usePrivacyStore();
     if (val == null) return <span>—</span>;
@@ -130,8 +131,10 @@ export function HoldingsTable({
       secondaryVal = num;
     } else {
       if (isPrivate) return <span>****** {nativeCurrency}</span>;
-      return <span>{fmt(num, nativeCurrency)}</span>;
+      return <span>{(showSign && num > 0 ? "+" : "") + fmt(num, nativeCurrency)}</span>;
     }
+
+    const sign = showSign && num > 0 ? "+" : "";
 
     if (isPrivate) {
       return (
@@ -148,10 +151,10 @@ export function HoldingsTable({
 
     return (
       <span>
-        {fmt(primaryVal, primaryCurrency)}
+        {sign}{fmt(primaryVal, primaryCurrency)}
         {secondaryCurrency && secondaryVal != null && (
           <span className="block text-xs text-muted-foreground">
-            ≈ {fmt(secondaryVal, secondaryCurrency)}
+            ≈ {sign}{fmt(secondaryVal, secondaryCurrency)}
           </span>
         )}
       </span>
@@ -207,13 +210,9 @@ export function HoldingsTable({
       ),
       cell: ({ row }) => (
         <span className="font-mono tabular-nums">
-          <PrivacyValue
-            value={
-              <MoneyCell
-                val={row.original.cost_per_share}
-                nativeCurrency={row.original.currency}
-              />
-            }
+          <MoneyCell
+            val={row.original.cost_per_share}
+            nativeCurrency={row.original.currency}
           />
         </span>
       ),
@@ -231,13 +230,9 @@ export function HoldingsTable({
       ),
       cell: ({ row }) => (
         <span className="font-mono tabular-nums">
-          <PrivacyValue
-            value={
-              <MoneyCell
-                val={row.original.total_cost}
-                nativeCurrency={row.original.currency}
-              />
-            }
+          <MoneyCell
+            val={row.original.total_cost}
+            nativeCurrency={row.original.currency}
           />
         </span>
       ),
@@ -255,13 +250,9 @@ export function HoldingsTable({
       ),
       cell: ({ row }) => (
         <span className="font-mono tabular-nums">
-          <PrivacyValue
-            value={
-              <MoneyCell
-                val={row.original.current_price}
-                nativeCurrency={row.original.currency}
-              />
-            }
+          <MoneyCell
+            val={row.original.current_price}
+            nativeCurrency={row.original.currency}
           />
         </span>
       ),
@@ -287,9 +278,9 @@ export function HoldingsTable({
             ? "text-emerald-600 dark:text-emerald-400"
             : "text-destructive";
         return (
-          <span className={`${color} font-mono tabular-nums`}>
-            {num >= 0 ? "+" : ""}
-            {num.toFixed(2)}%
+          <span className={`${color} font-mono tabular-nums inline-flex items-center gap-0.5`}>
+            {num >= 0 ? <ArrowUpRight className="h-3 w-3" strokeWidth={2.5} /> : <ArrowDownRight className="h-3 w-3" strokeWidth={2.5} />}
+            {Math.abs(num).toFixed(2)}%
           </span>
         );
       },
@@ -307,13 +298,9 @@ export function HoldingsTable({
       ),
       cell: ({ row }) => (
         <span className="font-mono tabular-nums">
-          <PrivacyValue
-            value={
-              <MoneyCell
-                val={row.original.holding_value}
-                nativeCurrency={row.original.currency}
-              />
-            }
+          <MoneyCell
+            val={row.original.holding_value}
+            nativeCurrency={row.original.currency}
           />
         </span>
       ),
@@ -346,18 +333,13 @@ export function HoldingsTable({
             : "text-destructive";
         return (
           <span className={`${color} font-mono tabular-nums`}>
-            <PrivacyValue
-              value={
-                <span>
-                  <MoneyCell val={val} nativeCurrency={row.original.currency} />
-                  {pct != null && (
-                    <span className="block text-xs opacity-75">
-                      {pct >= 0 ? "+" : ""}{pct.toFixed(2)}%
-                    </span>
-                  )}
-                </span>
-              }
-            />
+            <MoneyCell val={val} nativeCurrency={row.original.currency} showSign />
+            {pct != null && (
+              <span className="flex items-center gap-0.5 text-xs opacity-75">
+                {pct >= 0 ? <ArrowUpRight className="h-3 w-3" strokeWidth={2.5} /> : <ArrowDownRight className="h-3 w-3" strokeWidth={2.5} />}
+                {Math.abs(pct).toFixed(2)}%
+              </span>
+            )}
           </span>
         );
       },

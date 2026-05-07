@@ -133,14 +133,14 @@ export default function PortfolioPage() {
           <CardContent>
             <p className="text-2xl font-semibold font-mono tabular-nums tracking-tight">
               {isPrivate
-                ? "••••"
+                ? `****** ${displayCurrency}`
                 : summary
                 ? `${parseFloat(summary.total_cost).toLocaleString(undefined, { minimumFractionDigits: 2 })} ${displayCurrency}`
                 : "—"}
             </p>
-            {!isPrivate && summary?.total_cost_secondary != null && (
+            {summary?.total_cost_secondary != null && (
               <p className="text-xs text-muted-foreground mt-1 font-mono tabular-nums">
-                ≈ {parseFloat(summary.total_cost_secondary).toLocaleString(undefined, { minimumFractionDigits: 2 })} {displaySecondaryCurrency}
+                ≈ {isPrivate ? "******" : parseFloat(summary.total_cost_secondary).toLocaleString(undefined, { minimumFractionDigits: 2 })} {displaySecondaryCurrency}
               </p>
             )}
           </CardContent>

@@ -83,10 +83,22 @@ export function useDualCurrency() {
     };
   }
 
-  function formatPct(value: string | number): string {
+  function formatPnl(value: string | number): DualValue {
     const num = Number(value);
-    return `${num >= 0 ? "+" : ""}${fmt(num)}%`;
+    const sign = num >= 0 ? "+" : "";
+    const primary = `${sign}${fmt(num)} ${primaryCurrency}`;
+    let secondary: string | null = null;
+    if (rateData) {
+      const converted = num * Number(rateData.rate);
+      secondary = `≈ ${sign}${fmt(converted)} ${secondaryCurrency}`;
+    }
+    return { primary, secondary, primaryCurrency, secondaryCurrency };
   }
 
-  return { format, formatNative, formatPct, primaryCurrency, secondaryCurrency };
+  function formatPct(value: string | number): string {
+    const num = Number(value);
+    return `${fmt(Math.abs(num))}%`;
+  }
+
+  return { format, formatNative, formatPnl, formatPct, primaryCurrency, secondaryCurrency };
 }
