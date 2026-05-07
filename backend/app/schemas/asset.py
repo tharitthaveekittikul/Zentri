@@ -31,3 +31,10 @@ class AssetResponse(BaseModel):
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class CoinGeckoMatch(BaseModel):
+    id: str
+    symbol: str
+    name: str
+    thumb: str

@@ -1,4 +1,5 @@
 import pytest
+from unittest.mock import AsyncMock, MagicMock, patch
 
 
 @pytest.mark.asyncio
@@ -106,3 +107,37 @@ async def test_delete_asset_not_found(auth_client):
     import uuid
     response = await auth_client.delete(f"/api/v1/assets/{uuid.uuid4()}")
     assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_search_coingecko_returns_coins(auth_client):
+    mock_data = {
+        "coins": [
+            {"id": "bitcoin", "symbol": "btc", "name": "Bitcoin", "thumb": "https://example.com/btc.png"},
+            {"id": "bitcoin-cash", "symbol": "bch", "name": "Bitcoin Cash", "thumb": "https://example.com/bch.png"},
+        ]
+    }
+    mock_response = MagicMock()
+    mock_response.json.return_value = mock_data
+    mock_response.raise_for_status = MagicMock()
+
+    mock_client = AsyncMock()
+    mock_client.get.return_value = mock_response
+
+    with patch("app.api.assets.httpx.AsyncClient") as mock_cls:
+        mock_cls.return_value.__aenter__.return_value = mock_client
+        res = await auth_client.get("/api/v1/assets/search-coingecko?q=bitcoin")
+
+    assert res.status_code == 200
+    data = res.json()
+    assert len(data) == 2
+    assert data[0]["id"] == "bitcoin"
+    assert data[0]["symbol"] == "BTC"
+    assert data[0]["name"] == "Bitcoin"
+    assert "thumb" in data[0]
+
+
+@pytest.mark.asyncio
+async def test_search_coingecko_requires_auth(client):
+    res = await client.get("/api/v1/assets/search-coingecko?q=bitcoin")
+    assert res.status_code == 401

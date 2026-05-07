@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { updateHolding, fetchAsset, updateAsset, lookupThFund, ThFundMatch, HoldingRow } from "@/lib/services/portfolio";
+import { updateHolding, fetchAsset, updateAsset, lookupThFund, searchCoinGecko, CoinGeckoResult, ThFundMatch, HoldingRow } from "@/lib/services/portfolio";
 
 interface Props {
   holding: HoldingRow | null;
@@ -36,6 +36,8 @@ export function EditHoldingDialog({
   const [assetType, setAssetType] = useState("");
   const [projId, setProjId] = useState("");
   const [lookupResults, setLookupResults] = useState<ThFundMatch[]>([]);
+  const [coingeckoId, setCoingeckoId] = useState("");
+  const [coinResults, setCoinResults] = useState<CoinGeckoResult[]>([]);
   const [lookupLoading, setLookupLoading] = useState(false);
   const [assetLoading, setAssetLoading] = useState(false);
 
@@ -69,6 +71,8 @@ export function EditHoldingDialog({
     setAssetName("");
     setProjId("");
     setLookupResults([]);
+    setCoingeckoId("");
+    setCoinResults([]);
     setAssetLoading(true);
     fetchAsset(holding.asset_id)
       .then((asset) => {
@@ -79,6 +83,8 @@ export function EditHoldingDialog({
         setAssetName(asset.name);
         setAssetType(asset.asset_type);
         setProjId(fetchedProjId);
+        const fetchedCoinId = (asset.metadata_?.coingecko_id as string) ?? "";
+        setCoingeckoId(fetchedCoinId);
         if (!fetchedProjId && holding.asset_type === "th_fund") {
           lookupThFund(fetchedSymbol).then((results) => {
             if (cancelled) return;
@@ -95,6 +101,17 @@ export function EditHoldingDialog({
     return () => { cancelled = true; };
   }, [holding, open]);
 
+  useEffect(() => {
+    if (assetType !== "crypto" || symbol.length < 2 || coingeckoId) {
+      setCoinResults([]);
+      return;
+    }
+    const timer = setTimeout(() => {
+      searchCoinGecko(symbol).then(setCoinResults).catch(() => {});
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [symbol, assetType, coingeckoId]);
+
   if (!holding) return null;
 
   async function handleSubmit(e: React.FormEvent) {
@@ -105,6 +122,9 @@ export function EditHoldingDialog({
       const assetUpdate: Parameters<typeof updateAsset>[1] = { symbol, name: assetName, asset_type: assetType };
       if (assetType === "th_fund") {
         assetUpdate.metadata_ = { proj_id: projId.trim() };
+      }
+      if (assetType === "crypto") {
+        assetUpdate.metadata_ = { coingecko_id: coingeckoId.trim() };
       }
       await Promise.all([
         updateAsset(holding.asset_id, assetUpdate),
@@ -211,6 +231,35 @@ export function EditHoldingDialog({
                 <p className="text-xs text-muted-foreground">
                   Required for NAV price fetching.
                 </p>
+              </div>
+            )}
+            {assetType === "crypto" && (
+              <div className="space-y-1 relative">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">CoinGecko ID</p>
+                <Input
+                  value={coingeckoId}
+                  onChange={(e) => { setCoingeckoId(e.target.value); setCoinResults([]); }}
+                  placeholder="e.g. bitcoin"
+                />
+                {coinResults.length > 0 && (
+                  <div className="absolute z-10 w-full bg-background border rounded shadow-md top-full mt-1">
+                    {coinResults.map((coin) => (
+                      <button
+                        key={coin.id}
+                        type="button"
+                        className="w-full text-left px-3 py-2 hover:bg-muted text-sm flex items-center gap-2"
+                        onClick={() => {
+                          setSymbol(coin.symbol);
+                          setCoingeckoId(coin.id);
+                          setCoinResults([]);
+                        }}
+                      >
+                        {coin.thumb && <img src={coin.thumb} alt="" className="w-4 h-4 shrink-0" />}
+                        {coin.name} <span className="text-muted-foreground">({coin.symbol})</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>

@@ -123,6 +123,20 @@ export async function lookupThFund(q: string): Promise<ThFundMatch[]> {
   return res.json();
 }
 
+export interface CoinGeckoResult {
+  id: string;
+  symbol: string;
+  name: string;
+  thumb: string;
+}
+
+export async function searchCoinGecko(q: string): Promise<CoinGeckoResult[]> {
+  if (!q || q.length < 2) return [];
+  const res = await api.get(`/api/v1/assets/search-coingecko?q=${encodeURIComponent(q)}`);
+  if (!res.ok) return [];
+  return res.json();
+}
+
 export interface PortfolioSummary {
   holdings_count: number;
   total_cost: string;
@@ -146,6 +160,7 @@ export async function addHolding(body: {
   quantity: string;
   avg_cost_price: string;
   currency: string;
+  metadata_?: Record<string, unknown>;
 }): Promise<HoldingRow> {
   const res = await api.post("/api/v1/portfolio/holdings", body);
   if (!res.ok) throw new Error("Failed to add holding");

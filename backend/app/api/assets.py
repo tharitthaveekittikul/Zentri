@@ -1,7 +1,8 @@
 import uuid
 from datetime import datetime, timedelta, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, status
+import httpx
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import asc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,7 +12,7 @@ from app.core.encryption import decrypt
 from app.core.logging import get_logger
 from app.models.price import Price
 from app.models.user import User
-from app.schemas.asset import AssetCreate, AssetResponse, AssetUpdate
+from app.schemas.asset import AssetCreate, AssetResponse, AssetUpdate, CoinGeckoMatch
 from app.schemas.price import PriceBar, PriceHistoryResponse
 from app.services import asset as asset_service
 from app.services.th_fund import search_th_funds
@@ -129,6 +130,30 @@ async def lookup_th_fund(
         raise HTTPException(status_code=400, detail="SEC API key not configured — add it in Settings")
     api_key = decrypt(current_user.sec_api_key)
     return await search_th_funds(q, api_key)
+
+
+@router.get("/search-coingecko", response_model=list[CoinGeckoMatch])
+async def search_coingecko(
+    q: str = Query(..., min_length=2),
+    _: User = Depends(get_current_user),
+):
+    async with httpx.AsyncClient(timeout=10) as client:
+        resp = await client.get(
+            "https://api.coingecko.com/api/v3/search",
+            params={"query": q},
+        )
+        resp.raise_for_status()
+        data = resp.json()
+    coins = data.get("coins", [])[:10]
+    return [
+        CoinGeckoMatch(
+            id=c["id"],
+            symbol=c["symbol"].upper(),
+            name=c["name"],
+            thumb=c.get("thumb", ""),
+        )
+        for c in coins
+    ]
 
 
 @router.get("/{asset_id}", response_model=AssetResponse)

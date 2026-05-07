@@ -40,6 +40,9 @@ async def add_holding(
         )
         db.add(asset)
         await db.flush()
+    else:
+        if metadata_:
+            asset.metadata_ = {**(asset.metadata_ or {}), **metadata_}
 
     holding = Holding(
         id=uuid.uuid4(), user_id=user_id, asset_id=asset.id,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { addHolding } from "@/lib/services/portfolio";
+import { addHolding, searchCoinGecko, CoinGeckoResult } from "@/lib/services/portfolio";
 import { Plus } from "lucide-react";
 
 const ASSET_TYPES = [
@@ -46,6 +46,19 @@ export function AddHoldingDialog({ primaryCurrency, onAdded }: Props) {
   const [avgCost, setAvgCost] = useState("");
   const [currency, setCurrency] = useState(primaryCurrency);
   const [loading, setLoading] = useState(false);
+  const [coingeckoId, setCoingeckoId] = useState("");
+  const [coinResults, setCoinResults] = useState<CoinGeckoResult[]>([]);
+
+  useEffect(() => {
+    if (assetType !== "crypto" || coingeckoId.length < 2) {
+      setCoinResults([]);
+      return;
+    }
+    const timer = setTimeout(() => {
+      searchCoinGecko(coingeckoId).then(setCoinResults).catch(() => {});
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [coingeckoId, assetType]);
 
   const totalCost = useMemo(() => {
     const q = parseFloat(quantity);
@@ -66,6 +79,9 @@ export function AddHoldingDialog({ primaryCurrency, onAdded }: Props) {
         quantity,
         avg_cost_price: avgCost,
         currency,
+        ...(assetType === "crypto" && coingeckoId
+          ? { metadata_: { coingecko_id: coingeckoId } }
+          : {}),
       });
       toast.success(`Added ${symbol} to portfolio`);
       setOpen(false);
@@ -73,6 +89,8 @@ export function AddHoldingDialog({ primaryCurrency, onAdded }: Props) {
       setQuantity("");
       setAvgCost("");
       setPurchasedAt("");
+      setCoingeckoId("");
+      setCoinResults([]);
       onAdded();
     } catch {
       toast.error("Failed to add holding");
@@ -108,7 +126,17 @@ export function AddHoldingDialog({ primaryCurrency, onAdded }: Props) {
             </div>
             <div className="space-y-1">
               <Label>Asset Type</Label>
-              <Select value={assetType} onValueChange={(v) => { if (v !== null) setAssetType(v); }}>
+              <Select
+                value={assetType}
+                onValueChange={(v) => {
+                  if (v !== null) {
+                    setAssetType(v);
+                    if (v === "crypto") setCurrency("USD");
+                    setCoingeckoId("");
+                    setCoinResults([]);
+                  }
+                }}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -122,6 +150,36 @@ export function AddHoldingDialog({ primaryCurrency, onAdded }: Props) {
               </Select>
             </div>
           </div>
+          {assetType === "crypto" && (
+            <div className="space-y-1 relative">
+              <Label>CoinGecko ID</Label>
+              <Input
+                value={coingeckoId}
+                onChange={(e) => { setCoingeckoId(e.target.value); }}
+                placeholder="e.g. bitcoin"
+                required
+              />
+              {coinResults.length > 0 && (
+                <div className="absolute z-10 w-full bg-background border rounded shadow-md top-full mt-1">
+                  {coinResults.map((coin) => (
+                    <button
+                      key={coin.id}
+                      type="button"
+                      className="w-full text-left px-3 py-2 hover:bg-muted text-sm flex items-center gap-2"
+                      onClick={() => {
+                        setSymbol(coin.symbol);
+                        setCoingeckoId(coin.id);
+                        setCoinResults([]);
+                      }}
+                    >
+                      {coin.thumb && <img src={coin.thumb} alt="" className="w-4 h-4 shrink-0" />}
+                      {coin.name} <span className="text-muted-foreground">({coin.symbol})</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
           <div className="space-y-1">
             <Label>First Purchase Date (optional)</Label>
             <Input
