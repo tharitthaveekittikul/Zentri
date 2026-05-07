@@ -2,15 +2,12 @@
 
 import React, { useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   type PipelineJob,
   type JobType,
-  triggerJob,
 } from "@/lib/services/pipeline";
 import { StepList } from "@/components/pipeline/StepList";
-import { toast } from "sonner";
 
 const STATUS_VARIANT: Record<
   string,
@@ -35,13 +32,6 @@ const JOB_LABELS: Record<JobType, string> = {
   price_fetch_th_fund: "Thai Fund",
 };
 
-const ALL_TRIGGER_TYPES: JobType[] = [
-  "price_fetch_us",
-  "price_fetch_crypto",
-  "price_fetch_gold",
-  "price_fetch_benchmark",
-];
-
 interface JobsTableProps {
   jobs: PipelineJob[];
 }
@@ -58,31 +48,10 @@ export function JobsTable({ jobs }: JobsTableProps) {
     });
   }
 
-  async function handleTrigger(jobType: JobType) {
-    try {
-      await triggerJob(jobType);
-      toast.success(`${JOB_LABELS[jobType]} job enqueued`);
-    } catch {
-      toast.error(`Failed to trigger ${JOB_LABELS[jobType]} job`);
-    }
-  }
-
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader>
         <CardTitle>Pipeline Jobs</CardTitle>
-        <div className="flex gap-2 flex-wrap">
-          {ALL_TRIGGER_TYPES.map((jt) => (
-            <Button
-              key={jt}
-              size="sm"
-              variant="outline"
-              onClick={() => handleTrigger(jt)}
-            >
-              Run {JOB_LABELS[jt]}
-            </Button>
-          ))}
-        </div>
       </CardHeader>
       <CardContent>
         <table className="w-full text-sm">
