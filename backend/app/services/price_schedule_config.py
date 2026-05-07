@@ -140,8 +140,8 @@ async def should_run_job(db: AsyncSession, job_key: str) -> bool:
             .limit(1)
         )
         last_log = last_result.scalar_one_or_none()
-        if last_log and last_log.finished_at:
-            elapsed_min = (datetime.now(timezone.utc) - last_log.finished_at).total_seconds() / 60
+        if last_log and last_log.started_at:
+            elapsed_min = (datetime.now(timezone.utc) - last_log.started_at).total_seconds() / 60
             if elapsed_min < config.interval_minutes:
                 logger.debug("job %s skipped: only %.1f min since last run (interval=%d)", job_key, elapsed_min, config.interval_minutes)
                 return False
