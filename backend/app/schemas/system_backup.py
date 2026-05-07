@@ -15,6 +15,7 @@ class BackupSettings(BaseModel):
     privacy_mode: bool = False
     telegram_chat_id: Optional[str] = None
     telegram_bot_token: Optional[str] = None
+    sec_api_key: Optional[str] = None
 
 
 class BackupHolding(BaseModel):

@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { updateHolding, fetchAsset, updateAsset, HoldingRow } from "@/lib/services/portfolio";
+import { updateHolding, fetchAsset, updateAsset, lookupThFund, ThFundMatch, HoldingRow } from "@/lib/services/portfolio";
 
 interface Props {
   holding: HoldingRow | null;
@@ -33,7 +33,28 @@ export function EditHoldingDialog({
   const [loading, setLoading] = useState(false);
   const [symbol, setSymbol] = useState("");
   const [assetName, setAssetName] = useState("");
+  const [projId, setProjId] = useState("");
+  const [lookupResults, setLookupResults] = useState<ThFundMatch[]>([]);
+  const [lookupLoading, setLookupLoading] = useState(false);
   const [assetLoading, setAssetLoading] = useState(false);
+
+  async function triggerLookup(query: string) {
+    if (!query) return;
+    setLookupLoading(true);
+    setLookupResults([]);
+    try {
+      const results = await lookupThFund(query);
+      if (results.length === 1) {
+        setProjId(results[0].proj_id);
+      } else {
+        setLookupResults(results);
+      }
+    } catch {
+      toast.error("Fund lookup failed");
+    } finally {
+      setLookupLoading(false);
+    }
+  }
 
   useEffect(() => {
     if (!holding || !open) return;
@@ -44,12 +65,26 @@ export function EditHoldingDialog({
     setPlatform(holding.platform ?? "");
     setSymbol(holding.symbol);
     setAssetName("");
+    setProjId("");
+    setLookupResults([]);
     setAssetLoading(true);
     fetchAsset(holding.asset_id)
       .then((asset) => {
-        if (!cancelled) {
-          setSymbol(asset.symbol);
-          setAssetName(asset.name);
+        if (cancelled) return;
+        const fetchedSymbol = asset.symbol;
+        const fetchedProjId = (asset.metadata_?.proj_id as string) ?? "";
+        setSymbol(fetchedSymbol);
+        setAssetName(asset.name);
+        setProjId(fetchedProjId);
+        if (!fetchedProjId && holding.asset_type === "th_fund") {
+          lookupThFund(fetchedSymbol).then((results) => {
+            if (cancelled) return;
+            if (results.length === 1) {
+              setProjId(results[0].proj_id);
+            } else if (results.length > 1) {
+              setLookupResults(results);
+            }
+          }).catch(() => {});
         }
       })
       .catch(() => { if (!cancelled) toast.error("Could not load asset details"); })
@@ -64,8 +99,12 @@ export function EditHoldingDialog({
     if (!holding) return;
     setLoading(true);
     try {
+      const assetUpdate: Parameters<typeof updateAsset>[1] = { symbol, name: assetName };
+      if (holding.asset_type === "th_fund") {
+        assetUpdate.metadata_ = { proj_id: projId.trim() };
+      }
       await Promise.all([
-        updateAsset(holding.asset_id, { symbol, name: assetName }),
+        updateAsset(holding.asset_id, assetUpdate),
         updateHolding(holding.id, {
           quantity,
           avg_cost_price: costPerShare,
@@ -116,6 +155,52 @@ export function EditHoldingDialog({
                 />
               </div>
             </div>
+            {holding.asset_type === "th_fund" && (
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <Label>SEC Project ID</Label>
+                  <button
+                    type="button"
+                    onClick={() => triggerLookup(symbol)}
+                    disabled={lookupLoading || assetLoading || !symbol}
+                    className="text-xs text-primary hover:underline disabled:opacity-40"
+                  >
+                    {lookupLoading ? "Searching…" : "Lookup by symbol"}
+                  </button>
+                </div>
+                <Input
+                  value={projId}
+                  onChange={(e) => { setProjId(e.target.value); setLookupResults([]); }}
+                  disabled={assetLoading}
+                  placeholder="e.g. M0000_2552"
+                />
+                {lookupResults.length > 0 && (
+                  <div className="border rounded-md divide-y text-xs max-h-40 overflow-y-auto">
+                    {lookupResults.map((r) => (
+                      <button
+                        key={r.proj_id}
+                        type="button"
+                        onClick={() => {
+                          setProjId(r.proj_id);
+                          if (!assetName) setAssetName(r.proj_name_en || r.proj_abbr_name);
+                          setLookupResults([]);
+                        }}
+                        className="w-full text-left px-3 py-2 hover:bg-muted"
+                      >
+                        <span className="font-medium">{r.proj_abbr_name}</span>
+                        <span className="text-muted-foreground ml-2">{r.proj_id}</span>
+                        {r.proj_name_en && (
+                          <div className="text-muted-foreground truncate">{r.proj_name_en}</div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <p className="text-xs text-muted-foreground">
+                  Required for NAV price fetching.
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Holding section */}

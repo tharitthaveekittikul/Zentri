@@ -36,6 +36,7 @@ export interface AssetDetail {
   name: string;
   asset_type: string;
   currency: string;
+  metadata_?: Record<string, unknown>;
 }
 
 export async function fetchAsset(assetId: string): Promise<AssetDetail> {
@@ -46,10 +47,26 @@ export async function fetchAsset(assetId: string): Promise<AssetDetail> {
 
 export async function updateAsset(
   assetId: string,
-  data: { symbol?: string; name?: string },
+  data: { symbol?: string; name?: string; metadata_?: Record<string, unknown> },
 ): Promise<AssetDetail> {
   const res = await api.patch(`/api/v1/assets/${assetId}`, data);
   if (!res.ok) throw new Error("Failed to update asset");
+  return res.json();
+}
+
+export interface ThFundMatch {
+  proj_id: string;
+  proj_abbr_name: string;
+  proj_name_en: string;
+  proj_name_th: string;
+  fund_status: string;
+  management_style: string;
+  policy_desc: string;
+}
+
+export async function lookupThFund(q: string): Promise<ThFundMatch[]> {
+  const res = await api.get(`/api/v1/assets/th-fund/lookup?q=${encodeURIComponent(q)}`);
+  if (!res.ok) return [];
   return res.json();
 }
 

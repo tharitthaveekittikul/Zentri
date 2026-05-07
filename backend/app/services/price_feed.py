@@ -9,10 +9,14 @@ import yfinance as yf
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.encryption import decrypt
 from app.core.logging import get_logger
 from app.models.asset import Asset
 from app.models.benchmark import Benchmark, BenchmarkPrice
 from app.models.price import Price
+from app.models.user import User
+
+SEC_BASE_URL = "https://api.sec.or.th"
 
 logger = get_logger(__name__)
 
@@ -68,9 +72,9 @@ async def _upsert_benchmark_prices(db: AsyncSession, rows: list[dict]) -> int:
 # ---------------------------------------------------------------------------
 
 async def fetch_us_prices(db: AsyncSession) -> dict:
-    """Fetch latest daily OHLCV for all us_stock assets via yfinance."""
+    """Fetch latest daily OHLCV for all us_stock and etf assets via yfinance."""
     result = await db.execute(
-        select(Asset).where(Asset.asset_type == "us_stock")
+        select(Asset).where(Asset.asset_type.in_(["us_stock", "etf"]))
     )
     assets = list(result.scalars().all())
     if not assets:
@@ -108,6 +112,57 @@ async def fetch_us_prices(db: AsyncSession) -> dict:
     rows, fetched_symbols = await asyncio.get_event_loop().run_in_executor(None, _fetch)
     inserted = await _upsert_prices(db, rows)
     logger.info("fetch_us_prices: upserted %d rows for %d symbols", inserted, len(fetched_symbols))
+    return {"table": "prices", "inserted": inserted, "symbols": len(fetched_symbols), "tickers": fetched_symbols}
+
+
+# ---------------------------------------------------------------------------
+# Thai Stocks + Thai DRs (SET via yfinance, .BK suffix)
+# ---------------------------------------------------------------------------
+
+async def fetch_thai_stock_prices(db: AsyncSession) -> dict:
+    """Fetch latest daily OHLCV for all thai_stock and thai_dr assets via yfinance.
+
+    Appends .BK suffix to each symbol to form the SET ticker (e.g. PTT → PTT.BK).
+    """
+    result = await db.execute(
+        select(Asset).where(Asset.asset_type.in_(["thai_stock", "thai_dr"]))
+    )
+    assets = list(result.scalars().all())
+    if not assets:
+        logger.info("fetch_thai_stock_prices: no thai_stock/thai_dr assets found")
+        return {"inserted": 0, "symbols": 0, "tickers": []}
+
+    asset_map = {f"{a.symbol}.BK": a.id for a in assets}
+    yf_symbols = list(asset_map.keys())
+
+    logger.info("fetch_thai_stock_prices: fetching %d symbols", len(yf_symbols))
+
+    def _fetch():
+        tickers = yf.Tickers(" ".join(yf_symbols))
+        rows = []
+        fetched = []
+        for yf_sym, asset_id in asset_map.items():
+            try:
+                hist = tickers.tickers[yf_sym].history(period="5d", interval="1d")
+                if not hist.empty:
+                    fetched.append(yf_sym)
+                for ts, row in hist.iterrows():
+                    rows.append({
+                        "asset_id": asset_id,
+                        "timestamp": ts.to_pydatetime().replace(tzinfo=timezone.utc),
+                        "open": _to_decimal(row.get("Open")),
+                        "high": _to_decimal(row.get("High")),
+                        "low": _to_decimal(row.get("Low")),
+                        "close": _to_decimal(row.get("Close")),
+                        "volume": _to_decimal(row.get("Volume")),
+                    })
+            except Exception as e:
+                logger.warning("fetch_thai_stock_prices: failed for %s: %s", yf_sym, e)
+        return rows, fetched
+
+    rows, fetched_symbols = await asyncio.get_event_loop().run_in_executor(None, _fetch)
+    inserted = await _upsert_prices(db, rows)
+    logger.info("fetch_thai_stock_prices: upserted %d rows for %d symbols", inserted, len(fetched_symbols))
     return {"table": "prices", "inserted": inserted, "symbols": len(fetched_symbols), "tickers": fetched_symbols}
 
 
@@ -265,3 +320,119 @@ async def fetch_benchmark_prices(db: AsyncSession) -> int:
     inserted = await _upsert_benchmark_prices(db, rows)
     logger.info("fetch_benchmark_prices: upserted %d rows", inserted)
     return {"table": "benchmark_prices", "inserted": inserted, "benchmarks": [bm.symbol for bm in benchmarks]}
+
+
+# ---------------------------------------------------------------------------
+# Thai Mutual Funds (SEC Thailand API v2)
+# ---------------------------------------------------------------------------
+
+async def _fetch_th_fund_for_user(
+    client: httpx.AsyncClient,
+    assets: list,
+    api_key: str,
+    today: str,
+) -> tuple[list[dict], list[str], list[str]]:
+    """Fetch NAV rows for a single user's th_fund assets. Returns (rows, fetched, skipped)."""
+    headers = {
+        "Ocp-Apim-Subscription-Key": api_key,
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache",
+    }
+    rows: list[dict] = []
+    fetched: list[str] = []
+    skipped: list[str] = []
+
+    for asset in assets:
+        proj_id = (asset.metadata_ or {}).get("proj_id")
+        if not proj_id:
+            logger.warning("fetch_th_fund_prices: asset %s missing proj_id in metadata", asset.symbol)
+            skipped.append(asset.symbol)
+            continue
+
+        params: dict = {
+            "proj_id": proj_id,
+            "start_nav_date": today,
+            "end_nav_date": today,
+            "page_size": 100,
+        }
+        fund_class = (asset.metadata_ or {}).get("fund_class_name")
+        if fund_class:
+            params["fund_class_name"] = fund_class
+
+        try:
+            resp = await client.get(
+                f"{SEC_BASE_URL}/v2/fund/daily-info/nav",
+                headers=headers,
+                params=params,
+            )
+            if resp.status_code == 204:
+                logger.debug("fetch_th_fund_prices: no NAV for %s on %s (holiday/weekend)", proj_id, today)
+                continue
+            resp.raise_for_status()
+            data = resp.json()
+
+            for item in data.get("items", []):
+                nav_val = _to_decimal(item.get("last_val"))
+                nav_date_str = item.get("nav_date")
+                if not nav_val or not nav_date_str:
+                    continue
+                nav_dt = datetime.strptime(nav_date_str, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+                rows.append({
+                    "asset_id": asset.id,
+                    "timestamp": nav_dt,
+                    "open": None,
+                    "high": None,
+                    "low": None,
+                    "close": nav_val,
+                    "volume": None,
+                })
+                fetched.append(asset.symbol)
+
+            await asyncio.sleep(0.01)  # 10ms between calls per SEC rate limit guidance
+        except Exception as e:
+            logger.warning("fetch_th_fund_prices: failed for %s (%s): %s", asset.symbol, proj_id, e)
+
+    return rows, fetched, skipped
+
+
+async def fetch_th_fund_prices(db: AsyncSession) -> dict:
+    """Fetch daily NAV for all th_fund assets via SEC Thailand Open API v2.
+
+    Iterates per user — each user must have sec_api_key configured in settings.
+    Requires asset.metadata_['proj_id'] to be set (e.g. 'M0000_2552').
+    """
+    users_result = await db.execute(
+        select(User).join(Asset, Asset.user_id == User.id)
+        .where(Asset.asset_type == "th_fund")
+        .distinct()
+    )
+    users = list(users_result.scalars().all())
+    if not users:
+        logger.info("fetch_th_fund_prices: no users with th_fund assets")
+        return {"inserted": 0, "funds": [], "skipped": []}
+
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    all_rows: list[dict] = []
+    all_fetched: list[str] = []
+    all_skipped: list[str] = []
+
+    async with httpx.AsyncClient(timeout=30) as client:
+        for user in users:
+            if not user.sec_api_key:
+                logger.warning("fetch_th_fund_prices: user %s has no SEC API key — skipping", user.id)
+                continue
+            api_key = decrypt(user.sec_api_key)
+
+            assets_result = await db.execute(
+                select(Asset).where(Asset.asset_type == "th_fund", Asset.user_id == user.id)
+            )
+            assets = list(assets_result.scalars().all())
+
+            rows, fetched, skipped = await _fetch_th_fund_for_user(client, assets, api_key, today)
+            all_rows.extend(rows)
+            all_fetched.extend(fetched)
+            all_skipped.extend(skipped)
+
+    inserted = await _upsert_prices(db, all_rows)
+    logger.info("fetch_th_fund_prices: upserted %d rows for %d funds", inserted, len(all_fetched))
+    return {"table": "prices", "inserted": inserted, "funds": all_fetched, "skipped": all_skipped}

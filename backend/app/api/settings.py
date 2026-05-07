@@ -257,6 +257,41 @@ async def test_telegram(
     return {"ok": True}
 
 
+class SecApiConfigIn(BaseModel):
+    api_key: str
+
+
+class SecApiConfigOut(BaseModel):
+    has_key: bool
+
+
+@router.get("/sec-api", response_model=SecApiConfigOut)
+async def get_sec_api_config(
+    current_user: User = Depends(get_current_user),
+):
+    return SecApiConfigOut(has_key=bool(current_user.sec_api_key))
+
+
+@router.put("/sec-api", response_model=SecApiConfigOut)
+async def save_sec_api_config(
+    body: SecApiConfigIn,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    current_user.sec_api_key = encrypt(body.api_key)
+    await db.commit()
+    return SecApiConfigOut(has_key=True)
+
+
+@router.delete("/sec-api", status_code=204)
+async def delete_sec_api_config(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    current_user.sec_api_key = None
+    await db.commit()
+
+
 class PrivacySettingsOut(BaseModel):
     privacy_mode: bool
 

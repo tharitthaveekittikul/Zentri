@@ -27,3 +27,4 @@ class User(Base):
     telegram_bot_token: Mapped[str | None] = mapped_column(Text(), nullable=True, default=None)
     telegram_chat_id: Mapped[str | None] = mapped_column(String(100), nullable=True, default=None)
     privacy_mode: Mapped[bool] = mapped_column(Boolean(), nullable=False, default=False)
+    sec_api_key: Mapped[str | None] = mapped_column(Text(), nullable=True, default=None)

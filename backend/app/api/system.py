@@ -21,7 +21,7 @@ async def export_system(
     db: AsyncSession = Depends(get_db),
 ):
     backup = await backup_service.export_backup(db, current_user)
-    filename = f"zentri-backup-{datetime.now(timezone.utc).strftime('%Y-%m-%d')}.json"
+    filename = f"zentri-backup-{datetime.now(timezone.utc).strftime('%Y-%m-%d_%H%M%S')}.json"
     return JSONResponse(
         content=backup.model_dump(mode="json"),
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},

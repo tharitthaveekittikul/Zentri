@@ -50,6 +50,9 @@ async def export_backup(db: AsyncSession, user: User) -> SystemBackup:
         telegram_bot_token=(
             decrypt(user.telegram_bot_token) if user.telegram_bot_token else None
         ),
+        sec_api_key=(
+            decrypt(user.sec_api_key) if user.sec_api_key else None
+        ),
     )
 
     # Holdings
@@ -273,6 +276,7 @@ async def import_backup(db: AsyncSession, user: User, backup: SystemBackup) -> N
     user.privacy_mode = s.privacy_mode
     user.telegram_chat_id = s.telegram_chat_id
     user.telegram_bot_token = encrypt(s.telegram_bot_token) if s.telegram_bot_token else None
+    user.sec_api_key = encrypt(s.sec_api_key) if s.sec_api_key else None
 
     # Provider configs — build name→id map for feature config linking
     provider_name_to_id: dict[str, uuid.UUID] = {}

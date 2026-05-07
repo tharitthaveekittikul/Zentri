@@ -7,7 +7,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base
 
-ASSET_TYPES = ("us_stock", "thai_stock", "th_fund", "etf", "crypto", "gold", "cash")
+ASSET_TYPES = ("us_stock", "thai_stock", "thai_dr", "th_fund", "etf", "crypto", "gold", "cash")
 
 
 class Asset(Base):

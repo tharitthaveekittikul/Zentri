@@ -7,11 +7,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user
 from app.core.database import get_db
+from app.core.encryption import decrypt
 from app.models.price import Price
 from app.models.user import User
 from app.schemas.asset import AssetCreate, AssetResponse, AssetUpdate
 from app.schemas.price import PriceBar, PriceHistoryResponse
 from app.services import asset as asset_service
+from app.services.th_fund import search_th_funds
 
 router = APIRouter(prefix="/assets", tags=["assets"])
 
@@ -67,6 +69,18 @@ async def get_asset_history_by_symbol(
     )
     bars = list(result.scalars().all())
     return PriceHistoryResponse(asset_id=asset.id, bars=bars)
+
+
+@router.get("/th-fund/lookup")
+async def lookup_th_fund(
+    q: str,
+    current_user: User = Depends(get_current_user),
+):
+    """Search for active TH mutual funds by name/abbreviation via SEC API v2."""
+    if not current_user.sec_api_key:
+        raise HTTPException(status_code=400, detail="SEC API key not configured — add it in Settings")
+    api_key = decrypt(current_user.sec_api_key)
+    return await search_th_funds(q, api_key)
 
 
 @router.get("/{asset_id}", response_model=AssetResponse)

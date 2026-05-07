@@ -40,6 +40,8 @@ export default function SettingsPage() {
   const [telegramChatId, setTelegramChatId] = useState("");
   const [telegramHasToken, setTelegramHasToken] = useState(false);
   const [telegramTesting, setTelegramTesting] = useState(false);
+  const [secApiKey, setSecApiKey] = useState("");
+  const [secApiHasKey, setSecApiHasKey] = useState(false);
 
   useEffect(() => {
     api
@@ -89,6 +91,37 @@ export default function SettingsPage() {
       })
       .catch(() => null);
   }, []);
+
+  useEffect(() => {
+    api
+      .get("/api/v1/settings/sec-api")
+      .then((r) => r.json())
+      .then((d) => setSecApiHasKey(d.has_key))
+      .catch(() => null);
+  }, []);
+
+  async function saveSecApiKey() {
+    if (!secApiKey) return;
+    try {
+      await api.put("/api/v1/settings/sec-api", { api_key: secApiKey });
+      setSecApiHasKey(true);
+      setSecApiKey("");
+      toast.success("SEC API key saved");
+    } catch {
+      toast.error("Failed to save SEC API key");
+    }
+  }
+
+  async function deleteSecApiKey() {
+    try {
+      await api.delete("/api/v1/settings/sec-api");
+      setSecApiHasKey(false);
+      setSecApiKey("");
+      toast.success("SEC API key removed");
+    } catch {
+      toast.error("Failed to remove SEC API key");
+    }
+  }
 
   async function saveCurrencyPrefs() {
     await api.patch("/api/v1/settings/display", {
@@ -152,6 +185,7 @@ export default function SettingsPage() {
         <TabsList>
           <TabsTrigger value="general">General</TabsTrigger>
           <TabsTrigger value="ai">AI & LLM</TabsTrigger>
+          <TabsTrigger value="integrations">Integrations</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
         </TabsList>
 
@@ -316,6 +350,57 @@ export default function SettingsPage() {
 
         <TabsContent value="ai" className="mt-4">
           <AISettings />
+        </TabsContent>
+
+        <TabsContent value="integrations" className="space-y-6 mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>SEC Open API (Thai Funds)</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="rounded-md bg-muted px-4 py-3 text-xs text-muted-foreground space-y-1">
+                <p className="font-medium text-foreground">How to get your API key</p>
+                <p>1. Register at <span className="font-mono">secopendata.sec.or.th</span></p>
+                <p>2. Go to <strong>SEC Open APIs</strong> → subscribe to <strong>Fund Daily Info</strong></p>
+                <p>3. Copy your <strong>Ocp-Apim-Subscription-Key</strong> and paste it below</p>
+                <p className="text-xs mt-1">Required for automatic Thai mutual fund (กองทุนรวม) NAV price fetching.</p>
+              </div>
+              <div className="space-y-3">
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Subscription Key</label>
+                  <Input
+                    type="password"
+                    placeholder={secApiHasKey ? "••••••••" : "Paste your SEC API key"}
+                    value={secApiKey}
+                    onChange={(e) => setSecApiKey(e.target.value)}
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={saveSecApiKey}
+                    disabled={!secApiKey}
+                    className="hover:bg-primary/90 active:scale-95 transition-all cursor-pointer"
+                  >
+                    Save
+                  </Button>
+                  {secApiHasKey && (
+                    <Button
+                      variant="outline"
+                      onClick={deleteSecApiKey}
+                      className="text-destructive hover:text-destructive active:scale-95 transition-all cursor-pointer"
+                    >
+                      Remove
+                    </Button>
+                  )}
+                </div>
+                {secApiHasKey && (
+                  <p className="text-xs text-muted-foreground">
+                    API key saved. TH fund NAV will be fetched daily at 18:00 Bangkok time.
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="notifications" className="space-y-6 mt-4">

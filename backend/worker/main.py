@@ -12,6 +12,8 @@ from worker.jobs.price_fetch import (
     job_fetch_benchmark_prices,
     job_fetch_price_gold,
     job_fetch_prices_crypto,
+    job_fetch_prices_th_fund,
+    job_fetch_prices_thai_stock,
     job_fetch_prices_us,
 )
 from worker.jobs.watchlist_alert import job_check_watchlist_alerts
@@ -42,6 +44,8 @@ class WorkerSettings:
         job_fetch_prices_crypto,
         job_fetch_price_gold,
         job_fetch_benchmark_prices,
+        job_fetch_prices_th_fund,
+        job_fetch_prices_thai_stock,
         job_ingest_document,
         job_run_analysis,
         job_snapshot_net_worth,
@@ -56,6 +60,8 @@ class WorkerSettings:
         cron(job_fetch_prices_crypto, minute={0, 15, 30, 45}),
         cron(job_fetch_price_gold, minute={0, 15, 30, 45}),
         cron(job_fetch_benchmark_prices, minute=0),
+        cron(job_fetch_prices_thai_stock, hour=10, minute=0),  # 17:00 Bangkok (UTC+7), after SET close 16:30
+        cron(job_fetch_prices_th_fund, hour=11, minute=0),  # 18:00 Bangkok (UTC+7), after NAV publish
         cron(job_snapshot_net_worth, hour=1, minute=0),
         cron(job_fetch_dividends, weekday=0, hour=2, minute=0),
     ]
