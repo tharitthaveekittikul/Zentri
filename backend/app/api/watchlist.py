@@ -92,7 +92,7 @@ async def _item_to_out(db: AsyncSession, item: WatchlistItem) -> WatchlistItemOu
         alert_enabled=item.alert_enabled,
         alerted_at=item.alerted_at,
         created_at=item.created_at,
-        asset=AssetSummary(id=asset.id, symbol=asset.symbol, name=asset.name, currency=asset.currency),
+        asset=AssetSummary(id=asset.id, symbol=asset.symbol, name=asset.name, currency=asset.currency, asset_type=asset.asset_type, metadata_=asset.metadata_ or {}),
         current_price=current_price,
         pct_from_target=pct,
         last_verdict=analysis.verdict if analysis else None,

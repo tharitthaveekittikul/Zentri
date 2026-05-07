@@ -188,6 +188,8 @@ async def get_calendar(
             "quantity_held": qty,
             "projected_total_usd": projected_usd,
             "projected_total_secondary": projected_secondary,
+            "asset_type": asset.asset_type,
+            "metadata_": asset.metadata_ or {},
         })
         months_dict[key]["total_projected_usd"] += projected_usd
 

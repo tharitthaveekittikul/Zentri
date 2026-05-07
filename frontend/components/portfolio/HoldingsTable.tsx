@@ -52,6 +52,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { TickerLogo } from "@/components/ui/TickerLogo";
 
 interface TableParams {
   search: string;
@@ -134,7 +135,10 @@ export function HoldingsTable({
           className="hover:underline"
           prefetch={false}
         >
-          {row.original.symbol}
+          <div className="flex items-center gap-2">
+            <TickerLogo symbol={row.original.symbol} logoUrl={row.original.metadata_?.logo_url as string | undefined} />
+            <span>{row.original.symbol}</span>
+          </div>
         </Link>
       ),
     },

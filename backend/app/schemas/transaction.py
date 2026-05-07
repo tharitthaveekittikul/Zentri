@@ -56,6 +56,7 @@ class TransactionRow(BaseModel):
     source: str
     executed_at: datetime
     created_at: datetime
+    metadata_: dict = {}
 
     model_config = {"from_attributes": False}
 

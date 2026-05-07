@@ -29,6 +29,7 @@ import {
 } from "@/lib/services/events";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { TickerLogo } from "@/components/ui/TickerLogo";
 import { useDualCurrency } from "@/hooks/useDualCurrency";
 import { DualCurrencyAmount } from "@/components/ui/DualCurrencyAmount";
 
@@ -144,6 +145,7 @@ function CalendarGrid({
                     }`}
                   >
                     {ev.is_in_watchlist && <span>★</span>}
+                    <TickerLogo symbol={ev.symbol} logoUrl={ev.metadata_?.logo_url as string | undefined} size={16} />
                     {ev.symbol}
                   </div>
                 ))}
@@ -440,8 +442,11 @@ export default function EventsPage() {
               .map((ev) => (
                 <TableRow key={ev.id}>
                   <TableCell className="font-medium">
-                    {ev.is_in_watchlist && <span className="text-yellow-500 mr-1">★</span>}
-                    {ev.symbol}
+                    <div className="flex items-center gap-2">
+                      {ev.is_in_watchlist && <span className="text-yellow-500">★</span>}
+                      <TickerLogo symbol={ev.symbol} logoUrl={ev.metadata_?.logo_url as string | undefined} />
+                      <span>{ev.symbol}</span>
+                    </div>
                   </TableCell>
                   <TableCell>
                     <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${

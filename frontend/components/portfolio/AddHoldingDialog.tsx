@@ -47,6 +47,7 @@ export function AddHoldingDialog({ primaryCurrency, onAdded }: Props) {
   const [currency, setCurrency] = useState(primaryCurrency);
   const [loading, setLoading] = useState(false);
   const [coingeckoId, setCoingeckoId] = useState("");
+  const [coinThumb, setCoinThumb] = useState("");
   const [coinResults, setCoinResults] = useState<CoinGeckoResult[]>([]);
 
   useEffect(() => {
@@ -80,7 +81,7 @@ export function AddHoldingDialog({ primaryCurrency, onAdded }: Props) {
         avg_cost_price: avgCost,
         currency,
         ...(assetType === "crypto" && coingeckoId
-          ? { metadata_: { coingecko_id: coingeckoId } }
+          ? { metadata_: { coingecko_id: coingeckoId, ...(coinThumb ? { logo_url: coinThumb } : {}) } }
           : {}),
       });
       toast.success(`Added ${symbol} to portfolio`);
@@ -90,6 +91,7 @@ export function AddHoldingDialog({ primaryCurrency, onAdded }: Props) {
       setAvgCost("");
       setPurchasedAt("");
       setCoingeckoId("");
+      setCoinThumb("");
       setCoinResults([]);
       onAdded();
     } catch {
@@ -133,6 +135,7 @@ export function AddHoldingDialog({ primaryCurrency, onAdded }: Props) {
                     setAssetType(v);
                     if (v === "crypto") setCurrency("USD");
                     setCoingeckoId("");
+                    setCoinThumb("");
                     setCoinResults([]);
                   }
                 }}
@@ -167,8 +170,9 @@ export function AddHoldingDialog({ primaryCurrency, onAdded }: Props) {
                       type="button"
                       className="w-full text-left px-3 py-2 hover:bg-muted text-sm flex items-center gap-2"
                       onClick={() => {
-                        setSymbol(coin.symbol);
+                        setSymbol(coin.symbol.toUpperCase());
                         setCoingeckoId(coin.id);
+                        setCoinThumb(coin.thumb || "");
                         setCoinResults([]);
                       }}
                     >

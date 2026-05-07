@@ -10,6 +10,8 @@ class AssetSummary(BaseModel):
     symbol: str
     name: str
     currency: str
+    asset_type: str
+    metadata_: dict = {}
     model_config = ConfigDict(from_attributes=True)
 
 

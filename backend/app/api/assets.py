@@ -27,8 +27,17 @@ async def create_asset(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    import asyncio
+    from app.services.logo import get_logo_url
+    metadata = dict(body.metadata_)
+    if "logo_url" not in metadata:
+        logo = await asyncio.get_running_loop().run_in_executor(
+            None, get_logo_url, body.symbol, body.asset_type
+        )
+        if logo:
+            metadata["logo_url"] = logo
     return await asset_service.create_asset(
-        db, current_user.id, body.symbol, body.asset_type, body.name, body.currency, body.metadata_
+        db, current_user.id, body.symbol, body.asset_type, body.name, body.currency, metadata
     )
 
 
@@ -132,7 +141,7 @@ async def refresh_asset_names(
                 pass
         return results
 
-    name_map = await asyncio.get_event_loop().run_in_executor(None, _fetch)
+    name_map = await asyncio.get_running_loop().run_in_executor(None, _fetch)
 
     updated = 0
     for asset in assets:
@@ -141,6 +150,47 @@ async def refresh_asset_names(
             updated += 1
     await db.commit()
     logger.info("refresh_asset_names: updated %d/%d assets for user=%s", updated, len(assets), current_user.id)
+    return {"updated": updated, "total": len(assets)}
+
+
+@router.post("/backfill-logos")
+async def backfill_logos(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    import asyncio
+    import httpx
+    from app.services.logo import get_logo_url, _SUPPORTED_TYPES
+
+    assets = await asset_service.get_all_assets(db, current_user.id)
+    updated = 0
+    for asset in assets:
+        if asset.metadata_.get("logo_url"):
+            continue
+        logo: str | None = None
+        if asset.asset_type == "crypto":
+            coingecko_id = asset.metadata_.get("coingecko_id")
+            if coingecko_id:
+                try:
+                    async with httpx.AsyncClient(timeout=5) as client:
+                        r = await client.get(
+                            "https://api.coingecko.com/api/v3/search",
+                            params={"query": coingecko_id},
+                        )
+                    coins = r.json().get("coins", [])
+                    match = next((c for c in coins if c.get("id") == coingecko_id), None)
+                    if match:
+                        logo = match.get("thumb")
+                except Exception:
+                    pass
+        elif asset.asset_type in _SUPPORTED_TYPES:
+            logo = await asyncio.get_running_loop().run_in_executor(
+                None, get_logo_url, asset.symbol, asset.asset_type
+            )
+        if logo:
+            asset.metadata_ = {**asset.metadata_, "logo_url": logo}
+            updated += 1
+    await db.commit()
     return {"updated": updated, "total": len(assets)}
 
 

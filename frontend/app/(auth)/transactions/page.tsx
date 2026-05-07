@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/select";
 import { Pencil, Search, Trash2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { TickerLogo } from "@/components/ui/TickerLogo";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { useDualCurrency } from "@/hooks/useDualCurrency";
 import { DualCurrencyAmount } from "@/components/ui/DualCurrencyAmount";
@@ -290,7 +291,12 @@ export default function TransactionsPage() {
                     <TableCell className="text-sm">
                       {new Date(tx.executed_at).toLocaleDateString("en-GB")}
                     </TableCell>
-                    <TableCell className="font-medium">{tx.symbol}</TableCell>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-2">
+                        <TickerLogo symbol={tx.symbol} logoUrl={tx.metadata_?.logo_url as string | undefined} />
+                        <span>{tx.symbol}</span>
+                      </div>
+                    </TableCell>
                     <TableCell>
                       <span
                         className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${

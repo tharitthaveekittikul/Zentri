@@ -19,6 +19,8 @@ class DividendCalendarEvent(BaseModel):
     projected_total_usd: Decimal
     quantity_held: Decimal
     is_in_watchlist: bool = False
+    asset_type: str = "us_stock"
+    metadata_: dict = {}
 
 
 class IpoCalendarEvent(BaseModel):
@@ -32,6 +34,8 @@ class IpoCalendarEvent(BaseModel):
     sector: Optional[str] = None
     status: str
     is_in_watchlist: bool = False
+    asset_type: Optional[str] = None
+    metadata_: dict = {}
 
 
 CalendarEvent = Union[DividendCalendarEvent, IpoCalendarEvent]

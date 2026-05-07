@@ -57,6 +57,7 @@ import {
 } from "@/lib/services/watchlist";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { TickerLogo } from "@/components/ui/TickerLogo";
 import { useDualCurrency } from "@/hooks/useDualCurrency";
 import { DualCurrencyAmount } from "@/components/ui/DualCurrencyAmount";
 import { useTableParams } from "@/hooks/useTableParams";
@@ -454,7 +455,10 @@ export default function WatchlistPage() {
               {itemsPage.items.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell>
-                    <div className="font-medium">{item.asset.symbol}</div>
+                    <div className="flex items-center gap-2">
+                      <TickerLogo symbol={item.asset.symbol} logoUrl={item.asset.metadata_?.logo_url as string | undefined} />
+                      <span className="font-medium">{item.asset.symbol}</span>
+                    </div>
                     <div className="text-xs text-muted-foreground">
                       {item.asset.name}
                     </div>

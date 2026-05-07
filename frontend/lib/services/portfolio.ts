@@ -16,6 +16,7 @@ export interface HoldingRow {
   holding_value: string | null;
   unrealized_pnl: string | null;
   price_1d_change: string | null;
+  metadata_: Record<string, unknown>;
 }
 
 export interface PlatformGroup {
@@ -92,6 +93,7 @@ export interface TransactionRow {
   source: string;
   executed_at: string;
   created_at: string;
+  metadata_: Record<string, unknown>;
 }
 
 export interface TransactionParams {
@@ -131,7 +133,7 @@ export interface AssetDetail {
   name: string;
   asset_type: string;
   currency: string;
-  metadata_?: Record<string, unknown>;
+  metadata_: Record<string, unknown>;
 }
 
 export async function fetchAsset(assetId: string): Promise<AssetDetail> {

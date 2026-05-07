@@ -7,6 +7,7 @@ export interface Asset {
   name: string;
   currency: string;
   created_at: string;
+  metadata_: Record<string, unknown>;
 }
 
 export async function searchAssets(q: string): Promise<Asset[]> {

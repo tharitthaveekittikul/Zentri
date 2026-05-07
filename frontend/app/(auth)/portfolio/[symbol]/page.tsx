@@ -13,6 +13,7 @@ import { PrivacyValue } from "@/components/ui/PrivacyValue";
 import { api } from "@/lib/api";
 import { VerdictCard } from "@/components/analysis/VerdictCard";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { TickerLogo } from "@/components/ui/TickerLogo";
 import { useDualCurrency } from "@/hooks/useDualCurrency";
 import { DualCurrencyAmount } from "@/components/ui/DualCurrencyAmount";
 
@@ -82,7 +83,10 @@ export default function AssetDetailPage() {
       <PageHeader title="Asset" />
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold">{symbol.toUpperCase()}</h1>
+          <div className="flex items-center gap-3">
+            <TickerLogo symbol={symbol} logoUrl={asset?.metadata_?.logo_url as string | undefined} size={32} />
+            <h1 className="text-2xl font-bold">{symbol.toUpperCase()}</h1>
+          </div>
           <p className="text-muted-foreground">
             {assetsLoading ? "Loading..." : (asset?.name ?? "—")}
           </p>

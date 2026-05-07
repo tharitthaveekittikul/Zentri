@@ -38,6 +38,7 @@ class HoldingRow(BaseModel):
     holding_value: Decimal | None = None
     unrealized_pnl: Decimal | None = None
     price_1d_change: Decimal | None = None
+    metadata_: dict = {}
 
     model_config = {"from_attributes": True}
 

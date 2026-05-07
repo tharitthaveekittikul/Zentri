@@ -13,6 +13,8 @@ export type DividendCalendarEvent = {
   projected_total_usd: string;
   quantity_held: string;
   is_in_watchlist: boolean;
+  asset_type: string;
+  metadata_: Record<string, unknown>;
 };
 
 export type IpoCalendarEvent = {
@@ -26,6 +28,8 @@ export type IpoCalendarEvent = {
   sector: string | null;
   status: "upcoming" | "priced" | "listed";
   is_in_watchlist: boolean;
+  asset_type?: string | null;
+  metadata_?: Record<string, unknown>;
 };
 
 export type CalendarEvent = DividendCalendarEvent | IpoCalendarEvent;

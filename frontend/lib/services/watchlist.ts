@@ -6,6 +6,8 @@ export interface WatchlistAsset {
   symbol: string;
   name: string;
   currency: string;
+  asset_type: string;
+  metadata_: Record<string, unknown>;
 }
 
 export interface WatchlistItem {

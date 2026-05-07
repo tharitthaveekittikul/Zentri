@@ -41,6 +41,8 @@ async def get_calendar(
             "projected_total_usd": e["projected_total_usd"],
             "quantity_held": e["quantity_held"],
             "is_in_watchlist": False,
+            "asset_type": e.get("asset_type", "us_stock"),
+            "metadata_": e.get("metadata_", {}),
         }
         for e in dividend_events_raw
     ]
@@ -57,6 +59,8 @@ async def get_calendar(
             "sector": e.get("sector"),
             "status": e["status"],
             "is_in_watchlist": e["is_in_watchlist"],
+            "asset_type": e.get("asset_type"),
+            "metadata_": e.get("metadata_", {}),
         }
         for e in ipo_events_raw
     ]

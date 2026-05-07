@@ -33,10 +33,19 @@ async def add_holding(
     )
     asset = result.scalar_one_or_none()
     if asset is None:
+        from app.services.logo import get_logo_url, _SUPPORTED_TYPES
+        import asyncio
+        resolved_meta = dict(metadata_ or {})
+        if "logo_url" not in resolved_meta and asset_type in _SUPPORTED_TYPES:
+            logo = await asyncio.get_running_loop().run_in_executor(
+                None, get_logo_url, symbol, asset_type
+            )
+            if logo:
+                resolved_meta["logo_url"] = logo
         asset = Asset(
             id=uuid.uuid4(), user_id=user_id, symbol=symbol,
             asset_type=asset_type, name=symbol, currency=currency,
-            metadata_=metadata_ or {},
+            metadata_=resolved_meta,
         )
         db.add(asset)
         await db.flush()
@@ -121,6 +130,7 @@ async def list_holdings_with_assets(db: AsyncSession, user_id: uuid.UUID) -> lis
             "holding_value": holding_value,
             "unrealized_pnl": unrealized_pnl,
             "price_1d_change": price_1d_change,
+            "metadata_": asset.metadata_ or {},
         })
     return rows
 
@@ -223,6 +233,7 @@ async def list_holdings_paginated(
             "holding_value": holding_value,
             "unrealized_pnl": unrealized_pnl,
             "price_1d_change": price_1d_change,
+            "metadata_": asset.metadata_ or {},
         })
     return rows, total
 
@@ -274,10 +285,19 @@ async def add_manual_transaction(
     )
     asset = result.scalar_one_or_none()
     if asset is None:
+        from app.services.logo import get_logo_url, _SUPPORTED_TYPES
+        import asyncio
+        resolved_meta: dict = {}
+        if asset_type in _SUPPORTED_TYPES:
+            logo = await asyncio.get_running_loop().run_in_executor(
+                None, get_logo_url, symbol, asset_type
+            )
+            if logo:
+                resolved_meta["logo_url"] = logo
         asset = Asset(
             id=uuid.uuid4(), user_id=user_id, symbol=symbol,
             asset_type=asset_type, name=symbol, currency=currency,
-            metadata_={},
+            metadata_=resolved_meta,
         )
         db.add(asset)
         await db.flush()
@@ -423,6 +443,7 @@ async def list_transactions_with_assets(
             "source": tx.source,
             "executed_at": tx.executed_at,
             "created_at": tx.created_at,
+            "metadata_": asset.metadata_ or {},
         })
     return rows
 
@@ -501,6 +522,7 @@ async def list_transactions_paginated(
             "source": tx.source,
             "executed_at": tx.executed_at,
             "created_at": tx.created_at,
+            "metadata_": asset.metadata_ or {},
         })
     return rows, total
 
