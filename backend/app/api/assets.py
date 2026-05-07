@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 
 import httpx
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy import asc, select
+from sqlalchemy import asc, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user
@@ -58,7 +58,9 @@ async def get_asset_history_by_symbol(
 ):
     """Return OHLCV price history for an asset looked up by symbol string."""
     days = {"1W": 7, "1M": 30, "3M": 90, "1Y": 365}
+    bucket = {"1W": "1 day", "1M": "1 day", "3M": "1 week", "1Y": "1 week"}
     start = datetime.now(timezone.utc) - timedelta(days=days.get(range, 30))
+    bucket_interval = bucket.get(range, "1 day")
 
     assets = await asset_service.search_assets(db, current_user.id, symbol)
     asset = next((a for a in assets if a.symbol.upper() == symbol.upper()), None)
@@ -66,11 +68,33 @@ async def get_asset_history_by_symbol(
         raise HTTPException(status_code=404, detail="Asset not found")
 
     result = await db.execute(
-        select(Price)
-        .where(Price.asset_id == asset.id, Price.timestamp >= start)
-        .order_by(asc(Price.timestamp))
+        text(f"""
+            SELECT
+                time_bucket('{bucket_interval}'::interval, timestamp) AS timestamp,
+                first(open, timestamp) AS open,
+                max(high) AS high,
+                min(low) AS low,
+                last(close, timestamp) AS close,
+                sum(volume) AS volume
+            FROM prices
+            WHERE asset_id = :asset_id AND timestamp >= :start
+            GROUP BY 1
+            ORDER BY 1
+        """),
+        {"asset_id": asset.id, "start": start},
     )
-    bars = list(result.scalars().all())
+    rows = result.fetchall()
+    bars = [
+        PriceBar(
+            timestamp=row.timestamp,
+            open=row.open,
+            high=row.high,
+            low=row.low,
+            close=row.close,
+            volume=row.volume,
+        )
+        for row in rows
+    ]
     return PriceHistoryResponse(asset_id=asset.id, bars=bars)
 
 

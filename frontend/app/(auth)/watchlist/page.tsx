@@ -493,7 +493,7 @@ export default function WatchlistPage() {
                   </TableCell>
                   <TableCell className="text-xs text-muted-foreground">
                     {item.last_scanned_at
-                      ? new Date(item.last_scanned_at).toLocaleDateString()
+                      ? new Date(item.last_scanned_at).toLocaleDateString("en-GB")
                       : "Never"}
                   </TableCell>
                   <TableCell>

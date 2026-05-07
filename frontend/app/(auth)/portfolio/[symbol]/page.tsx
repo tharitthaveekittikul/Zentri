@@ -34,7 +34,7 @@ export default function AssetDetailPage() {
   const { symbol } = useParams<{ symbol: string }>();
   const [range, setRange] = useState<Range>("1M");
 
-  const { data: assets = [] } = useQuery({
+  const { data: assets = [], isLoading: assetsLoading } = useQuery({
     queryKey: ["assets"],
     queryFn: fetchAllAssets,
   });
@@ -59,7 +59,8 @@ export default function AssetDetailPage() {
         `/api/v1/portfolio/transactions?asset_id=${asset.id}`,
       );
       if (!res.ok) return [];
-      return res.json();
+      const data = await res.json();
+      return Array.isArray(data) ? data : (data.items ?? []);
     },
     enabled: !!asset,
   });
@@ -82,16 +83,18 @@ export default function AssetDetailPage() {
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold">{symbol.toUpperCase()}</h1>
-          <p className="text-muted-foreground">{asset?.name ?? "Loading..."}</p>
+          <p className="text-muted-foreground">
+            {assetsLoading ? "Loading..." : (asset?.name ?? "—")}
+          </p>
         </div>
         <div className="text-right">
           {latestBar && (
             <>
-              <p className="text-2xl font-semibold">
+              <div className="text-2xl font-semibold">
                 <DualCurrencyAmount
                   value={formatNative(latestBar.close, assetCurrency)}
                 />
-              </p>
+              </div>
               {dailyChange != null && dailyChangePct != null && (
                 <Badge
                   variant={dailyChange >= 0 ? "default" : "destructive"}
@@ -158,7 +161,7 @@ export default function AssetDetailPage() {
               {(txData ?? []).map((tx) => (
                 <tr key={tx.id} className="border-t">
                   <td className="p-3 text-muted-foreground">
-                    {new Date(tx.executed_at).toLocaleDateString("en-US")}
+                    {new Date(tx.executed_at).toLocaleDateString("en-GB")}
                   </td>
                   <td className="p-3">
                     <Badge

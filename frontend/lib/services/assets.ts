@@ -16,7 +16,7 @@ export async function searchAssets(q: string): Promise<Asset[]> {
 }
 
 export async function fetchAllAssets(): Promise<Asset[]> {
-  const res = await api.get("/api/v1/assets/search?q=");
+  const res = await api.get("/api/v1/assets");
   if (!res.ok) return [];
   return res.json();
 }

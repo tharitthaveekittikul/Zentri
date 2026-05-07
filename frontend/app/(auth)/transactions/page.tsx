@@ -272,7 +272,7 @@ export default function TransactionsPage() {
                 {data.items.map((tx) => (
                   <TableRow key={tx.id}>
                     <TableCell className="text-sm">
-                      {new Date(tx.executed_at).toLocaleDateString()}
+                      {new Date(tx.executed_at).toLocaleDateString("en-GB")}
                     </TableCell>
                     <TableCell className="font-medium">{tx.symbol}</TableCell>
                     <TableCell>

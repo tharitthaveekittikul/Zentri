@@ -128,7 +128,7 @@ export default function AIUsagePage() {
                 {data.logs.map((log) => (
                   <tr key={log.id} className="border-b hover:bg-muted/50">
                     <td className="py-2">
-                      {new Date(log.created_at).toLocaleDateString()}
+                      {new Date(log.created_at).toLocaleDateString("en-GB")}
                     </td>
                     <td className="py-2">{log.feature_key.replace(/_/g, " ")}</td>
                     <td className="py-2">

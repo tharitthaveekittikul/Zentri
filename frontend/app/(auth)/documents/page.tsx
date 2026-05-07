@@ -194,7 +194,7 @@ export default function DocumentsPage() {
               </TableCell>
               <TableCell>{doc.chunk_count ?? "—"}</TableCell>
               <TableCell className="text-sm text-muted-foreground">
-                {new Date(doc.created_at).toLocaleDateString()}
+                {new Date(doc.created_at).toLocaleDateString("en-GB")}
               </TableCell>
               <TableCell className="flex gap-2">
                 {doc.status === "failed" && (
