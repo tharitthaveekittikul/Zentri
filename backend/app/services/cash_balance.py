@@ -1,7 +1,7 @@
 import uuid
 from datetime import date, datetime, timezone
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logging import get_logger
@@ -41,6 +41,21 @@ async def get_latest(db: AsyncSession, user_id: uuid.UUID, asset_id: uuid.UUID) 
         .limit(1)
     )
     return result.scalar_one_or_none()
+
+
+async def get_all_latest(db: AsyncSession, user_id: uuid.UUID) -> list[CashBalance]:
+    subq = (
+        select(CashBalance.asset_id, func.max(CashBalance.snapshot_date).label("max_date"))
+        .where(CashBalance.user_id == user_id)
+        .group_by(CashBalance.asset_id)
+        .subquery()
+    )
+    result = await db.execute(
+        select(CashBalance)
+        .join(subq, (CashBalance.asset_id == subq.c.asset_id) & (CashBalance.snapshot_date == subq.c.max_date))
+        .where(CashBalance.user_id == user_id)
+    )
+    return list(result.scalars().all())
 
 
 async def get_history(db: AsyncSession, user_id: uuid.UUID, asset_id: uuid.UUID) -> list[CashBalance]:

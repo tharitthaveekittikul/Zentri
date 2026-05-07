@@ -23,6 +23,14 @@ async def create_balance(
     )
 
 
+@router.get("/latest", response_model=list[CashBalanceOut])
+async def get_all_latest_balances(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return await cash_service.get_all_latest(db, current_user.id)
+
+
 @router.get("/{asset_id}/latest", response_model=CashBalanceOut)
 async def get_latest_balance(
     asset_id: uuid.UUID,

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
-import { getLatestBalance, CashBalance } from "@/lib/services/cash-balance";
+import { getAllLatestBalances, CashBalance } from "@/lib/services/cash-balance";
 import { Pencil, Trash2, Copy } from "lucide-react";
 import {
   AlertDialog,
@@ -55,17 +55,11 @@ export function CashAccountsSection() {
     const all: CashAsset[] = await res.json();
     const cashAssets = all.filter((a) => a.asset_type === "cash");
 
-    const states = await Promise.all(
-      cashAssets.map(async (asset) => {
-        let latest: CashBalance | null = null;
-        try {
-          latest = await getLatestBalance(asset.id);
-        } catch {
-          // no snapshot yet
-        }
-        return { asset, latest };
-      }),
-    );
+    const balanceMap = await getAllLatestBalances();
+    const states = cashAssets.map((asset) => ({
+      asset,
+      latest: balanceMap[asset.id] ?? null,
+    }));
     setAccounts(states);
   }, []);
 
