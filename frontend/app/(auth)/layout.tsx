@@ -30,8 +30,8 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <TopNav />
-        <main className="flex-1 overflow-hidden p-6">
-          <div className="bg-white dark:bg-slate-900 rounded-[32px] h-full border border-slate-200/60 dark:border-slate-800 overflow-hidden">
+        <main className="flex-1 overflow-hidden pt-3 px-3">
+          <div className="bg-white dark:bg-slate-900 rounded-t-[28px] h-full border-x border-t border-slate-200/60 dark:border-slate-800 overflow-hidden">
             <div className="overflow-auto h-full p-6 md:p-8 pb-safe-tab">
               {children}
             </div>

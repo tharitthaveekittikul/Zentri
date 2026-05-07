@@ -24,7 +24,8 @@ export function HoldingsSnapshot({ holdings }: Props) {
 
   return (
     <div className="bg-card card-surface rounded-2xl border border-border overflow-hidden">
-      <table className="w-full text-sm">
+      <div className="overflow-x-auto">
+      <table className="w-full min-w-[560px] text-sm">
         <thead>
           <tr className="bg-muted/50">
             <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground uppercase tracking-wide">Symbol</th>
@@ -84,6 +85,7 @@ export function HoldingsSnapshot({ holdings }: Props) {
           )}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }
