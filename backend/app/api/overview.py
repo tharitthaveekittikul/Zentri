@@ -15,7 +15,7 @@ async def get_summary(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    return await overview_service.get_summary(db, current_user.id)
+    return await overview_service.get_summary(db, current_user.id, current_user.currency_primary)
 
 
 @router.get("/allocation", response_model=list[AllocationItem])
@@ -23,7 +23,7 @@ async def get_allocation(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    return await overview_service.get_allocation(db, current_user.id)
+    return await overview_service.get_allocation(db, current_user.id, current_user.currency_primary)
 
 
 @router.get("/performance", response_model=PerformanceResponse)

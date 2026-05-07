@@ -1,13 +1,10 @@
 "use client";
 
-import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchOverviewSummary, fetchAllocation } from "@/lib/services/overview";
-import { fetchHoldings } from "@/lib/services/portfolio";
 import { KpiCards } from "@/components/overview/KpiCards";
 import { PerformanceChart } from "@/components/overview/PerformanceChart";
 import { AllocationDonut } from "@/components/overview/AllocationDonut";
-import { HoldingsSnapshot, SnapshotHolding } from "@/components/overview/HoldingsSnapshot";
 import { Skeleton } from "@/components/ui/skeleton";
 import { NetWorthChart } from "@/components/net-worth-chart";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -24,29 +21,6 @@ export default function OverviewPage() {
     queryFn: fetchAllocation,
     refetchInterval: 60_000,
   });
-
-  const { data: holdingsPage } = useQuery({
-    queryKey: ["portfolio", "holdings"],
-    queryFn: fetchHoldings,
-  });
-
-  const snapshotHoldings = useMemo<SnapshotHolding[]>(
-    () =>
-      (holdingsPage?.items ?? [])
-        .map((h) => ({
-          symbol: h.symbol,
-          asset_type: h.asset_type,
-          quantity: h.outstanding_shares,
-          current_value: h.holding_value != null ? Number(h.holding_value) : Number(h.total_cost),
-          cost_basis: Number(h.total_cost),
-          pnl_pct:
-            h.holding_value != null && Number(h.total_cost) > 0
-              ? ((Number(h.holding_value) - Number(h.total_cost)) / Number(h.total_cost)) * 100
-              : 0,
-        }))
-        .sort((a, b) => b.current_value - a.current_value),
-    [holdingsPage],
-  );
 
   return (
     <div className="flex flex-col gap-6 max-w-7xl mx-auto">
@@ -70,13 +44,6 @@ export default function OverviewPage() {
         <div className="lg:col-span-2 bg-card card-surface rounded-2xl border border-border p-5 overflow-hidden">
           <AllocationDonut allocation={allocation} />
         </div>
-      </div>
-
-      <div>
-        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-3">
-          Holdings
-        </p>
-        <HoldingsSnapshot holdings={snapshotHoldings} />
       </div>
     </div>
   );

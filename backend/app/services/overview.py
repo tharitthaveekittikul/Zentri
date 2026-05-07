@@ -11,6 +11,7 @@ from app.models.cash_balance import CashBalance
 from app.models.holding import Holding
 from app.models.price import Price
 from app.models.net_worth_snapshot import NetWorthSnapshot
+from app.services import exchange_rate as fx_service
 
 logger = get_logger(__name__)
 
@@ -41,7 +42,7 @@ async def _prev_day_price(db: AsyncSession, asset_id: uuid.UUID) -> Price | None
     return result.scalar_one_or_none()
 
 
-async def get_summary(db: AsyncSession, user_id: uuid.UUID) -> dict:
+async def get_summary(db: AsyncSession, user_id: uuid.UUID, target_currency: str = "USD") -> dict:
     holdings = list((await db.execute(
         select(Holding).where(Holding.user_id == user_id)
     )).scalars().all())
@@ -51,29 +52,39 @@ async def get_summary(db: AsyncSession, user_id: uuid.UUID) -> dict:
         return dict(total_value=zero, total_cost=zero, total_pnl=zero,
                     total_pnl_pct=zero, daily_change=zero, daily_change_pct=zero)
 
-    total_cost = sum(h.quantity * h.avg_cost_price for h in holdings)
+    total_cost = zero
     total_value = zero
     yesterday_value = zero
 
     for h in holdings:
+        asset = (await db.execute(
+            select(Asset).where(Asset.id == h.asset_id)
+        )).scalar_one_or_none()
+        if not asset:
+            continue
+        rate = await fx_service.get_rate(db, asset.currency, target_currency)
+        multiplier = rate if rate else Decimal("1")
+
+        total_cost += h.quantity * h.avg_cost_price * multiplier
+
         latest = await _latest_price(db, h.asset_id)
         if latest:
-            total_value += h.quantity * latest.close
+            total_value += h.quantity * latest.close * multiplier
         prev = await _prev_day_price(db, h.asset_id)
         if prev:
-            yesterday_value += h.quantity * prev.close
+            yesterday_value += h.quantity * prev.close * multiplier
 
     total_pnl = total_value - total_cost
     total_pnl_pct = (total_pnl / total_cost * 100) if total_cost else zero
     daily_change = total_value - yesterday_value
     daily_change_pct = (daily_change / yesterday_value * 100) if yesterday_value else zero
 
-    logger.info("Summary: user=%s total_value=%s total_cost=%s", user_id, total_value, total_cost)
+    logger.info("Summary: user=%s target=%s total_value=%s total_cost=%s", user_id, target_currency, total_value, total_cost)
     return dict(total_value=total_value, total_cost=total_cost, total_pnl=total_pnl,
                 total_pnl_pct=total_pnl_pct, daily_change=daily_change, daily_change_pct=daily_change_pct)
 
 
-async def get_allocation(db: AsyncSession, user_id: uuid.UUID) -> list[dict]:
+async def get_allocation(db: AsyncSession, user_id: uuid.UUID, target_currency: str = "USD") -> list[dict]:
     holdings = list((await db.execute(
         select(Holding).where(Holding.user_id == user_id)
     )).scalars().all())
@@ -88,8 +99,11 @@ async def get_allocation(db: AsyncSession, user_id: uuid.UUID) -> list[dict]:
         )).scalar_one_or_none()
         if not asset:
             continue
+        value_native = h.quantity * latest.close
+        rate = await fx_service.get_rate(db, asset.currency, target_currency)
+        value_converted = value_native * rate if rate else value_native
         asset_type = asset.asset_type
-        by_type[asset_type] = by_type.get(asset_type, Decimal("0")) + h.quantity * latest.close
+        by_type[asset_type] = by_type.get(asset_type, Decimal("0")) + value_converted
 
     # Add cash balances — latest snapshot per cash asset
     cash_assets = list((await db.execute(
@@ -105,7 +119,10 @@ async def get_allocation(db: AsyncSession, user_id: uuid.UUID) -> list[dict]:
         )
         snap = snap_result.scalar_one_or_none()
         if snap:
-            by_type["cash"] = by_type.get("cash", Decimal("0")) + Decimal(str(snap.balance))
+            balance = Decimal(str(snap.balance))
+            rate = await fx_service.get_rate(db, ca.currency, target_currency)
+            balance_converted = balance * rate if rate else balance
+            by_type["cash"] = by_type.get("cash", Decimal("0")) + balance_converted
 
     total = sum(by_type.values()) or Decimal("1")
     logger.info("Allocation: user=%s types=%s", user_id, list(by_type.keys()))
