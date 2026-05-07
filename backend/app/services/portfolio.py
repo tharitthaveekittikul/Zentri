@@ -2,12 +2,13 @@ import uuid
 from datetime import date, datetime, timezone
 from decimal import Decimal
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logging import get_logger
 from app.models.asset import Asset
 from app.models.holding import Holding
+from app.models.price import Price
 from app.models.transaction import Transaction
 from app.services.exchange_rate import get_rate
 
@@ -54,14 +55,53 @@ async def add_holding(
 
 
 async def list_holdings_with_assets(db: AsyncSession, user_id: uuid.UUID) -> list[dict]:
-    result = await db.execute(
+    holdings_result = await db.execute(
         select(Holding, Asset)
         .join(Asset, Asset.id == Holding.asset_id)
         .where(Holding.user_id == user_id)
     )
+    holdings_raw = list(holdings_result.all())
+    if not holdings_raw:
+        return []
+
+    asset_ids = [asset.id for _, asset in holdings_raw]
+
+    ranked_sq = (
+        select(
+            Price.asset_id,
+            Price.close,
+            func.row_number().over(
+                partition_by=Price.asset_id,
+                order_by=Price.timestamp.desc(),
+            ).label("rn"),
+        )
+        .where(Price.asset_id.in_(asset_ids))
+        .subquery()
+    )
+    price_result = await db.execute(
+        select(ranked_sq.c.asset_id, ranked_sq.c.close, ranked_sq.c.rn)
+        .where(ranked_sq.c.rn <= 2)
+    )
+
+    price_map: dict[uuid.UUID, dict[int, Decimal]] = {}
+    for row in price_result:
+        price_map.setdefault(row.asset_id, {})[row.rn] = row.close
+
     rows = []
-    for holding, asset in result.all():
+    for holding, asset in holdings_raw:
         total_cost = holding.quantity * holding.avg_cost_price
+        prices = price_map.get(asset.id, {})
+        latest_close = prices.get(1)
+        prev_close = prices.get(2)
+
+        holding_value = holding.quantity * latest_close if latest_close is not None else None
+        unrealized_pnl = holding_value - total_cost if holding_value is not None else None
+        price_1d_change = (
+            float((latest_close - prev_close) / prev_close * 100)
+            if latest_close is not None and prev_close and prev_close != 0
+            else None
+        )
+
         rows.append({
             "id": holding.id,
             "asset_id": holding.asset_id,
@@ -73,10 +113,10 @@ async def list_holdings_with_assets(db: AsyncSession, user_id: uuid.UUID) -> lis
             "outstanding_shares": holding.quantity,
             "cost_per_share": holding.avg_cost_price,
             "total_cost": total_cost,
-            "current_price": None,
-            "holding_value": None,
-            "unrealized_pnl": None,
-            "price_1d_change": None,
+            "current_price": latest_close,
+            "holding_value": holding_value,
+            "unrealized_pnl": unrealized_pnl,
+            "price_1d_change": price_1d_change,
         })
     return rows
 

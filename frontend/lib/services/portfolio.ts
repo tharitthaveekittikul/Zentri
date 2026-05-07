@@ -30,6 +30,29 @@ export interface Transaction {
   created_at: string;
 }
 
+export interface AssetDetail {
+  id: string;
+  symbol: string;
+  name: string;
+  asset_type: string;
+  currency: string;
+}
+
+export async function fetchAsset(assetId: string): Promise<AssetDetail> {
+  const res = await api.get(`/api/v1/assets/${assetId}`);
+  if (!res.ok) throw new Error("Failed to fetch asset");
+  return res.json();
+}
+
+export async function updateAsset(
+  assetId: string,
+  data: { symbol?: string; name?: string },
+): Promise<AssetDetail> {
+  const res = await api.patch(`/api/v1/assets/${assetId}`, data);
+  if (!res.ok) throw new Error("Failed to update asset");
+  return res.json();
+}
+
 export interface PortfolioSummary {
   holdings_count: number;
   total_cost: string;

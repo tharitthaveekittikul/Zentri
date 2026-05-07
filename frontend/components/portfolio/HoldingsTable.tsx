@@ -338,6 +338,8 @@ export function HoldingsTable({
             </span>
           );
         const num = Number(val);
+        const totalCost = Number(row.original.total_cost);
+        const pct = totalCost !== 0 ? (num / totalCost) * 100 : null;
         const color =
           num >= 0
             ? "text-emerald-600 dark:text-emerald-400"
@@ -346,7 +348,14 @@ export function HoldingsTable({
           <span className={`${color} font-mono tabular-nums`}>
             <PrivacyValue
               value={
-                <MoneyCell val={val} nativeCurrency={row.original.currency} />
+                <span>
+                  <MoneyCell val={val} nativeCurrency={row.original.currency} />
+                  {pct != null && (
+                    <span className="block text-xs opacity-75">
+                      {pct >= 0 ? "+" : ""}{pct.toFixed(2)}%
+                    </span>
+                  )}
+                </span>
               }
             />
           </span>
