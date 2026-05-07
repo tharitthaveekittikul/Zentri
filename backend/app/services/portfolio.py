@@ -25,6 +25,7 @@ async def add_holding(
     currency: str,
     purchased_at: date | None = None,
     platform: str | None = None,
+    metadata_: dict | None = None,
 ) -> tuple[Holding, Asset]:
     symbol = symbol.strip().upper()
     result = await db.execute(
@@ -35,7 +36,7 @@ async def add_holding(
         asset = Asset(
             id=uuid.uuid4(), user_id=user_id, symbol=symbol,
             asset_type=asset_type, name=symbol, currency=currency,
-            metadata_={},
+            metadata_=metadata_ or {},
         )
         db.add(asset)
         await db.flush()

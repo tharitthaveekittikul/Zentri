@@ -121,3 +121,24 @@ async def test_list_transactions_includes_symbol(auth_client, asset_id):
     res = await auth_client.get("/api/v1/portfolio/transactions")
     assert res.status_code == 200
     assert res.json()[0]["symbol"] == "AAPL"
+
+
+@pytest.mark.asyncio
+async def test_add_holding_persists_metadata(auth_client):
+    response = await auth_client.post("/api/v1/portfolio/holdings", json={
+        "symbol": "BTC",
+        "asset_type": "crypto",
+        "quantity": "0.5",
+        "avg_cost_price": "50000",
+        "currency": "USD",
+        "metadata_": {"coingecko_id": "bitcoin"},
+    })
+    assert response.status_code == 201
+    data = response.json()
+    assert data["symbol"] == "BTC"
+
+    # Verify asset was stored with coingecko_id
+    asset_id = data["asset_id"]
+    asset_res = await auth_client.get(f"/api/v1/assets/{asset_id}")
+    assert asset_res.status_code == 200
+    assert asset_res.json()["metadata_"]["coingecko_id"] == "bitcoin"

@@ -31,6 +31,8 @@ const JOB_LABELS: Record<JobType, string> = {
   watchlist_scan: "Watchlist Scan",
   run_analysis: "AI Analysis",
   ingest_document: "Ingest Document",
+  price_fetch_thai_stock: "Thai Stock/DR",
+  price_fetch_th_fund: "Thai Fund",
 };
 
 const ALL_TRIGGER_TYPES: JobType[] = [
@@ -100,7 +102,8 @@ export function JobsTable({ jobs }: JobsTableProps) {
                   colSpan={5}
                   className="py-8 text-center text-muted-foreground"
                 >
-                  No jobs have run yet. Use the buttons above to trigger a fetch.
+                  No jobs have run yet. Use the buttons above to trigger a
+                  fetch.
                 </td>
               </tr>
             )}

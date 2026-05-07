@@ -27,7 +27,7 @@ async def add_holding(
     holding, asset = await portfolio_service.add_holding(
         db, current_user.id, body.symbol, body.asset_type,
         body.quantity, body.avg_cost_price, body.currency,
-        body.purchased_at, body.platform,
+        body.purchased_at, body.platform, body.metadata_,
     )
     total_cost = holding.quantity * holding.avg_cost_price
     return HoldingRow(

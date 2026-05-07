@@ -13,6 +13,7 @@ class HoldingCreate(BaseModel):
     avg_cost_price: Decimal
     currency: str = "THB"
     platform: str | None = None
+    metadata_: dict | None = None
 
 
 class HoldingUpdate(BaseModel):

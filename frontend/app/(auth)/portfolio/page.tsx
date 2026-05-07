@@ -12,6 +12,7 @@ import { HoldingsTable } from "@/components/portfolio/HoldingsTable";
 import { CashAccountsSection } from "@/components/portfolio/CashAccountsSection";
 import { AddHoldingDialog } from "@/components/portfolio/AddHoldingDialog";
 import { AddTransactionDialog } from "@/components/portfolio/AddTransactionDialog";
+import { PlatformBreakdownCards } from "@/components/portfolio/PlatformBreakdownCards";
 import {
   Card,
   CardContent,
@@ -149,6 +150,8 @@ export default function PortfolioPage() {
           </CardContent>
         </Card>
       </div>
+
+      <PlatformBreakdownCards holdings={holdings} />
 
       {isLoading ? (
         <Skeleton className="h-48 w-full" />

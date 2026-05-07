@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import {
   ColumnDef,
   flexRender,
@@ -95,6 +96,15 @@ export function HoldingsTable({ holdings, onDelete, onUpdated }: Props) {
         >
           Symbol <SortIcon isSorted={column.getIsSorted()} />
         </button>
+      ),
+      cell: ({ row }) => (
+        <Link
+          href={`/portfolio/${encodeURIComponent(row.original.symbol)}`}
+          className="hover:underline"
+          prefetch={false}
+        >
+          {row.original.symbol}
+        </Link>
       ),
     },
     {

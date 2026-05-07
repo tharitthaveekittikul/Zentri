@@ -17,6 +17,53 @@ export interface HoldingRow {
   price_1d_change: string | null;
 }
 
+export interface PlatformGroup {
+  platform: string;
+  count: number;
+  currencyGroups: {
+    currency: string;
+    totalValue: number | null;
+    totalPnl: number | null;
+  }[];
+}
+
+export function groupHoldingsByPlatform(holdings: HoldingRow[]): PlatformGroup[] {
+  const map = new Map<string, HoldingRow[]>();
+  for (const h of holdings) {
+    if (h.asset_type === "cash" || Number(h.outstanding_shares) < 1e-6) continue;
+    const key = h.platform ?? "No Platform";
+    const existing = map.get(key) ?? [];
+    existing.push(h);
+    map.set(key, existing);
+  }
+
+  return Array.from(map.entries()).map(([platform, rows]) => {
+    const currencyMap = new Map<string, { value: number | null; pnl: number | null }>();
+    for (const row of rows) {
+      const curr = row.currency;
+      const entry = currencyMap.get(curr) ?? { value: null, pnl: null };
+      if (row.holding_value != null) {
+        entry.value = (entry.value ?? 0) + Number(row.holding_value);
+      }
+      if (row.unrealized_pnl != null) {
+        entry.pnl = (entry.pnl ?? 0) + Number(row.unrealized_pnl);
+      }
+      currencyMap.set(curr, entry);
+    }
+    return {
+      platform,
+      count: rows.length,
+      currencyGroups: Array.from(currencyMap.entries()).map(
+        ([currency, { value, pnl }]) => ({
+          currency,
+          totalValue: value,
+          totalPnl: pnl,
+        }),
+      ),
+    };
+  });
+}
+
 export interface Transaction {
   id: string;
   asset_id: string;
