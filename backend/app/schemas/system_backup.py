@@ -7,6 +7,15 @@ from typing import Optional
 from pydantic import BaseModel
 
 
+class BackupScheduleConfig(BaseModel):
+    job_key: str
+    enabled: bool
+    days: list[int]
+    run_at_hour: int
+    run_at_minute: int
+    interval_minutes: int | None = None
+
+
 class BackupSettings(BaseModel):
     currency_primary: str
     currency_secondary: str
@@ -16,6 +25,8 @@ class BackupSettings(BaseModel):
     telegram_chat_id: Optional[str] = None
     telegram_bot_token: Optional[str] = None
     sec_api_key: Optional[str] = None
+    schedule_timezone: str = "Asia/Bangkok"
+    schedule_configs: list[BackupScheduleConfig] = []
 
 
 class BackupHolding(BaseModel):
@@ -99,7 +110,7 @@ class BackupAIAnalysis(BaseModel):
 class SystemBackup(BaseModel):
     model_config = {"from_attributes": True}
 
-    version: str = "1"
+    version: str = "2"
     exported_at: datetime
     settings: BackupSettings
     portfolio: BackupPortfolio

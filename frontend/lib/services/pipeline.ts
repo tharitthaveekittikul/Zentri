@@ -5,6 +5,8 @@ export type JobType =
   | "price_fetch_crypto"
   | "price_fetch_gold"
   | "price_fetch_benchmark"
+  | "price_fetch_thai_stock"
+  | "price_fetch_th_fund"
   | "watchlist_discovery"
   | "watchlist_scan"
   | "run_analysis"

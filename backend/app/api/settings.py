@@ -11,7 +11,9 @@ from app.core.encryption import decrypt, encrypt
 from app.core.logging import get_logger
 from app.models.llm_settings import LLMSettings
 from app.models.user import User
+from app.schemas.price_schedule_config import ScheduleConfigIn, ScheduleConfigOut
 from app.services import exchange_rate as exchange_rate_service
+from app.services import price_schedule_config as schedule_service
 from app.services.hardware import detect_hardware
 from app.services.telegram import send_message as _send_telegram
 from app.services.user_context import get_user_age_context
@@ -155,6 +157,7 @@ async def update_display_settings(
 class ProfileSettingsIn(BaseModel):
     birth_date: date_type | None = None
     plan_to_age: int | None = None
+    schedule_timezone: str = "Asia/Bangkok"
 
 
 class ProfileSettingsOut(BaseModel):
@@ -163,6 +166,7 @@ class ProfileSettingsOut(BaseModel):
     current_age: int | None
     years_remaining: int | None
     target_year: int | None
+    schedule_timezone: str
 
 
 @router.get("/profile", response_model=ProfileSettingsOut)
@@ -177,6 +181,7 @@ async def get_profile_settings(
         current_age=ctx["current_age"] if ctx else None,
         years_remaining=ctx["years_remaining"] if ctx else None,
         target_year=ctx["target_year"] if ctx else None,
+        schedule_timezone=current_user.schedule_timezone,
     )
 
 
@@ -190,6 +195,8 @@ async def update_profile_settings(
         current_user.birth_date = body.birth_date
     if "plan_to_age" in body.model_fields_set:
         current_user.plan_to_age = body.plan_to_age
+    if "schedule_timezone" in body.model_fields_set:
+        current_user.schedule_timezone = body.schedule_timezone
     await db.commit()
     await db.refresh(current_user)
     ctx = get_user_age_context(current_user)
@@ -199,6 +206,7 @@ async def update_profile_settings(
         current_age=ctx["current_age"] if ctx else None,
         years_remaining=ctx["years_remaining"] if ctx else None,
         target_year=ctx["target_year"] if ctx else None,
+        schedule_timezone=current_user.schedule_timezone,
     )
 
 
@@ -330,3 +338,24 @@ async def get_exchange_rate(
     if rate is None:
         raise HTTPException(status_code=503, detail="Exchange rate unavailable")
     return {"from": from_currency, "to": to_currency, "rate": str(rate)}
+
+
+@router.get("/schedule", response_model=list[ScheduleConfigOut])
+async def get_schedule(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    configs = await schedule_service.get_all_configs(db, current_user.id)
+    await db.commit()
+    return configs
+
+
+@router.put("/schedule", response_model=list[ScheduleConfigOut])
+async def update_schedule(
+    updates: list[ScheduleConfigIn],
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    configs = await schedule_service.upsert_configs(db, current_user.id, updates)
+    await db.commit()
+    return configs

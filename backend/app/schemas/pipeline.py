@@ -7,6 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field
 JobType = Literal[
     "price_fetch_us", "price_fetch_crypto",
     "price_fetch_gold", "price_fetch_benchmark",
+    "price_fetch_thai_stock", "price_fetch_th_fund",
     "snapshot_net_worth",
     "watchlist_discovery", "watchlist_scan",
     "run_analysis", "ingest_document",

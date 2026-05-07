@@ -46,7 +46,7 @@ async def test_export_returns_full_backup(auth_client):
     assert "attachment" in response.headers["content-disposition"]
 
     data = response.json()
-    assert data["version"] == "1"
+    assert data["version"] == "2"
     assert "exported_at" in data
     assert len(data["portfolio"]["holdings"]) == 1
     assert data["portfolio"]["holdings"][0]["symbol"] == "AAPL"

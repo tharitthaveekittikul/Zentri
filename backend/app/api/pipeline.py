@@ -80,12 +80,14 @@ async def trigger_job(
         "price_fetch_crypto": "job_fetch_prices_crypto",
         "price_fetch_gold": "job_fetch_price_gold",
         "price_fetch_benchmark": "job_fetch_benchmark_prices",
+        "price_fetch_thai_stock": "job_fetch_prices_thai_stock",
+        "price_fetch_th_fund": "job_fetch_prices_th_fund",
         "snapshot_net_worth": "job_snapshot_net_worth",
     }
     if job_type not in job_fn_map:
         raise HTTPException(status_code=400, detail=f"Job type '{job_type}' cannot be triggered manually")
     fn_name = job_fn_map[job_type]
-    job = await redis.enqueue_job(fn_name)
+    job = await redis.enqueue_job(fn_name, manual=True)
     await redis.aclose()
     return {"enqueued": True, "job_id": job.job_id if job else None}
 

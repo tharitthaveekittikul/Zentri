@@ -25,21 +25,23 @@ from app.schemas.system_backup import (
     BackupHolding,
     BackupPortfolio,
     BackupProviderConfig,
+    BackupScheduleConfig,
     BackupSettings,
     BackupTransaction,
     BackupWatchlistItem,
     SystemBackup,
 )
+from app.services import price_schedule_config as schedule_service
 
 logger = get_logger(__name__)
 
-SUPPORTED_VERSIONS = {"1"}
+SUPPORTED_VERSIONS = {"1", "2"}
 
 
 async def export_backup(db: AsyncSession, user: User) -> SystemBackup:
     user_id = user.id
 
-    # Settings
+    # Settings (schedule_configs added later after async fetch)
     settings = BackupSettings(
         currency_primary=user.currency_primary,
         currency_secondary=user.currency_secondary,
@@ -53,6 +55,7 @@ async def export_backup(db: AsyncSession, user: User) -> SystemBackup:
         sec_api_key=(
             decrypt(user.sec_api_key) if user.sec_api_key else None
         ),
+        schedule_timezone=user.schedule_timezone,
     )
 
     # Holdings
@@ -201,9 +204,23 @@ async def export_backup(db: AsyncSession, user: User) -> SystemBackup:
         for analysis, asset in analysis_list
     ]
 
+    raw_schedules = await schedule_service.get_all_configs(db, user.id)
+    schedule_configs = [
+        BackupScheduleConfig(
+            job_key=c.job_key,
+            enabled=c.enabled,
+            days=c.days,
+            run_at_hour=c.run_at_hour,
+            run_at_minute=c.run_at_minute,
+            interval_minutes=c.interval_minutes,
+        )
+        for c in raw_schedules
+    ]
+    settings = settings.model_copy(update={"schedule_configs": schedule_configs})
+
     logger.info("Exported backup for user=%s", user_id)
     return SystemBackup(
-        version="1",
+        version="2",
         exported_at=datetime.now(timezone.utc),
         settings=settings,
         portfolio=BackupPortfolio(holdings=holdings, transactions=transactions),
@@ -277,6 +294,24 @@ async def import_backup(db: AsyncSession, user: User, backup: SystemBackup) -> N
     user.telegram_chat_id = s.telegram_chat_id
     user.telegram_bot_token = encrypt(s.telegram_bot_token) if s.telegram_bot_token else None
     user.sec_api_key = encrypt(s.sec_api_key) if s.sec_api_key else None
+    if backup.settings.schedule_timezone:
+        user.schedule_timezone = backup.settings.schedule_timezone
+
+    if backup.settings.schedule_configs:
+        from app.schemas.price_schedule_config import ScheduleConfigIn
+        updates = [
+            ScheduleConfigIn(
+                job_key=sc.job_key,
+                enabled=sc.enabled,
+                days=sc.days,
+                run_at_hour=sc.run_at_hour,
+                run_at_minute=sc.run_at_minute,
+                interval_minutes=sc.interval_minutes,
+            )
+            for sc in backup.settings.schedule_configs
+        ]
+        await schedule_service.upsert_configs(db, user.id, updates)
+        logger.info("Restored %d schedule configs", len(updates))
 
     # Provider configs — build name→id map for feature config linking
     provider_name_to_id: dict[str, uuid.UUID] = {}

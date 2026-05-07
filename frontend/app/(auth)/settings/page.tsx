@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AISettings } from "@/components/settings/AISettings";
+import { ScheduleTab } from "@/components/settings/ScheduleTab";
 import { getProfile, saveProfile, type ProfileSettings } from "@/lib/services/auth";
 import { Switch } from "@/components/ui/switch";
 import { usePrivacyStore } from "@/store/privacy";
@@ -187,6 +188,7 @@ export default function SettingsPage() {
           <TabsTrigger value="ai">AI & LLM</TabsTrigger>
           <TabsTrigger value="integrations">Integrations</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
+          <TabsTrigger value="schedule">Schedule</TabsTrigger>
         </TabsList>
 
         <TabsContent value="general" className="space-y-6 mt-4">
@@ -458,6 +460,10 @@ export default function SettingsPage() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="schedule" className="space-y-6 mt-4">
+          <ScheduleTab />
         </TabsContent>
       </Tabs>
     </div>

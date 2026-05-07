@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchJobs, type PipelineJob } from "@/lib/services/pipeline";
 import { JobsTable } from "@/components/pipeline/JobsTable";
+import { TriggerButtons } from "@/components/pipeline/TriggerButtons";
 import { PageHeader } from "@/components/layout/PageHeader";
 
 export default function PipelinePage() {
@@ -59,6 +60,7 @@ export default function PipelinePage() {
       <p className="text-muted-foreground text-sm">
         Live price fetch job status. Updates every 3 seconds via SSE.
       </p>
+      <TriggerButtons />
       <JobsTable jobs={jobs} />
     </div>
   );
