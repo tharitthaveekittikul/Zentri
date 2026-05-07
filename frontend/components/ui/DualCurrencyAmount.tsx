@@ -7,6 +7,7 @@ import { DualValue } from "@/hooks/useDualCurrency";
 interface Props {
   value: DualValue;
   primaryClassName?: string;
+  secondaryClassName?: string;
   // inline=true: "1,234.56 THB (≈ 45.67 USD)" on one line — for table cells
   // inline=false (default): primary on top, secondary muted below — for cards/KPIs
   inline?: boolean;
@@ -15,6 +16,7 @@ interface Props {
 export function DualCurrencyAmount({
   value,
   primaryClassName,
+  secondaryClassName,
   inline = false,
 }: Props) {
   const { isPrivate } = usePrivacyStore();
@@ -49,7 +51,7 @@ export function DualCurrencyAmount({
         {primaryDisplay}
       </span>
       {secondaryDisplay && (
-        <p className="text-sm text-muted-foreground font-mono tabular-nums mt-0.5">
+        <p className={cn("text-sm text-muted-foreground font-mono tabular-nums mt-0.5", secondaryClassName)}>
           {secondaryDisplay}
         </p>
       )}

@@ -21,9 +21,10 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { Info } from "lucide-react";
-import { usePrivacyStore } from "@/store/privacy";
 import { api } from "@/lib/api";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { DualCurrencyAmount } from "@/components/ui/DualCurrencyAmount";
+import { DualValue } from "@/hooks/useDualCurrency";
 
 function InfoTooltip({ content }: { content: React.ReactNode }) {
   return (
@@ -38,7 +39,6 @@ function InfoTooltip({ content }: { content: React.ReactNode }) {
 
 export default function PortfolioPage() {
   const qc = useQueryClient();
-  const { isPrivate } = usePrivacyStore();
   const [primaryCurrency, setPrimaryCurrency] = useState("THB");
   const [secondaryCurrency, setSecondaryCurrency] = useState("USD");
 
@@ -131,17 +131,20 @@ export default function PortfolioPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-semibold font-mono tabular-nums tracking-tight">
-              {isPrivate
-                ? `****** ${displayCurrency}`
-                : summary
-                ? `${parseFloat(summary.total_cost).toLocaleString(undefined, { minimumFractionDigits: 2 })} ${displayCurrency}`
-                : "—"}
-            </p>
-            {summary?.total_cost_secondary != null && (
-              <p className="text-xs text-muted-foreground mt-1 font-mono tabular-nums">
-                ≈ {isPrivate ? "******" : parseFloat(summary.total_cost_secondary).toLocaleString(undefined, { minimumFractionDigits: 2 })} {displaySecondaryCurrency}
-              </p>
+            {summary ? (
+              <DualCurrencyAmount
+                value={{
+                  primary: `${parseFloat(summary.total_cost).toLocaleString(undefined, { minimumFractionDigits: 2 })} ${displayCurrency}`,
+                  secondary: summary.total_cost_secondary != null
+                    ? `≈ ${parseFloat(summary.total_cost_secondary).toLocaleString(undefined, { minimumFractionDigits: 2 })} ${displaySecondaryCurrency}`
+                    : null,
+                  primaryCurrency: displayCurrency,
+                  secondaryCurrency: displaySecondaryCurrency,
+                } satisfies DualValue}
+                primaryClassName="text-2xl font-semibold font-mono tabular-nums tracking-tight"
+              />
+            ) : (
+              <p className="text-2xl font-semibold font-mono tabular-nums tracking-tight">—</p>
             )}
           </CardContent>
         </Card>
@@ -152,13 +155,6 @@ export default function PortfolioPage() {
       ) : (
         <HoldingsTable
           holdings={holdings}
-          primaryCurrency={displayCurrency}
-          secondaryCurrency={displaySecondaryCurrency}
-          primaryToSecondaryRate={
-            summary?.total_cost_secondary != null && parseFloat(summary.total_cost) > 0
-              ? parseFloat(summary.total_cost_secondary) / parseFloat(summary.total_cost)
-              : undefined
-          }
           onDelete={(id) => deleteMutation.mutate(id)}
           onUpdated={refresh}
         />

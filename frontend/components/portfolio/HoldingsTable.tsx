@@ -28,7 +28,8 @@ import {
 } from "@/components/ui/select";
 import { Trash2, Pencil, ArrowUpDown, ArrowUp, ArrowDown, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { HoldingRow } from "@/lib/services/portfolio";
-import { usePrivacyStore } from "@/store/privacy";
+import { useDualCurrency } from "@/hooks/useDualCurrency";
+import { DualCurrencyAmount } from "@/components/ui/DualCurrencyAmount";
 import { EditHoldingDialog } from "./EditHoldingDialog";
 import {
   AlertDialog,
@@ -43,21 +44,13 @@ import {
 
 interface Props {
   holdings: HoldingRow[];
-  primaryCurrency: string;
-  secondaryCurrency?: string;
-  primaryToSecondaryRate?: number;
   onDelete: (id: string) => void;
   onUpdated: () => void;
 }
 
-export function HoldingsTable({
-  holdings,
-  primaryCurrency,
-  secondaryCurrency,
-  primaryToSecondaryRate,
-  onDelete,
-  onUpdated,
-}: Props) {
+const secondaryCls = "text-xs text-muted-foreground font-mono tabular-nums mt-0.5";
+
+export function HoldingsTable({ holdings, onDelete, onUpdated }: Props) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [platformFilter, setPlatformFilter] = useState<string>("all");
   const [pageSize, setPageSize] = useState(25);
@@ -66,13 +59,13 @@ export function HoldingsTable({
   const [editOpen, setEditOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<HoldingRow | null>(null);
 
-  // Filter out cash assets and zero-share positions
+  const { formatNative } = useDualCurrency();
+
   const nonCashHoldings = useMemo(
     () => holdings.filter((h) => h.asset_type !== "cash" && Number(h.outstanding_shares) >= 1e-6),
     [holdings],
   );
 
-  // Unique non-null platforms for dropdown
   const platforms = useMemo(() => {
     const seen = new Set<string>();
     for (const h of nonCashHoldings) {
@@ -81,89 +74,13 @@ export function HoldingsTable({
     return Array.from(seen).sort();
   }, [nonCashHoldings]);
 
-  // Apply platform filter
   const filteredHoldings = useMemo(() => {
     if (platformFilter === "all") return nonCashHoldings;
     return nonCashHoldings.filter((h) => h.platform === platformFilter);
   }, [nonCashHoldings, platformFilter]);
 
-  function fmt(
-    val: string | number | null | undefined,
-    currency: string,
-  ): string {
-    if (val == null) return "—";
-    return `${Number(val).toLocaleString(undefined, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })} ${currency}`;
-  }
-
-  function MoneyCell({
-    val,
-    nativeCurrency,
-    showSign = false,
-  }: {
-    val: string | null | undefined;
-    nativeCurrency: string;
-    showSign?: boolean;
-  }) {
-    const { isPrivate } = usePrivacyStore();
-    if (val == null) return <span>—</span>;
-    const num = Number(val);
-    const native = nativeCurrency.toUpperCase();
-    const primary = primaryCurrency.toUpperCase();
-    const secondary = secondaryCurrency?.toUpperCase();
-
-    let primaryVal: number = num;
-    let secondaryVal: number | null = null;
-
-    if (native === primary) {
-      primaryVal = num;
-      if (primaryToSecondaryRate != null && secondaryCurrency) {
-        secondaryVal = num * primaryToSecondaryRate;
-      }
-    } else if (
-      native === secondary &&
-      primaryToSecondaryRate != null &&
-      primaryToSecondaryRate > 0
-    ) {
-      primaryVal = num / primaryToSecondaryRate;
-      secondaryVal = num;
-    } else {
-      if (isPrivate) return <span>****** {nativeCurrency}</span>;
-      return <span>{(showSign && num > 0 ? "+" : "") + fmt(num, nativeCurrency)}</span>;
-    }
-
-    const sign = showSign && num > 0 ? "+" : "";
-
-    if (isPrivate) {
-      return (
-        <span>
-          ****** {primaryCurrency}
-          {secondaryCurrency && (
-            <span className="block text-xs text-muted-foreground">
-              ≈ ****** {secondaryCurrency}
-            </span>
-          )}
-        </span>
-      );
-    }
-
-    return (
-      <span>
-        {sign}{fmt(primaryVal, primaryCurrency)}
-        {secondaryCurrency && secondaryVal != null && (
-          <span className="block text-xs text-muted-foreground">
-            ≈ {sign}{fmt(secondaryVal, secondaryCurrency)}
-          </span>
-        )}
-      </span>
-    );
-  }
-
   function SortIcon({ isSorted }: { isSorted: false | "asc" | "desc" }) {
-    if (!isSorted)
-      return <ArrowUpDown className="ml-1 h-3 w-3 inline opacity-40" />;
+    if (!isSorted) return <ArrowUpDown className="ml-1 h-3 w-3 inline opacity-40" />;
     if (isSorted === "asc") return <ArrowUp className="ml-1 h-3 w-3 inline" />;
     return <ArrowDown className="ml-1 h-3 w-3 inline" />;
   }
@@ -208,14 +125,15 @@ export function HoldingsTable({
           Cost/Share <SortIcon isSorted={column.getIsSorted()} />
         </button>
       ),
-      cell: ({ row }) => (
-        <span className="font-mono tabular-nums">
-          <MoneyCell
-            val={row.original.cost_per_share}
-            nativeCurrency={row.original.currency}
+      cell: ({ row }) =>
+        row.original.cost_per_share == null ? (
+          <span>—</span>
+        ) : (
+          <DualCurrencyAmount
+            value={formatNative(row.original.cost_per_share, row.original.currency)}
+            secondaryClassName={secondaryCls}
           />
-        </span>
-      ),
+        ),
     },
     {
       accessorKey: "total_cost",
@@ -228,14 +146,15 @@ export function HoldingsTable({
           Total Cost <SortIcon isSorted={column.getIsSorted()} />
         </button>
       ),
-      cell: ({ row }) => (
-        <span className="font-mono tabular-nums">
-          <MoneyCell
-            val={row.original.total_cost}
-            nativeCurrency={row.original.currency}
+      cell: ({ row }) =>
+        row.original.total_cost == null ? (
+          <span>—</span>
+        ) : (
+          <DualCurrencyAmount
+            value={formatNative(row.original.total_cost, row.original.currency)}
+            secondaryClassName={secondaryCls}
           />
-        </span>
-      ),
+        ),
     },
     {
       accessorKey: "current_price",
@@ -248,14 +167,15 @@ export function HoldingsTable({
           Price <SortIcon isSorted={column.getIsSorted()} />
         </button>
       ),
-      cell: ({ row }) => (
-        <span className="font-mono tabular-nums">
-          <MoneyCell
-            val={row.original.current_price}
-            nativeCurrency={row.original.currency}
+      cell: ({ row }) =>
+        row.original.current_price == null ? (
+          <span>—</span>
+        ) : (
+          <DualCurrencyAmount
+            value={formatNative(row.original.current_price, row.original.currency)}
+            secondaryClassName={secondaryCls}
           />
-        </span>
-      ),
+        ),
     },
     {
       accessorKey: "price_1d_change",
@@ -267,19 +187,14 @@ export function HoldingsTable({
       cell: ({ row }) => {
         const val = row.original.price_1d_change;
         if (val == null)
-          return (
-            <span className="font-mono tabular-nums text-muted-foreground">
-              —
-            </span>
-          );
+          return <span className="font-mono tabular-nums text-muted-foreground">—</span>;
         const num = Number(val);
-        const color =
-          num >= 0
-            ? "text-emerald-600 dark:text-emerald-400"
-            : "text-destructive";
+        const color = num >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-destructive";
         return (
           <span className={`${color} font-mono tabular-nums inline-flex items-center gap-0.5`}>
-            {num >= 0 ? <ArrowUpRight className="h-3 w-3" strokeWidth={2.5} /> : <ArrowDownRight className="h-3 w-3" strokeWidth={2.5} />}
+            {num >= 0
+              ? <ArrowUpRight className="h-3 w-3" strokeWidth={2.5} />
+              : <ArrowDownRight className="h-3 w-3" strokeWidth={2.5} />}
             {Math.abs(num).toFixed(2)}%
           </span>
         );
@@ -296,14 +211,15 @@ export function HoldingsTable({
           Value <SortIcon isSorted={column.getIsSorted()} />
         </button>
       ),
-      cell: ({ row }) => (
-        <span className="font-mono tabular-nums">
-          <MoneyCell
-            val={row.original.holding_value}
-            nativeCurrency={row.original.currency}
+      cell: ({ row }) =>
+        row.original.holding_value == null ? (
+          <span>—</span>
+        ) : (
+          <DualCurrencyAmount
+            value={formatNative(row.original.holding_value, row.original.currency)}
+            secondaryClassName={secondaryCls}
           />
-        </span>
-      ),
+        ),
     },
     {
       accessorKey: "unrealized_pnl",
@@ -319,28 +235,27 @@ export function HoldingsTable({
       cell: ({ row }) => {
         const val = row.original.unrealized_pnl;
         if (val == null)
-          return (
-            <span className="font-mono tabular-nums text-muted-foreground">
-              —
-            </span>
-          );
+          return <span className="font-mono tabular-nums text-muted-foreground">—</span>;
         const num = Number(val);
         const totalCost = Number(row.original.total_cost);
         const pct = totalCost !== 0 ? (num / totalCost) * 100 : null;
-        const color =
-          num >= 0
-            ? "text-emerald-600 dark:text-emerald-400"
-            : "text-destructive";
+        const color = num >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-destructive";
         return (
-          <span className={`${color} font-mono tabular-nums`}>
-            <MoneyCell val={val} nativeCurrency={row.original.currency} showSign />
+          <div className={color}>
+            <DualCurrencyAmount
+              value={formatNative(val, row.original.currency, 2, true)}
+              primaryClassName={`font-mono tabular-nums ${color}`}
+              secondaryClassName={`${secondaryCls} ${color} opacity-75`}
+            />
             {pct != null && (
               <span className="flex items-center gap-0.5 text-xs opacity-75">
-                {pct >= 0 ? <ArrowUpRight className="h-3 w-3" strokeWidth={2.5} /> : <ArrowDownRight className="h-3 w-3" strokeWidth={2.5} />}
+                {pct >= 0
+                  ? <ArrowUpRight className="h-3 w-3" strokeWidth={2.5} />
+                  : <ArrowDownRight className="h-3 w-3" strokeWidth={2.5} />}
                 {Math.abs(pct).toFixed(2)}%
               </span>
             )}
-          </span>
+          </div>
         );
       },
     },
@@ -465,10 +380,7 @@ export function HoldingsTable({
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
                 </TableRow>

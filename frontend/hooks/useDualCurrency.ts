@@ -51,24 +51,25 @@ export function useDualCurrency() {
   // Use when the value is in a native asset currency that may differ from primaryCurrency.
   // Converts to primary (and secondary) if the native currency matches one of the two.
   // Falls back to native currency label when no conversion is possible.
-  function formatNative(value: string | number, nativeCurrency: string, decimals = 2): DualValue {
+  function formatNative(value: string | number, nativeCurrency: string, decimals = 2, showSign = false): DualValue {
     const num = Number(value);
     const native = nativeCurrency.toUpperCase();
     const primary = primaryCurrency.toUpperCase();
     const secondary = secondaryCurrency.toUpperCase();
     const rate = rateData ? Number(rateData.rate) : null;
+    const sign = showSign && num >= 0 ? "+" : "";
 
     if (native === primary) {
-      const p = `${fmt(num, decimals)} ${primaryCurrency}`;
-      const s = rate ? `≈ ${fmt(num * rate, decimals)} ${secondaryCurrency}` : null;
+      const p = `${sign}${fmt(num, decimals)} ${primaryCurrency}`;
+      const s = rate ? `≈ ${sign}${fmt(num * rate, decimals)} ${secondaryCurrency}` : null;
       return { primary: p, secondary: s, primaryCurrency, secondaryCurrency };
     }
 
     if (native === secondary && rate !== null && rate > 0) {
       const primaryVal = num / rate;
       return {
-        primary: `${fmt(primaryVal, decimals)} ${primaryCurrency}`,
-        secondary: `≈ ${fmt(num, decimals)} ${secondaryCurrency}`,
+        primary: `${sign}${fmt(primaryVal, decimals)} ${primaryCurrency}`,
+        secondary: `≈ ${sign}${fmt(num, decimals)} ${secondaryCurrency}`,
         primaryCurrency,
         secondaryCurrency,
       };
@@ -76,7 +77,7 @@ export function useDualCurrency() {
 
     // Unknown currency pair — show native only.
     return {
-      primary: `${fmt(num, decimals)} ${nativeCurrency}`,
+      primary: `${sign}${fmt(num, decimals)} ${nativeCurrency}`,
       secondary: null,
       primaryCurrency,
       secondaryCurrency,
