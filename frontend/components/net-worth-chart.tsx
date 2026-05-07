@@ -68,7 +68,7 @@ export function NetWorthChart({ privacyMode }: { privacyMode: boolean }) {
         chart.applyOptions({ width: containerRef.current.clientWidth });
       }
     };
-    window.addEventListener("resize", handleResize);
+    window.addEventListener("resize", handleResize, { passive: true });
     return () => {
       window.removeEventListener("resize", handleResize);
       chartRef.current = null;

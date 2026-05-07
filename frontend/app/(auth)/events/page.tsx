@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -83,18 +83,24 @@ function CalendarGrid({
     else setViewMonth((m) => m + 1);
   };
 
-  const byDay: Record<number, CalendarEvent[]> = {};
-  for (const ev of events) {
-    const d = new Date(ev.event_date);
-    if (d.getFullYear() === viewYear && d.getMonth() === viewMonth) {
-      const day = d.getDate();
-      if (!byDay[day]) byDay[day] = [];
-      byDay[day].push(ev);
+  const byDay = useMemo(() => {
+    const map: Record<number, CalendarEvent[]> = {};
+    for (const ev of events) {
+      const d = new Date(ev.event_date);
+      if (d.getFullYear() === viewYear && d.getMonth() === viewMonth) {
+        const day = d.getDate();
+        if (!map[day]) map[day] = [];
+        map[day].push(ev);
+      }
     }
-  }
+    return map;
+  }, [events, viewYear, viewMonth]);
 
-  const cells: (number | null)[] = Array(firstDay).fill(null);
-  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+  const cells = useMemo(() => {
+    const arr: (number | null)[] = Array(firstDay).fill(null);
+    for (let d = 1; d <= daysInMonth; d++) arr.push(d);
+    return arr;
+  }, [firstDay, daysInMonth]);
 
   return (
     <div className="border rounded-lg overflow-hidden">
@@ -308,7 +314,7 @@ export default function EventsPage() {
     if (res.ok) { setSelectedDividend(null); fetchData(); }
   };
 
-  const filtered = filterEvents(allEvents, filter);
+  const filtered = useMemo(() => filterEvents(allEvents, filter), [allEvents, filter]);
 
   const FILTERS: { key: FilterType; label: string }[] = [
     { key: "all", label: "All" },

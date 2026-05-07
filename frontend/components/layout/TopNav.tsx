@@ -54,7 +54,10 @@ export function TopNav() {
           className="flex flex-1 items-center gap-3 h-10 px-4 rounded-full bg-slate-100/70 dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-left min-w-0"
           title="Search (⌘K)"
         >
-          <Search className="h-[15px] w-[15px] text-slate-400 shrink-0" strokeWidth={1.5} />
+          <Search
+            className="h-[15px] w-[15px] text-slate-400 shrink-0"
+            strokeWidth={1.5}
+          />
           <span className="text-sm text-slate-400 flex-1 truncate">
             Search assets, pages...
           </span>
@@ -92,7 +95,7 @@ export function TopNav() {
           <span
             key={resolvedTheme}
             style={{
-              animation: "icon-spin-in 1500ms cubic-bezier(0.16,1,0.3,1) both",
+              animation: "icon-spin-in 300ms cubic-bezier(0.16,1,0.3,1) both",
               display: "flex",
             }}
           >

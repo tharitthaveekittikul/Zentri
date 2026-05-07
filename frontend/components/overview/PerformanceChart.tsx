@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { memo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   LineChart,
@@ -18,7 +18,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 const RANGES = ["1W", "1M", "3M", "1Y"] as const;
 type Range = (typeof RANGES)[number];
 
-export function PerformanceChart() {
+export const PerformanceChart = memo(function PerformanceChart() {
   const [range, setRange] = useState<Range>("1M");
 
   const { data } = useQuery({
@@ -80,4 +80,4 @@ export function PerformanceChart() {
       )}
     </div>
   );
-}
+});

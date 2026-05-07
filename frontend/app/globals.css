@@ -103,9 +103,9 @@ html:root.dark {
   --signal-loss-bg: oklch(0.577 0.245 27.325 / 8%);
 
   /* ── Glass tokens (light) ── */
-  --glass-blur: 32px;
-  --glass-saturate: 200%;
-  --glass-bg: oklch(1 0 0 / 68%);
+  --glass-blur: 12px;
+  --glass-saturate: 160%;
+  --glass-bg: oklch(1 0 0 / 92%);
   --glass-border: oklch(0.11 0 0 / 8%);
   --glass-specular: oklch(1 0 0 / 72%);
 }
@@ -155,9 +155,9 @@ html:root.dark {
   --sidebar-ring: oklch(0.97 0 0);
 
   /* ── Glass tokens (dark true black) ── */
-  --glass-blur: 32px;
-  --glass-saturate: 200%;
-  --glass-bg: oklch(1 0 0 / 7%);
+  --glass-blur: 12px;
+  --glass-saturate: 160%;
+  --glass-bg: oklch(0.13 0 0 / 94%);
   --glass-border: oklch(1 0 0 / 10%);
   --glass-specular: oklch(1 0 0 / 18%);
 }
@@ -177,8 +177,8 @@ html:root.dark {
   /* Glass for command palette and modal dialogs */
   [role="dialog"][aria-modal] {
     background: var(--card) !important;
-    backdrop-filter: blur(32px) saturate(200%);
-    -webkit-backdrop-filter: blur(32px) saturate(200%);
+    backdrop-filter: blur(12px) saturate(160%);
+    -webkit-backdrop-filter: blur(12px) saturate(160%);
     border: 1px solid var(--glass-border) !important;
     box-shadow:
       0 8px 40px oklch(0 0 0 / 20%),
@@ -189,8 +189,8 @@ html:root.dark {
   [data-radix-popper-content-wrapper] > [role="listbox"],
   [data-radix-popper-content-wrapper] > div {
     background: var(--card) !important;
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(10px) saturate(150%);
+    -webkit-backdrop-filter: blur(10px) saturate(150%);
     border-color: var(--glass-border) !important;
   }
 
@@ -204,8 +204,7 @@ html:root.dark {
   body,
   .glass-chrome,
   [data-slot="card"],
-  .card-surface,
-  main {
+  .card-surface {
     transition:
       background-color 250ms cubic-bezier(0.16, 1, 0.3, 1),
       border-color 200ms cubic-bezier(0.16, 1, 0.3, 1),
@@ -274,16 +273,8 @@ html:root.dark {
 @layer utilities {
   .glass-chrome {
     background: var(--glass-bg);
-    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
     box-shadow: inset 0 1px 0 var(--glass-specular);
-  }
-
-  @supports not (backdrop-filter: blur(1px)) {
-    .glass-chrome {
-      background: var(--background);
-      box-shadow: none;
-    }
+    transform: translateZ(0);
   }
 
   /* Safe-area utilities for iOS notch / home indicator */

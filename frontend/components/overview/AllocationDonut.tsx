@@ -1,5 +1,6 @@
 "use client";
 
+import { memo, useMemo } from "react";
 import { PieChart as RechartsPieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { PieChart as PieChartIcon } from "lucide-react";
 import { AllocationItem } from "@/lib/services/overview";
@@ -12,13 +13,16 @@ interface Props {
   allocation: AllocationItem[];
 }
 
-export function AllocationDonut({ allocation }: Props) {
+export const AllocationDonut = memo(function AllocationDonut({ allocation }: Props) {
   const { format } = useDualCurrency();
-  const data = allocation.map((a) => ({
-    name: a.asset_type.replace("_", " ").toUpperCase(),
-    value: Number(a.pct),
-    rawValue: a.value,
-  }));
+  const data = useMemo(
+    () => allocation.map((a) => ({
+      name: a.asset_type.replace("_", " ").toUpperCase(),
+      value: Number(a.pct),
+      rawValue: a.value,
+    })),
+    [allocation],
+  );
 
   return (
     <div className="flex flex-col gap-2 h-full">
@@ -69,4 +73,4 @@ export function AllocationDonut({ allocation }: Props) {
       )}
     </div>
   );
-}
+});

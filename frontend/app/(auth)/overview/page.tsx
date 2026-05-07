@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchOverviewSummary, fetchAllocation } from "@/lib/services/overview";
 import { fetchHoldings } from "@/lib/services/portfolio";
@@ -29,18 +30,23 @@ export default function OverviewPage() {
     queryFn: fetchHoldings,
   });
 
-  const snapshotHoldings: SnapshotHolding[] = (holdingsPage?.items ?? [])
-    .map((h) => ({
-      symbol: h.symbol,
-      asset_type: h.asset_type,
-      quantity: h.outstanding_shares,
-      current_value: h.holding_value != null ? Number(h.holding_value) : Number(h.total_cost),
-      cost_basis: Number(h.total_cost),
-      pnl_pct: h.holding_value != null && Number(h.total_cost) > 0
-        ? ((Number(h.holding_value) - Number(h.total_cost)) / Number(h.total_cost)) * 100
-        : 0,
-    }))
-    .sort((a, b) => b.current_value - a.current_value);
+  const snapshotHoldings = useMemo<SnapshotHolding[]>(
+    () =>
+      (holdingsPage?.items ?? [])
+        .map((h) => ({
+          symbol: h.symbol,
+          asset_type: h.asset_type,
+          quantity: h.outstanding_shares,
+          current_value: h.holding_value != null ? Number(h.holding_value) : Number(h.total_cost),
+          cost_basis: Number(h.total_cost),
+          pnl_pct:
+            h.holding_value != null && Number(h.total_cost) > 0
+              ? ((Number(h.holding_value) - Number(h.total_cost)) / Number(h.total_cost)) * 100
+              : 0,
+        }))
+        .sort((a, b) => b.current_value - a.current_value),
+    [holdingsPage],
+  );
 
   return (
     <div className="flex flex-col gap-6 max-w-7xl mx-auto">
