@@ -112,7 +112,7 @@ export default function DocumentsPage() {
       <PageHeader title="Documents" />
       <div className="flex flex-wrap items-center justify-end gap-3">
         <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
-          <DialogTrigger>
+          <DialogTrigger asChild>
             <Button>Upload PDF</Button>
           </DialogTrigger>
           <DialogContent>

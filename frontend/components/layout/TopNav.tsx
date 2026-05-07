@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Eye, EyeOff, LogOut, Sun, Moon, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePrivacyStore } from "@/store/privacy";
@@ -15,6 +15,8 @@ export function TopNav() {
   const router = useRouter();
   const { resolvedTheme, setTheme } = useTheme();
   const toggleRef = useRef<HTMLButtonElement>(null);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   async function handleLogout() {
     await logout();
@@ -87,19 +89,21 @@ export function TopNav() {
           className="h-9 w-9 shrink-0 relative rounded-full"
           onClick={toggleTheme}
           title={
-            resolvedTheme === "dark"
+            mounted && resolvedTheme === "dark"
               ? "Switch to light mode"
               : "Switch to dark mode"
           }
         >
           <span
-            key={resolvedTheme}
+            key={mounted ? resolvedTheme : "init"}
             style={{
-              animation: "icon-spin-in 300ms cubic-bezier(0.16,1,0.3,1) both",
+              animation: mounted
+                ? "icon-spin-in 300ms cubic-bezier(0.16,1,0.3,1) both"
+                : undefined,
               display: "flex",
             }}
           >
-            {resolvedTheme === "dark" ? (
+            {mounted && resolvedTheme === "dark" ? (
               <Sun className="h-[17px] w-[17px]" strokeWidth={1.5} />
             ) : (
               <Moon className="h-[17px] w-[17px]" strokeWidth={1.5} />
