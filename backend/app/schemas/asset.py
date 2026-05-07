@@ -16,6 +16,7 @@ class AssetCreate(BaseModel):
 class AssetUpdate(BaseModel):
     symbol: str | None = None
     name: str | None = None
+    asset_type: Literal["us_stock", "thai_stock", "thai_dr", "th_fund", "etf", "crypto", "gold", "cash"] | None = None
     currency: str | None = None
     metadata_: dict[str, Any] | None = None
 

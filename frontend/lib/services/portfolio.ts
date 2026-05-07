@@ -47,10 +47,16 @@ export async function fetchAsset(assetId: string): Promise<AssetDetail> {
 
 export async function updateAsset(
   assetId: string,
-  data: { symbol?: string; name?: string; metadata_?: Record<string, unknown> },
+  data: { symbol?: string; name?: string; asset_type?: string; metadata_?: Record<string, unknown> },
 ): Promise<AssetDetail> {
   const res = await api.patch(`/api/v1/assets/${assetId}`, data);
   if (!res.ok) throw new Error("Failed to update asset");
+  return res.json();
+}
+
+export async function refreshAssetNames(): Promise<{ updated: number; total: number }> {
+  const res = await api.post("/api/v1/assets/refresh-names", {});
+  if (!res.ok) throw new Error("Failed to refresh names");
   return res.json();
 }
 

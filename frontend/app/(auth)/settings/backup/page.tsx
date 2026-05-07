@@ -18,11 +18,25 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { exportSystem, importSystem } from "@/lib/services/system";
+import { refreshAssetNames } from "@/lib/services/portfolio";
 import { PageHeader } from "@/components/layout/PageHeader";
 
 export default function BackupPage() {
   const [exporting, setExporting] = useState(false);
   const [importing, setImporting] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  async function handleRefreshNames() {
+    setRefreshing(true);
+    try {
+      const result = await refreshAssetNames();
+      toast.success(`Updated ${result.updated} of ${result.total} asset names`);
+    } catch {
+      toast.error("Failed to refresh names");
+    } finally {
+      setRefreshing(false);
+    }
+  }
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -75,6 +89,21 @@ export default function BackupPage() {
         <strong>Security notice:</strong> Backup files contain your API keys in
         plaintext. Do not share or store them in insecure locations.
       </div>
+
+      {/* Refresh Names */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Refresh Asset Names</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground mb-4">
+            Fetch proper names for all assets from yfinance. Covers US stocks, ETFs, Thai stocks, and Thai DRs. Gold, cash, and TH funds are skipped.
+          </p>
+          <Button variant="outline" onClick={handleRefreshNames} disabled={refreshing}>
+            {refreshing ? "Refreshing…" : "Refresh All Names"}
+          </Button>
+        </CardContent>
+      </Card>
 
       {/* Export */}
       <Card>

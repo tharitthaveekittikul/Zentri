@@ -33,6 +33,7 @@ export function EditHoldingDialog({
   const [loading, setLoading] = useState(false);
   const [symbol, setSymbol] = useState("");
   const [assetName, setAssetName] = useState("");
+  const [assetType, setAssetType] = useState("");
   const [projId, setProjId] = useState("");
   const [lookupResults, setLookupResults] = useState<ThFundMatch[]>([]);
   const [lookupLoading, setLookupLoading] = useState(false);
@@ -64,6 +65,7 @@ export function EditHoldingDialog({
     setCurrency(holding.currency);
     setPlatform(holding.platform ?? "");
     setSymbol(holding.symbol);
+    setAssetType(holding.asset_type);
     setAssetName("");
     setProjId("");
     setLookupResults([]);
@@ -75,6 +77,7 @@ export function EditHoldingDialog({
         const fetchedProjId = (asset.metadata_?.proj_id as string) ?? "";
         setSymbol(fetchedSymbol);
         setAssetName(asset.name);
+        setAssetType(asset.asset_type);
         setProjId(fetchedProjId);
         if (!fetchedProjId && holding.asset_type === "th_fund") {
           lookupThFund(fetchedSymbol).then((results) => {
@@ -99,8 +102,8 @@ export function EditHoldingDialog({
     if (!holding) return;
     setLoading(true);
     try {
-      const assetUpdate: Parameters<typeof updateAsset>[1] = { symbol, name: assetName };
-      if (holding.asset_type === "th_fund") {
+      const assetUpdate: Parameters<typeof updateAsset>[1] = { symbol, name: assetName, asset_type: assetType };
+      if (assetType === "th_fund") {
         assetUpdate.metadata_ = { proj_id: projId.trim() };
       }
       await Promise.all([
@@ -128,8 +131,17 @@ export function EditHoldingDialog({
         <DialogHeader>
           <DialogTitle>Edit {holding.symbol}</DialogTitle>
         </DialogHeader>
-        <div className="text-sm text-muted-foreground mb-2">
-          {holding.asset_type}
+        <div className="mb-2">
+          <select
+            className="text-sm border rounded px-2 py-1 bg-background text-muted-foreground"
+            value={assetType}
+            onChange={(e) => setAssetType(e.target.value)}
+            disabled={assetLoading}
+          >
+            {["us_stock","thai_stock","thai_dr","th_fund","etf","crypto","gold","cash"].map((t) => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </select>
         </div>
         <form onSubmit={handleSubmit} className="space-y-3">
           {/* Asset section */}
@@ -155,7 +167,7 @@ export function EditHoldingDialog({
                 />
               </div>
             </div>
-            {holding.asset_type === "th_fund" && (
+            {assetType === "th_fund" && (
               <div className="space-y-1">
                 <div className="flex items-center justify-between">
                   <Label>SEC Project ID</Label>

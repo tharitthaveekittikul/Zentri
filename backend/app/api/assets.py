@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.deps import get_current_user
 from app.core.database import get_db
 from app.core.encryption import decrypt
+from app.core.logging import get_logger
 from app.models.price import Price
 from app.models.user import User
 from app.schemas.asset import AssetCreate, AssetResponse, AssetUpdate
@@ -16,6 +17,7 @@ from app.services import asset as asset_service
 from app.services.th_fund import search_th_funds
 
 router = APIRouter(prefix="/assets", tags=["assets"])
+logger = get_logger(__name__)
 
 
 @router.post("", response_model=AssetResponse, status_code=201)
@@ -69,6 +71,52 @@ async def get_asset_history_by_symbol(
     )
     bars = list(result.scalars().all())
     return PriceHistoryResponse(asset_id=asset.id, bars=bars)
+
+
+@router.post("/refresh-names")
+async def refresh_asset_names(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Fetch proper names for all assets from yfinance and update the DB."""
+    import asyncio
+    import yfinance as yf
+
+    assets = await asset_service.get_all_assets(db, current_user.id)
+
+    yf_map: dict[str, uuid.UUID] = {}
+    for asset in assets:
+        if asset.asset_type in ("us_stock", "etf", "crypto"):
+            yf_map[asset.symbol] = asset.id
+        elif asset.asset_type in ("thai_stock", "thai_dr"):
+            yf_map[f"{asset.symbol}.BK"] = asset.id
+
+    if not yf_map:
+        return {"updated": 0, "total": len(assets)}
+
+    def _fetch():
+        results: dict[uuid.UUID, str] = {}
+        tickers = yf.Tickers(" ".join(yf_map.keys()))
+        for yf_sym, asset_id in yf_map.items():
+            try:
+                info = tickers.tickers[yf_sym].info
+                name = info.get("longName") or info.get("shortName")
+                if name:
+                    results[asset_id] = name
+            except Exception:
+                pass
+        return results
+
+    name_map = await asyncio.get_event_loop().run_in_executor(None, _fetch)
+
+    updated = 0
+    for asset in assets:
+        if asset.id in name_map:
+            asset.name = name_map[asset.id]
+            updated += 1
+    await db.commit()
+    logger.info("refresh_asset_names: updated %d/%d assets for user=%s", updated, len(assets), current_user.id)
+    return {"updated": updated, "total": len(assets)}
 
 
 @router.get("/th-fund/lookup")
