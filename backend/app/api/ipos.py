@@ -4,11 +4,14 @@ import uuid
 from datetime import date, datetime, timezone
 
 import yfinance as yf
+from arq import create_pool
+from arq.connections import RedisSettings
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user
+from app.core.config import settings
 from app.core.database import get_db
 from app.core.logging import get_logger
 from app.models.ai_analysis import AIAnalysis
@@ -19,6 +22,13 @@ from app.services.llm_gateway import LLMGateway
 
 logger = get_logger(__name__)
 router = APIRouter(prefix="/ipos", tags=["ipos"])
+
+
+@router.post("/refresh", status_code=202)
+async def refresh_ipos(current_user: User = Depends(get_current_user)):
+    redis = await create_pool(RedisSettings.from_dsn(settings.REDIS_URL))
+    await redis.enqueue_job("job_fetch_ipos", str(current_user.id))
+    await redis.aclose()
 
 
 async def _get_cached_analysis(db: AsyncSession, ipo_event_id: uuid.UUID) -> AIAnalysis | None:

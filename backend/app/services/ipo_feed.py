@@ -9,6 +9,7 @@ from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logging import get_logger
+from app.models.asset import Asset
 from app.models.ipo_event import IpoEvent
 from app.models.watchlist_item import WatchlistItem
 
@@ -58,7 +59,9 @@ async def refresh_ipos_from_watchlist(db: AsyncSession, user_id: uuid.UUID) -> i
         Number of rows upserted
     """
     result = await db.execute(
-        select(WatchlistItem.symbol).where(WatchlistItem.user_id == user_id)
+        select(Asset.symbol)
+        .join(WatchlistItem, WatchlistItem.asset_id == Asset.id)
+        .where(WatchlistItem.user_id == user_id)
     )
     symbols = [row[0] for row in result.fetchall()]
     if not symbols:
@@ -114,7 +117,9 @@ async def get_ipo_events(
     events = result.scalars().all()
 
     watchlist_result = await db.execute(
-        select(WatchlistItem.symbol).where(WatchlistItem.user_id == user_id)
+        select(Asset.symbol)
+        .join(WatchlistItem, WatchlistItem.asset_id == Asset.id)
+        .where(WatchlistItem.user_id == user_id)
     )
     watchlist_symbols = {row[0] for row in watchlist_result.fetchall()}
 

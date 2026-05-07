@@ -14,6 +14,7 @@ JOB_TYPES = (
     "snapshot_net_worth",
     "ingest_document", "run_analysis",
     "watchlist_discovery", "watchlist_scan",
+    "dividend_fetch", "ipo_fetch",
 )
 JOB_STATUSES = ("queued", "running", "done", "failed")
 

@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from app.core.config import settings
 from app.core.logging import get_logger, setup_logging
 from worker.jobs.dividend_fetch import job_fetch_dividends
+from worker.jobs.ipo_fetch import job_fetch_ipos
 from worker.jobs.ingest_document import job_ingest_document
 from worker.jobs.net_worth_snapshot import job_snapshot_net_worth
 from worker.jobs.run_analysis import job_run_analysis
@@ -50,6 +51,7 @@ class WorkerSettings:
         job_run_analysis,
         job_snapshot_net_worth,
         job_fetch_dividends,
+        job_fetch_ipos,
         job_check_watchlist_alerts,
         job_scan_watchlist_item,
         job_scan_watchlist_batch,

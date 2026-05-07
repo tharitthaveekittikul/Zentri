@@ -123,7 +123,7 @@ function CalendarGrid({
           <div
             key={i}
             className={`min-h-[72px] border-b border-r p-1 text-xs ${!day ? "bg-muted/10" : ""} ${
-              day === today.getDate() && isCurrentMonth ? "bg-blue-50" : ""
+              day === today.getDate() && isCurrentMonth ? "bg-blue-100 dark:bg-blue-950/40 ring-1 ring-inset ring-blue-300 dark:ring-blue-800" : ""
             }`}
           >
             {day && (
@@ -139,8 +139,8 @@ function CalendarGrid({
                     }
                     className={`truncate rounded px-1 py-0.5 mb-0.5 cursor-pointer text-[10px] font-medium flex items-center gap-0.5 ${
                       ev.event_type === "dividend"
-                        ? "bg-blue-100 text-blue-800"
-                        : "bg-orange-100 text-orange-800"
+                        ? "bg-blue-100 text-blue-800 dark:bg-blue-900/70 dark:text-blue-200"
+                        : "bg-orange-100 text-orange-800 dark:bg-orange-900/70 dark:text-orange-200"
                     }`}
                   >
                     {ev.is_in_watchlist && <span>★</span>}
@@ -270,6 +270,7 @@ export default function EventsPage() {
   const { formatNative } = useDualCurrency();
   const [allEvents, setAllEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [filter, setFilter] = useState<FilterType>("all");
   const [selectedDividend, setSelectedDividend] = useState<DividendCalendarEvent | null>(null);
@@ -280,9 +281,12 @@ export default function EventsPage() {
 
   const fetchData = async () => {
     setLoading(true);
+    setFetchError(null);
     try {
       const data = await fetchEventsCalendar(3);
       setAllEvents(data.months.flatMap((m) => m.events));
+    } catch (err: unknown) {
+      setFetchError(err instanceof Error ? err.message : "Failed to load events");
     } finally {
       setLoading(false);
     }
@@ -292,9 +296,28 @@ export default function EventsPage() {
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    await api.post("/api/v1/dividends/refresh", {});
-    setRefreshing(false);
-    setTimeout(fetchData, 2000);
+    await Promise.all([
+      api.post("/api/v1/dividends/refresh", {}),
+      api.post("/api/v1/ipos/refresh", {}),
+    ]);
+    // Job is async (~20s). Poll every 5s until data arrives or 60s timeout.
+    let attempts = 0;
+    const poll = async () => {
+      attempts++;
+      try {
+        const data = await fetchEventsCalendar(3);
+        const events = data.months.flatMap((m) => m.events);
+        setAllEvents(events);
+        if (events.length > 0 || attempts >= 12) {
+          setRefreshing(false);
+        } else {
+          setTimeout(poll, 5000);
+        }
+      } catch {
+        setRefreshing(false);
+      }
+    };
+    setTimeout(poll, 5000);
   };
 
   const openDividend = (ev: DividendCalendarEvent) => {
@@ -355,6 +378,12 @@ export default function EventsPage() {
         </div>
       </div>
 
+      {fetchError && (
+        <div className="rounded-md border border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/30 px-4 py-3 text-sm text-red-700 dark:text-red-400">
+          {fetchError}
+        </div>
+      )}
+
       {loading ? (
         <div className="border rounded-lg overflow-hidden">
           <div className="flex items-center justify-between px-4 py-2 border-b">
@@ -398,6 +427,13 @@ export default function EventsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
+            {filtered.filter((e) => e.status !== "paid" && e.status !== "listed").length === 0 && (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                  No upcoming events. Try clicking Refresh or check back later.
+                </TableCell>
+              </TableRow>
+            )}
             {filtered
               .filter((e) => e.status !== "paid" && e.status !== "listed")
               .sort((a, b) => a.event_date.localeCompare(b.event_date))
@@ -415,18 +451,28 @@ export default function EventsPage() {
                     </span>
                   </TableCell>
                   <TableCell>{ev.event_date}</TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {ev.event_type === "dividend" ? (
-                      <span className="flex items-center gap-1">
-                        <DualCurrencyAmount
-                          value={formatNative(
-                            (ev as DividendCalendarEvent).amount_per_share,
-                            (ev as DividendCalendarEvent).currency
-                          )}
-                        />
-                        <span className="text-muted-foreground">/sh</span>
-                      </span>
-                    ) : (ev as IpoCalendarEvent).price_low
+                  <TableCell>
+                    {ev.event_type === "dividend" ? (() => {
+                      const d = ev as DividendCalendarEvent;
+                      const qty = parseFloat(d.quantity_held);
+                      return qty > 0 ? (
+                        <span className="flex flex-col gap-0.5">
+                          <DualCurrencyAmount
+                            value={formatNative(d.projected_total_usd, "USD")}
+                          />
+                          <span className="text-xs text-muted-foreground">
+                            {qty} shares × {parseFloat(d.amount_per_share).toFixed(2)} {d.currency}
+                          </span>
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-1 text-muted-foreground">
+                          <DualCurrencyAmount
+                            value={formatNative(d.amount_per_share, d.currency)}
+                          />
+                          <span className="text-muted-foreground">/ share</span>
+                        </span>
+                      );
+                    })() : (ev as IpoCalendarEvent).price_low
                       ? `${(ev as IpoCalendarEvent).price_low}–${(ev as IpoCalendarEvent).price_high} USD`
                       : "N/A"}
                   </TableCell>

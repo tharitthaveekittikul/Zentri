@@ -1,4 +1,3 @@
-import asyncio
 import uuid
 from datetime import date, timedelta
 
@@ -20,10 +19,8 @@ async def get_calendar(
     start_date = today - timedelta(days=30)
     end_date = today + timedelta(days=months * 31)
 
-    dividend_result, ipo_events_raw = await asyncio.gather(
-        dividend_feed.get_calendar(db, user_id, months, secondary_currency),
-        ipo_feed.get_ipo_events(db, user_id, start_date, end_date),
-    )
+    dividend_result = await dividend_feed.get_calendar(db, user_id, months, secondary_currency)
+    ipo_events_raw = await ipo_feed.get_ipo_events(db, user_id, start_date, end_date)
 
     dividend_events_raw = []
     if isinstance(dividend_result, dict):
