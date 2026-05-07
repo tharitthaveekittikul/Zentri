@@ -28,6 +28,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { api } from "@/lib/api";
+import { Skeleton } from "@/components/ui/skeleton";
 import { PageHeader } from "@/components/layout/PageHeader";
 
 interface Document {
@@ -62,6 +63,7 @@ const DOC_TYPES = ["research", "annual_report", "earnings", "news", "general"];
 
 export default function DocumentsPage() {
   const [docs, setDocs] = useState<Document[]>([]);
+  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("");
   const [uploading, setUploading] = useState(false);
   const [uploadOpen, setUploadOpen] = useState(false);
@@ -70,11 +72,16 @@ export default function DocumentsPage() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   async function load() {
-    const url = filter
-      ? `/api/v1/documents?asset=${filter.toUpperCase()}`
-      : "/api/v1/documents";
-    const res = await api.get(url);
-    if (res.ok) setDocs(await res.json());
+    setLoading(true);
+    try {
+      const url = filter
+        ? `/api/v1/documents?asset=${filter.toUpperCase()}`
+        : "/api/v1/documents";
+      const res = await api.get(url);
+      if (res.ok) setDocs(await res.json());
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => {
@@ -112,9 +119,7 @@ export default function DocumentsPage() {
       <PageHeader title="Documents" />
       <div className="flex flex-wrap items-center justify-end gap-3">
         <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
-          <DialogTrigger asChild>
-            <Button>Upload PDF</Button>
-          </DialogTrigger>
+          <DialogTrigger render={<Button />}>Upload PDF</DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Upload Research Document</DialogTitle>
@@ -171,6 +176,22 @@ export default function DocumentsPage() {
         className="max-w-xs"
       />
 
+      {loading ? (
+        <div className="space-y-3">
+          <div className="flex gap-4 pb-2 border-b">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Skeleton key={i} className="h-4 flex-1" />
+            ))}
+          </div>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="flex gap-4">
+              {Array.from({ length: 5 }).map((_, j) => (
+                <Skeleton key={j} className="h-4 flex-1" />
+              ))}
+            </div>
+          ))}
+        </div>
+      ) : (
       <div className="overflow-x-auto">
       <Table>
         <TableHeader>
@@ -229,6 +250,7 @@ export default function DocumentsPage() {
         </TableBody>
       </Table>
       </div>
+      )}
     </div>
   );
 }

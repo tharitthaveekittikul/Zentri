@@ -27,6 +27,7 @@ import {
   IpoCalendarEvent,
   IpoAnalysisResult,
 } from "@/lib/services/events";
+import { Skeleton } from "@/components/ui/skeleton";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { useDualCurrency } from "@/hooks/useDualCurrency";
 import { DualCurrencyAmount } from "@/components/ui/DualCurrencyAmount";
@@ -355,7 +356,27 @@ export default function EventsPage() {
       </div>
 
       {loading ? (
-        <div className="text-center py-12 text-muted-foreground">Loading…</div>
+        <div className="border rounded-lg overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-2 border-b">
+            <Skeleton className="h-8 w-8 rounded-full" />
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-8 w-8 rounded-full" />
+          </div>
+          <div className="grid grid-cols-7 text-xs border-b">
+            {Array.from({ length: 7 }).map((_, i) => (
+              <div key={i} className="py-1 flex justify-center">
+                <Skeleton className="h-3 w-6" />
+              </div>
+            ))}
+          </div>
+          <div className="grid grid-cols-7">
+            {Array.from({ length: 35 }).map((_, i) => (
+              <div key={i} className="min-h-[72px] border-b border-r p-1">
+                <Skeleton className="h-3 w-4 mb-1" />
+              </div>
+            ))}
+          </div>
+        </div>
       ) : (
         <CalendarGrid
           events={filtered}

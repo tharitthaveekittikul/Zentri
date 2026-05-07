@@ -35,6 +35,7 @@ import {
 } from "recharts";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { useDualCurrency } from "@/hooks/useDualCurrency";
 import { DualCurrencyAmount } from "@/components/ui/DualCurrencyAmount";
@@ -76,6 +77,7 @@ interface CallLogDetail extends CallLog {
 }
 
 export default function AIUsagePage() {
+  const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState<Summary | null>(null);
   const [logs, setLogs] = useState<Analysis[]>([]);
   const [filterProvider, setFilterProvider] = useState("all");
@@ -104,14 +106,19 @@ export default function AIUsagePage() {
   }
 
   async function load() {
-    const summaryRes = await api.get("/api/v1/analysis/usage/summary");
-    const logsUrl =
-      filterProvider === "all"
-        ? "/api/v1/analysis/usage/logs"
-        : `/api/v1/analysis/usage/logs?provider=${filterProvider}`;
-    const logsRes = await api.get(logsUrl);
-    if (summaryRes.ok) setSummary(await summaryRes.json());
-    if (logsRes.ok) setLogs(await logsRes.json());
+    setLoading(true);
+    try {
+      const summaryRes = await api.get("/api/v1/analysis/usage/summary");
+      const logsUrl =
+        filterProvider === "all"
+          ? "/api/v1/analysis/usage/logs"
+          : `/api/v1/analysis/usage/logs?provider=${filterProvider}`;
+      const logsRes = await api.get(logsUrl);
+      if (summaryRes.ok) setSummary(await summaryRes.json());
+      if (logsRes.ok) setLogs(await logsRes.json());
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function loadCallLogs() {
@@ -165,7 +172,20 @@ export default function AIUsagePage() {
     <div className="space-y-6">
       <PageHeader title="AI Usage" />
 
-      {summary && (
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Card key={i}>
+              <CardHeader className="pb-1">
+                <Skeleton className="h-4 w-24" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-8 w-32" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : summary ? (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <Card>
@@ -220,7 +240,7 @@ export default function AIUsagePage() {
             </Card>
           )}
         </>
-      )}
+      ) : null}
 
       <Tabs defaultValue="analyses">
         <TabsList>
@@ -247,6 +267,22 @@ export default function AIUsagePage() {
             </Select>
           </div>
 
+          {loading ? (
+            <div className="space-y-3">
+              <div className="flex gap-4 pb-2 border-b">
+                {Array.from({ length: 7 }).map((_, i) => (
+                  <Skeleton key={i} className="h-4 flex-1" />
+                ))}
+              </div>
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="flex gap-4">
+                  {Array.from({ length: 7 }).map((_, j) => (
+                    <Skeleton key={j} className="h-4 flex-1" />
+                  ))}
+                </div>
+              ))}
+            </div>
+          ) : (
           <div className="overflow-x-auto">
           <Table>
             <TableHeader>
@@ -326,6 +362,7 @@ export default function AIUsagePage() {
             </TableBody>
           </Table>
           </div>
+          )}
         </TabsContent>
 
         <TabsContent value="call-logs" className="pt-2">

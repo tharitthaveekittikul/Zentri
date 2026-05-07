@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Skeleton } from "@/components/ui/skeleton";
 import { PageHeader } from "@/components/layout/PageHeader";
 
 interface CallLog {
@@ -109,7 +110,20 @@ export default function AIUsagePage() {
         </TabsList>
         <TabsContent value={activeTab}>
           {loading ? (
-            <p className="text-muted-foreground py-8 text-center">Loading...</p>
+            <div className="space-y-3 mt-4">
+              <div className="flex gap-4 pb-2 border-b">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <Skeleton key={i} className="h-4 flex-1" />
+                ))}
+              </div>
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="flex gap-4">
+                  {Array.from({ length: 6 }).map((_, j) => (
+                    <Skeleton key={j} className="h-4 flex-1" />
+                  ))}
+                </div>
+              ))}
+            </div>
           ) : !data?.logs.length ? (
             <p className="text-muted-foreground py-8 text-center">No calls yet.</p>
           ) : (

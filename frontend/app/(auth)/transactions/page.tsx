@@ -27,6 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Pencil, Search, Trash2 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { useDualCurrency } from "@/hooks/useDualCurrency";
 import { DualCurrencyAmount } from "@/components/ui/DualCurrencyAmount";
@@ -237,7 +238,22 @@ export default function TransactionsPage() {
       </div>
 
       {loading ? (
-        <p className="text-muted-foreground">Loading...</p>
+        <div className="rounded-md border">
+          <div className="p-4 space-y-3">
+            <div className="flex gap-4 pb-2 border-b">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <Skeleton key={i} className="h-4 flex-1" />
+              ))}
+            </div>
+            {Array.from({ length: 10 }).map((_, i) => (
+              <div key={i} className="flex gap-4">
+                {Array.from({ length: 8 }).map((_, j) => (
+                  <Skeleton key={j} className="h-4 flex-1" />
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
       ) : (
         <>
           <div

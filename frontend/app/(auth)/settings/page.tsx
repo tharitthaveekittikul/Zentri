@@ -11,6 +11,7 @@ import { AISettings } from "@/components/settings/AISettings";
 import { ScheduleTab } from "@/components/settings/ScheduleTab";
 import { getProfile, saveProfile, type ProfileSettings } from "@/lib/services/auth";
 import { Switch } from "@/components/ui/switch";
+import { Skeleton } from "@/components/ui/skeleton";
 import { usePrivacyStore } from "@/store/privacy";
 import { PageHeader } from "@/components/layout/PageHeader";
 
@@ -225,9 +226,12 @@ export default function SettingsPage() {
                   </div>
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground">
-                  Loading hardware info...
-                </p>
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-48" />
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-4 w-40" />
+                  <Skeleton className="h-20 w-full rounded-md mt-2" />
+                </div>
               )}
             </CardContent>
           </Card>

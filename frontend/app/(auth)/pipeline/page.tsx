@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchJobs, type PipelineJob } from "@/lib/services/pipeline";
 import { JobsTable } from "@/components/pipeline/JobsTable";
 import { TriggerButtons } from "@/components/pipeline/TriggerButtons";
+import { Skeleton } from "@/components/ui/skeleton";
 import { PageHeader } from "@/components/layout/PageHeader";
 
 export default function PipelinePage() {
@@ -49,7 +50,11 @@ export default function PipelinePage() {
     return (
       <div className="space-y-4">
         <PageHeader title="Pipeline" />
-        <p className="text-muted-foreground">Loading...</p>
+        <div className="space-y-2">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <Skeleton key={i} className="h-12 w-full" />
+          ))}
+        </div>
       </div>
     );
   }
