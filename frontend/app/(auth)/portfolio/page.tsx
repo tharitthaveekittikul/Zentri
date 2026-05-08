@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -29,6 +29,11 @@ import { api } from "@/lib/api";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { DualCurrencyAmount } from "@/components/ui/DualCurrencyAmount";
 import { DualValue } from "@/hooks/useDualCurrency";
+import { ViewMode, holdingsToViewItems } from "@/lib/visualizations/types";
+import { PortfolioViewToggle } from "@/components/portfolio/PortfolioViewToggle";
+import { TreemapView } from "@/components/portfolio/TreemapView";
+import { BeeswarmView } from "@/components/portfolio/BeeswarmView";
+import { CirclepackView } from "@/components/portfolio/CirclepackView";
 
 function InfoTooltip({ content }: { content: React.ReactNode }) {
   return (
@@ -45,6 +50,18 @@ export default function PortfolioPage() {
   const qc = useQueryClient();
   const [primaryCurrency, setPrimaryCurrency] = useState("THB");
   const [secondaryCurrency, setSecondaryCurrency] = useState("USD");
+
+  const [portfolioView, setPortfolioView] = useState<ViewMode>(() => {
+    if (typeof window !== "undefined") {
+      return (localStorage.getItem("portfolio-view") as ViewMode) ?? "table";
+    }
+    return "table";
+  });
+
+  const handleViewChange = useCallback((v: ViewMode) => {
+    setPortfolioView(v);
+    localStorage.setItem("portfolio-view", v);
+  }, []);
 
   const { get, getInt, setParam } = useTableParams();
 
@@ -131,6 +148,8 @@ export default function PortfolioPage() {
         />
       </div>
 
+      <PortfolioViewToggle view={portfolioView} onChange={handleViewChange} />
+
       <div className="grid grid-cols-2 gap-4">
         <Card className="min-h-[96px] flex flex-col justify-between">
           <CardHeader className="pb-1">
@@ -182,24 +201,39 @@ export default function PortfolioPage() {
 
       <PlatformBreakdownCards holdings={allHoldingsPage?.items ?? []} />
 
-      {holdingsPage ? (
-        <HoldingsTable
-          data={holdingsPage}
-          params={{
-            search: tableParams.search ?? "",
-            platform: tableParams.platform ?? "",
-            asset_type: tableParams.asset_type ?? "",
-            page: tableParams.page ?? 1,
-            page_size: tableParams.page_size ?? 25,
-          }}
-          onParamChange={setParam}
-          onDelete={(id) => deleteMutation.mutate(id)}
-          onUpdated={refresh}
-          isFetching={holdingsFetching}
-          platformColors={platformColors}
-        />
+      {portfolioView === "table" ? (
+        holdingsPage ? (
+          <HoldingsTable
+            data={holdingsPage}
+            params={{
+              search: tableParams.search ?? "",
+              platform: tableParams.platform ?? "",
+              asset_type: tableParams.asset_type ?? "",
+              page: tableParams.page ?? 1,
+              page_size: tableParams.page_size ?? 25,
+            }}
+            onParamChange={setParam}
+            onDelete={(id) => deleteMutation.mutate(id)}
+            onUpdated={refresh}
+            isFetching={holdingsFetching}
+            platformColors={platformColors}
+          />
+        ) : (
+          <Skeleton className="h-64 w-full" />
+        )
+      ) : allHoldingsPage ? (
+        (() => {
+          const vizItems = holdingsToViewItems(allHoldingsPage.items, {
+              primaryCurrency: displayCurrency,
+              secondaryCurrency: displaySecondaryCurrency,
+              exchangeRate: summary?.exchange_rate ? Number(summary.exchange_rate) : undefined,
+            });
+          if (portfolioView === "grid") return <TreemapView items={vizItems} />;
+          if (portfolioView === "swarm") return <BeeswarmView items={vizItems} />;
+          return <CirclepackView items={vizItems} />;
+        })()
       ) : (
-        <Skeleton className="h-48 w-full" />
+        <Skeleton className="w-full" style={{ height: "calc(100svh - 320px)", minHeight: 400 }} />
       )}
 
       <CashAccountsSection />
