@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +15,8 @@ import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePrivacyStore } from "@/store/privacy";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { fetchPlatformConfigs, updatePlatformColor } from "@/lib/services/platform-configs";
+import { fetchHoldings } from "@/lib/services/portfolio";
 
 interface HardwareRecommendation {
   can_run_local_llm: boolean;
@@ -37,7 +40,39 @@ export default function SettingsPage() {
   const [profile, setProfile] = useState<ProfileSettings | null>(null);
   const [birthDate, setBirthDate] = useState("");
   const [planToAge, setPlanToAge] = useState("85");
+  const [pendingColors, setPendingColors] = useState<Record<string, string>>({});
   const { isPrivate: privacyMode, setPrivate } = usePrivacyStore();
+
+  const qc = useQueryClient();
+
+  const { data: platformConfigs = [] } = useQuery({
+    queryKey: ["platform-configs"],
+    queryFn: fetchPlatformConfigs,
+  });
+
+  const { data: holdingsPage } = useQuery({
+    queryKey: ["holdings-all-settings"],
+    queryFn: () => fetchHoldings({ page: 1, page_size: 1000 }),
+  });
+
+  const uniquePlatforms: string[] = Array.from(
+    new Set(
+      (holdingsPage?.items ?? [])
+        .map((h) => h.platform)
+        .filter((p): p is string => Boolean(p))
+    )
+  ).sort();
+
+  const platformColorMap = Object.fromEntries(
+    platformConfigs.map((pc) => [pc.name, pc.color])
+  );
+
+  const colorMutation = useMutation({
+    mutationFn: ({ name, color }: { name: string; color: string }) =>
+      updatePlatformColor(name, color),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["platform-configs"] }),
+    onError: () => toast.error("Failed to save platform color"),
+  });
   const [telegramToken, setTelegramToken] = useState("");
   const [telegramChatId, setTelegramChatId] = useState("");
   const [telegramHasToken, setTelegramHasToken] = useState(false);
@@ -190,6 +225,7 @@ export default function SettingsPage() {
           <TabsTrigger value="integrations">Integrations</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
           <TabsTrigger value="schedule">Schedule</TabsTrigger>
+          <TabsTrigger value="platforms">Platforms</TabsTrigger>
         </TabsList>
 
         <TabsContent value="general" className="space-y-6 mt-4">
@@ -468,6 +504,63 @@ export default function SettingsPage() {
 
         <TabsContent value="schedule" className="space-y-6 mt-4">
           <ScheduleTab />
+        </TabsContent>
+
+        <TabsContent value="platforms" className="space-y-4 mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm font-medium">Platform Colors</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {uniquePlatforms.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No platforms found in your holdings.</p>
+              ) : (
+                uniquePlatforms.map((platform) => {
+                  const currentValue = pendingColors[platform] ?? platformColorMap[platform] ?? "";
+                  const isValidHex = /^#[0-9a-fA-F]{6}$/.test(currentValue);
+                  return (
+                    <div key={platform} className="flex items-center justify-between gap-3">
+                      <span className="text-sm font-medium">{platform}</span>
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="h-7 w-7 rounded border border-border flex-shrink-0"
+                          style={{ backgroundColor: isValidHex ? currentValue : undefined }}
+                        />
+                        <Input
+                          className="h-8 w-28 font-mono text-xs"
+                          placeholder="#6366f1"
+                          maxLength={7}
+                          value={currentValue}
+                          onChange={(e) =>
+                            setPendingColors((prev) => ({ ...prev, [platform]: e.target.value }))
+                          }
+                        />
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-8"
+                          disabled={colorMutation.isPending || !isValidHex}
+                          onClick={() =>
+                            colorMutation.mutate(
+                              { name: platform, color: currentValue },
+                              {
+                                onSuccess: () => {
+                                  setPendingColors((prev) => ({ ...prev, [platform]: currentValue }));
+                                  toast.success(`Saved color for ${platform}`);
+                                },
+                              }
+                            )
+                          }
+                        >
+                          Save
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>

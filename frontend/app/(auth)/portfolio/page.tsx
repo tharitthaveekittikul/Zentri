@@ -9,6 +9,7 @@ import {
   fetchSummary,
   type HoldingsParams,
 } from "@/lib/services/portfolio";
+import { fetchPlatformConfigs } from "@/lib/services/platform-configs";
 import { useTableParams } from "@/hooks/useTableParams";
 import { HoldingsTable } from "@/components/portfolio/HoldingsTable";
 import { CashAccountsSection } from "@/components/portfolio/CashAccountsSection";
@@ -81,6 +82,15 @@ export default function PortfolioPage() {
     queryKey: ["portfolio-summary"],
     queryFn: fetchSummary,
   });
+
+  const { data: platformConfigsList = [] } = useQuery({
+    queryKey: ["platform-configs"],
+    queryFn: fetchPlatformConfigs,
+  });
+
+  const platformColors = Object.fromEntries(
+    platformConfigsList.map((pc) => [pc.name, pc.color])
+  );
 
   const deleteMutation = useMutation({
     mutationFn: deleteHolding,
@@ -186,6 +196,7 @@ export default function PortfolioPage() {
           onDelete={(id) => deleteMutation.mutate(id)}
           onUpdated={refresh}
           isFetching={holdingsFetching}
+          platformColors={platformColors}
         />
       ) : (
         <Skeleton className="h-48 w-full" />

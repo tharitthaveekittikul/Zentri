@@ -107,10 +107,15 @@ class BackupAIAnalysis(BaseModel):
     conversations: list[BackupConversation] = []
 
 
+class BackupPlatformConfig(BaseModel):
+    name: str
+    color: str
+
+
 class SystemBackup(BaseModel):
     model_config = {"from_attributes": True}
 
-    version: str = "2"
+    version: str = "3"
     exported_at: datetime
     settings: BackupSettings
     portfolio: BackupPortfolio
@@ -119,3 +124,4 @@ class SystemBackup(BaseModel):
     watchlist: list[BackupWatchlistItem] = []
     cash_balances: list[BackupCashBalance] = []
     ai_analyses: list[BackupAIAnalysis] = []
+    platform_configs: list[BackupPlatformConfig] = []

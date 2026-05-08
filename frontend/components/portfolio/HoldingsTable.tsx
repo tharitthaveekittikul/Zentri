@@ -69,6 +69,7 @@ interface Props {
   onDelete: (id: string) => void;
   onUpdated: () => void;
   isFetching?: boolean;
+  platformColors?: Record<string, string>;
 }
 
 const secondaryCls = "text-xs text-muted-foreground font-mono tabular-nums mt-0.5";
@@ -82,6 +83,7 @@ export function HoldingsTable({
   onDelete,
   onUpdated,
   isFetching = false,
+  platformColors = {},
 }: Props) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [searchInput, setSearchInput] = useState(params.search);
@@ -112,6 +114,19 @@ export function HoldingsTable({
     [data.items],
   );
 
+  function contrastColor(hex: string): string {
+    if (!/^#[0-9a-fA-F]{6}$/.test(hex)) return "#000000";
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    const lin = (c: number) => {
+      const s = c / 255;
+      return s <= 0.04045 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+    };
+    const L = 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+    return L > 0.179 ? "#000000" : "#ffffff";
+  }
+
   function SortIcon({ isSorted }: { isSorted: false | "asc" | "desc" }) {
     if (!isSorted) return <ArrowUpDown className="ml-1 h-3 w-3 inline opacity-40" />;
     if (isSorted === "asc") return <ArrowUp className="ml-1 h-3 w-3 inline" />;
@@ -129,18 +144,36 @@ export function HoldingsTable({
           Symbol <SortIcon isSorted={column.getIsSorted()} />
         </button>
       ),
-      cell: ({ row }) => (
-        <Link
-          href={`/portfolio/${encodeURIComponent(row.original.symbol)}`}
-          className="hover:underline"
-          prefetch={false}
-        >
-          <div className="flex items-center gap-2">
-            <TickerLogo symbol={row.original.symbol} logoUrl={row.original.metadata_?.logo_url as string | undefined} />
-            <span>{row.original.symbol}</span>
-          </div>
-        </Link>
-      ),
+      cell: ({ row }) => {
+        const platform = row.original.platform;
+        const bgColor = platform ? platformColors[platform] : undefined;
+        return (
+          <Link
+            href={`/portfolio/${encodeURIComponent(row.original.symbol)}`}
+            className="hover:underline"
+            prefetch={false}
+          >
+            <div className="flex items-center gap-2 flex-wrap">
+              <TickerLogo symbol={row.original.symbol} logoUrl={row.original.metadata_?.logo_url as string | undefined} />
+              <span>{row.original.symbol}</span>
+              {platform && (
+                <span
+                  className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium max-w-[96px] truncate ${
+                    bgColor ? "" : "bg-muted text-muted-foreground"
+                  }`}
+                  style={
+                    bgColor
+                      ? { backgroundColor: bgColor, color: contrastColor(bgColor) }
+                      : undefined
+                  }
+                >
+                  {platform}
+                </span>
+              )}
+            </div>
+          </Link>
+        );
+      },
     },
     {
       accessorKey: "outstanding_shares",

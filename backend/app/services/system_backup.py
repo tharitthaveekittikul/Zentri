@@ -13,6 +13,7 @@ from app.models.cash_balance import CashBalance
 from app.models.feature_llm_config import FeatureLLMConfig
 from app.models.holding import Holding
 from app.models.llm_conversation import LLMConversation
+from app.models.platform_config import PlatformConfig
 from app.models.provider_config import ProviderConfig
 from app.models.transaction import Transaction
 from app.models.user import User
@@ -23,6 +24,7 @@ from app.schemas.system_backup import (
     BackupConversation,
     BackupFeatureLLMConfig,
     BackupHolding,
+    BackupPlatformConfig,
     BackupPortfolio,
     BackupProviderConfig,
     BackupScheduleConfig,
@@ -35,7 +37,7 @@ from app.services import price_schedule_config as schedule_service
 
 logger = get_logger(__name__)
 
-SUPPORTED_VERSIONS = {"1", "2"}
+SUPPORTED_VERSIONS = {"1", "2", "3"}
 
 
 async def export_backup(db: AsyncSession, user: User) -> SystemBackup:
@@ -218,9 +220,18 @@ async def export_backup(db: AsyncSession, user: User) -> SystemBackup:
     ]
     settings = settings.model_copy(update={"schedule_configs": schedule_configs})
 
+    # Platform configs
+    pc_rows = await db.execute(
+        select(PlatformConfig).where(PlatformConfig.user_id == user_id)
+    )
+    platform_configs = [
+        BackupPlatformConfig(name=pc.name, color=pc.color)
+        for pc in pc_rows.scalars().all()
+    ]
+
     logger.info("Exported backup for user=%s", user_id)
     return SystemBackup(
-        version="2",
+        version="3",
         exported_at=datetime.now(timezone.utc),
         settings=settings,
         portfolio=BackupPortfolio(holdings=holdings, transactions=transactions),
@@ -229,6 +240,7 @@ async def export_backup(db: AsyncSession, user: User) -> SystemBackup:
         watchlist=watchlist,
         cash_balances=cash_balances,
         ai_analyses=ai_analyses,
+        platform_configs=platform_configs,
     )
 
 
@@ -282,6 +294,7 @@ async def import_backup(db: AsyncSession, user: User, backup: SystemBackup) -> N
     await db.execute(delete(Holding).where(Holding.user_id == user_id))
     await db.execute(delete(Asset).where(Asset.user_id == user_id))
     await db.execute(delete(ProviderConfig).where(ProviderConfig.user_id == user_id))
+    await db.execute(delete(PlatformConfig).where(PlatformConfig.user_id == user_id))
     await db.flush()
 
     # --- Restore ---
@@ -431,6 +444,20 @@ async def import_backup(db: AsyncSession, user: User, backup: SystemBackup) -> N
                 content=conv.content,
                 message_order=conv.message_order,
             ))
+
+    # Platform configs
+    from sqlalchemy.dialects.postgresql import insert as pg_insert
+    for pc in backup.platform_configs:
+        stmt = (
+            pg_insert(PlatformConfig)
+            .values(id=uuid.uuid4(), user_id=user_id, name=pc.name, color=pc.color)
+            .on_conflict_do_update(
+                constraint="uq_platform_configs_user_name",
+                set_={"color": pc.color},
+            )
+        )
+        await db.execute(stmt)
+    logger.info("Restored %d platform configs", len(backup.platform_configs))
 
     await db.commit()
     await db.refresh(user)
