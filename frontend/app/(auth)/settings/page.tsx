@@ -17,6 +17,7 @@ import { usePrivacyStore } from "@/store/privacy";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { fetchPlatformConfigs, updatePlatformColor } from "@/lib/services/platform-configs";
 import { fetchHoldings } from "@/lib/services/portfolio";
+import { DatePicker } from "@/components/ui/date-picker";
 
 interface HardwareRecommendation {
   can_run_local_llm: boolean;
@@ -327,10 +328,10 @@ export default function SettingsPage() {
               <div className="flex flex-col sm:flex-row gap-4 sm:items-end">
                 <div className="flex-1">
                   <label className="text-sm font-medium mb-1 block">Date of Birth</label>
-                  <Input
-                    type="date"
+                  <DatePicker
                     value={birthDate}
-                    onChange={(e) => setBirthDate(e.target.value)}
+                    onChange={setBirthDate}
+                    captionLayout="dropdown"
                   />
                 </div>
                 <div className="flex-1">

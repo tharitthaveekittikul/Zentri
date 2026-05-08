@@ -40,6 +40,7 @@ import {
   type TransactionParams,
 } from "@/lib/services/portfolio";
 import type { PaginatedResponse } from "@/lib/types";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
 
 const TYPE_COLORS: Record<string, string> = {
   buy: "bg-green-100 text-green-800",
@@ -223,18 +224,10 @@ export default function TransactionsPage() {
             ))}
           </SelectContent>
         </Select>
-        <Input
-          type="date"
-          className="h-9 w-[150px]"
-          value={get("date_from")}
-          onChange={(e) => setParam({ date_from: e.target.value || null })}
-        />
-        <span className="text-muted-foreground text-sm">to</span>
-        <Input
-          type="date"
-          className="h-9 w-[150px]"
-          value={get("date_to")}
-          onChange={(e) => setParam({ date_to: e.target.value || null })}
+        <DateRangePicker
+          from={get("date_from")}
+          to={get("date_to")}
+          onChange={({ from, to }) => setParam({ date_from: from, date_to: to })}
         />
       </div>
 

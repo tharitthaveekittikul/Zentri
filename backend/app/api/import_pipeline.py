@@ -72,7 +72,7 @@ async def confirm_import(
 
             raw_date = row.get("trade_date") or ""
             try:
-                executed_at = dp.parse(str(raw_date)).replace(tzinfo=timezone.utc)
+                executed_at = dp.parse(str(raw_date), dayfirst=True).replace(tzinfo=timezone.utc)
             except Exception:
                 executed_at = datetime.now(timezone.utc)
 

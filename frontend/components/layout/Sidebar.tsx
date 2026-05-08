@@ -76,28 +76,7 @@ export function Sidebar() {
     <aside className="hidden md:flex w-72 flex-col h-full py-4 pl-4">
       {/* Single card wrapping logo + nav */}
       <div className="flex-1 bg-white dark:bg-slate-900 rounded-[24px] border border-slate-200/60 dark:border-slate-800 flex flex-col overflow-hidden">
-        {/* Logo area */}
         <div className="flex items-center gap-4 px-5 h-20 shrink-0">
-          <div
-            className="flex items-center justify-center w-11 h-11 rounded-2xl bg-slate-900 dark:bg-white shrink-0"
-            aria-hidden="true"
-          >
-            <svg
-              width="22"
-              height="22"
-              viewBox="0 0 14 14"
-              fill="none"
-              className="text-white dark:text-slate-900"
-            >
-              <path
-                d="M2 2.5h10L5.5 7.5H12M2 11.5h10"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </div>
           <span className="text-base font-semibold tracking-[0.06em] uppercase text-slate-900 dark:text-white leading-none">
             Zentri
           </span>

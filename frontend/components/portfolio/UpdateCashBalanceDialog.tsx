@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { createBalance } from "@/lib/services/cash-balance";
+import { DatePicker } from "@/components/ui/date-picker";
 
 interface Props {
   assetId: string;
@@ -72,11 +73,9 @@ export function UpdateCashBalanceDialog({
           </div>
           <div className="space-y-1">
             <Label>Date</Label>
-            <Input
-              type="date"
+            <DatePicker
               value={date}
-              onChange={(e) => setDate(e.target.value)}
-              required
+              onChange={setDate}
             />
           </div>
           <Button type="submit" className="w-full" disabled={loading}>

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -518,7 +519,7 @@ export default function EventsPage() {
             </div>
             <div className="space-y-1">
               <label className="text-sm font-medium">Date received</label>
-              <input type="date" className="w-full border rounded px-3 py-2 text-sm" value={confirmDate} onChange={(e) => setConfirmDate(e.target.value)} />
+              <DatePicker value={confirmDate} onChange={setConfirmDate} className="w-full" />
             </div>
             {confirmQty && selectedDividend && (
               <div className="flex justify-between font-semibold border-t pt-2">

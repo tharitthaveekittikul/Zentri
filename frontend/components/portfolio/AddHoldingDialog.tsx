@@ -21,6 +21,7 @@ import {
 import { toast } from "sonner";
 import { addHolding, searchCoinGecko, CoinGeckoResult } from "@/lib/services/portfolio";
 import { Plus } from "lucide-react";
+import { DatePicker } from "@/components/ui/date-picker";
 
 const ASSET_TYPES = [
   "us_stock",
@@ -186,10 +187,10 @@ export function AddHoldingDialog({ primaryCurrency, onAdded }: Props) {
           )}
           <div className="space-y-1">
             <Label>First Purchase Date (optional)</Label>
-            <Input
-              type="date"
+            <DatePicker
               value={purchasedAt}
-              onChange={(e) => setPurchasedAt(e.target.value)}
+              onChange={setPurchasedAt}
+              placeholder="Select date (optional)"
             />
           </div>
           <div className="grid grid-cols-2 gap-3">

@@ -21,6 +21,7 @@ import {
 import { toast } from "sonner";
 import { addManualTransaction } from "@/lib/services/portfolio";
 import { ArrowRightLeft } from "lucide-react";
+import { DatePicker } from "@/components/ui/date-picker";
 
 const ASSET_TYPES = [
   "us_stock",
@@ -158,11 +159,9 @@ export function AddTransactionDialog({ primaryCurrency, onAdded }: Props) {
             </div>
             <div className="space-y-1">
               <Label>Date</Label>
-              <Input
-                type="date"
+              <DatePicker
                 value={executedAt}
-                onChange={(e) => setExecutedAt(e.target.value)}
-                required
+                onChange={setExecutedAt}
               />
             </div>
           </div>

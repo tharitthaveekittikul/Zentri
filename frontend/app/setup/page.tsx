@@ -10,6 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import { setupAccount, saveProfile, type HardwareRecommendation } from "@/lib/services/auth";
 import { importSystem } from "@/lib/services/system";
+import { DatePicker } from "@/components/ui/date-picker";
 
 type Step = "account" | "restore" | "profile" | "hardware" | "llm";
 
@@ -169,10 +170,10 @@ export default function SetupPage() {
             </p>
             <div className="space-y-1">
               <Label>Date of Birth</Label>
-              <Input
-                type="date"
+              <DatePicker
                 value={birthDate}
-                onChange={(e) => setBirthDate(e.target.value)}
+                onChange={setBirthDate}
+                captionLayout="dropdown"
               />
             </div>
             <div className="space-y-1">
