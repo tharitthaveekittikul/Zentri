@@ -11,10 +11,10 @@ colors:
   border: "oklch(0.88 0 0)"
   # Chrome palette (dark) — true black iOS
   dark-body-bg: "oklch(0 0 0)"
-  dark-card-surface: "oklch(0.13 0 0)"
+  dark-card-surface: "oklch(0.16 0 0)"
   dark-foreground: "oklch(0.97 0 0)"
   dark-quiet-text: "oklch(0.60 0 0)"
-  dark-border: "oklch(1 0 0 / 10%)"
+  dark-border: "oklch(1 0 0 / 15%)"
   # Data-driven accents (signals only — never chrome)
   signal-green-bg: "oklch(0.95 0.05 145 / 12%)"
   signal-green-text: "oklch(0.35 0.10 145)"
@@ -69,7 +69,7 @@ glass:
   light-border: "oklch(0.11 0 0 / 8%)"
   light-specular: "oklch(1 0 0 / 72%)"
   # Dark mode
-  dark-bg: "oklch(1 0 0 / 7%)"
+  dark-bg: "oklch(1 0 0 / 11%)"
   dark-blur: "32px"
   dark-saturate: "200%"
   dark-border: "oklch(1 0 0 / 10%)"

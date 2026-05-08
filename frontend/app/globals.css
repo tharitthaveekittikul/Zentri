@@ -149,9 +149,9 @@ html:root.dark {
   /* ── Base palette (dark) — true black iOS ── */
   --background: oklch(0 0 0);
   --foreground: oklch(0.97 0 0);
-  --card: oklch(0.13 0 0);
+  --card: oklch(0.16 0 0);
   --card-foreground: oklch(0.97 0 0);
-  --popover: oklch(0.13 0 0 / 94%);
+  --popover: oklch(0.16 0 0 / 94%);
   --popover-foreground: oklch(0.97 0 0);
   --primary: oklch(0.97 0 0);
   --primary-foreground: oklch(0.05 0 0);
@@ -162,7 +162,7 @@ html:root.dark {
   --accent: oklch(0.20 0 0);
   --accent-foreground: oklch(0.97 0 0);
   --destructive: oklch(0.65 0.22 25);
-  --border: oklch(1 0 0 / 10%);
+  --border: oklch(1 0 0 / 15%);
   --input: oklch(1 0 0 / 12%);
   --ring: oklch(0.97 0 0);
   --chart-1: oklch(0.87 0 0);
@@ -172,7 +172,7 @@ html:root.dark {
   --chart-5: oklch(0.269 0 0);
 
   /* ── Card ambient shadow (dark) ── */
-  --card-shadow: 0 1px 0 oklch(1 0 0 / 5%), 0 4px 24px oklch(0 0 0 / 55%);
+  --card-shadow: 0 1px 0 oklch(1 0 0 / 9%), 0 4px 24px oklch(0 0 0 / 55%);
 
   /* ── Signal colors (dark) ── */
   --signal-gain-bg: oklch(0.696 0.170 162 / 10%);
@@ -180,7 +180,7 @@ html:root.dark {
   --signal-loss-bg: oklch(0.65 0.22 25 / 10%);
 
   /* ── Sidebar glass (dark true black) ── */
-  --sidebar: oklch(1 0 0 / 7%);
+  --sidebar: oklch(1 0 0 / 11%);
   --sidebar-foreground: oklch(0.60 0 0);
   --sidebar-primary: oklch(0.97 0 0);
   --sidebar-primary-foreground: oklch(0.05 0 0);
@@ -235,10 +235,16 @@ html:root.dark {
     box-shadow: var(--card-shadow);
   }
 
-  /* Borderless cards — shadow provides depth */
+  /* Borderless cards in light mode — shadow provides depth */
   [data-slot="card"],
   .card-surface {
     border-width: 0;
+  }
+
+  /* Dark mode: re-enable 1px border for card edge definition */
+  .dark [data-slot="card"],
+  .dark .card-surface {
+    border-width: 1px;
   }
 
   /* Theme switch — smooth cross-fade on key surfaces */
