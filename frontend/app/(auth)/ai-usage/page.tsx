@@ -255,12 +255,12 @@ export default function AIUsagePage() {
               onValueChange={(v) => setFilterProvider(v ?? "all")}
             >
               <SelectTrigger className="w-40">
-                <SelectValue />
+                <span className="truncate">{filterProvider === "all" ? "All Providers" : filterProvider}</span>
               </SelectTrigger>
               <SelectContent>
                 {providers.map((p) => (
                   <SelectItem key={p} value={p}>
-                    {p}
+                    {p === "all" ? "All Providers" : p}
                   </SelectItem>
                 ))}
               </SelectContent>

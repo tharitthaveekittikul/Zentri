@@ -358,7 +358,7 @@ export default function WatchlistPage() {
           onValueChange={(v) => setParam({ asset_type: v === "all" ? null : v })}
         >
           <SelectTrigger className="h-9 w-[150px]">
-            <SelectValue placeholder="Asset Type" />
+            <span className="truncate">{get("asset_type") || "All Types"}</span>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Types</SelectItem>
@@ -372,7 +372,7 @@ export default function WatchlistPage() {
           onValueChange={(v) => setParam({ alert_status: v === "all" ? null : v })}
         >
           <SelectTrigger className="h-9 w-[150px]">
-            <SelectValue placeholder="Alert Status" />
+            <span className="truncate">{get("alert_status") || "All Statuses"}</span>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Statuses</SelectItem>

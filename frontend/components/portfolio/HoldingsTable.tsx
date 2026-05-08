@@ -392,7 +392,7 @@ export function HoldingsTable({
           onValueChange={(v) => onParamChange({ platform: v === "all" ? null : v })}
         >
           <SelectTrigger className="h-9 w-[160px]">
-            <SelectValue placeholder="Platform" />
+            <span className="truncate">{params.platform || "All Platforms"}</span>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Platforms</SelectItem>
@@ -406,7 +406,7 @@ export function HoldingsTable({
           onValueChange={(v) => onParamChange({ asset_type: v === "all" ? null : v })}
         >
           <SelectTrigger className="h-9 w-[160px]">
-            <SelectValue placeholder="Asset Type" />
+            <span className="truncate">{params.asset_type || "All Types"}</span>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Types</SelectItem>

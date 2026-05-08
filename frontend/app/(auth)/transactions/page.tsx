@@ -196,7 +196,7 @@ export default function TransactionsPage() {
           onValueChange={(v) => setParam({ type: v === "all" ? null : v })}
         >
           <SelectTrigger className="h-9 w-[140px]">
-            <SelectValue placeholder="Type" />
+            <span className="truncate">{get("type") || "All Types"}</span>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Types</SelectItem>
@@ -212,7 +212,7 @@ export default function TransactionsPage() {
           onValueChange={(v) => setParam({ platform: v === "all" ? null : v })}
         >
           <SelectTrigger className="h-9 w-[140px]">
-            <SelectValue placeholder="Platform" />
+            <span className="truncate">{get("platform") || "All Platforms"}</span>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Platforms</SelectItem>

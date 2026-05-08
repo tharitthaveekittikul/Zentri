@@ -343,7 +343,7 @@ export default function EventsPage() {
   const filtered = useMemo(() => filterEvents(allEvents, filter), [allEvents, filter]);
 
   const FILTERS: { key: FilterType; label: string }[] = [
-    { key: "all", label: "All" },
+    { key: "all", label: "All Events" },
     { key: "dividend", label: "Dividends" },
     { key: "ipo", label: "IPOs" },
     { key: "watchlist", label: "Watchlist only" },
