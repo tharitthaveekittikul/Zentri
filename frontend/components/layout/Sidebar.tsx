@@ -52,15 +52,15 @@ function NavItem({
   return (
     <div className="relative">
       {isActive && (
-        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-emerald-600 rounded-full" />
+        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-full" style={{ background: 'var(--gradient-brand)' }} />
       )}
       <Link
         href={href}
         className={cn(
           "mx-3 flex items-center gap-3 px-3 py-2.5 rounded-full text-[15px] tracking-wide transition-colors duration-150",
           isActive
-            ? "bg-emerald-100/60 dark:bg-emerald-950/20 text-emerald-900 dark:text-emerald-100 font-bold"
-            : "text-slate-500 dark:text-slate-400 font-normal hover:text-slate-700 dark:hover:text-slate-300",
+            ? "bg-brand-accent/10 dark:bg-brand-accent/15 text-brand-deep dark:text-brand-sage font-semibold"
+            : "text-ink-muted/60 dark:text-ink-muted/60 font-normal hover:text-ink dark:hover:text-ink",
         )}
       >
         <Icon className="h-[18px] w-[18px] shrink-0" strokeWidth={1.2} />
@@ -75,14 +75,14 @@ export function Sidebar() {
   return (
     <aside className="hidden md:flex w-72 flex-col h-full py-4 pl-4">
       {/* Single card wrapping logo + nav */}
-      <div className="flex-1 bg-white dark:bg-slate-900 rounded-[24px] border border-slate-200/60 dark:border-slate-800 flex flex-col overflow-hidden">
+      <div className="flex-1 bg-shell dark:bg-shell rounded-[24px] flex flex-col overflow-hidden">
         <div className="flex items-center gap-4 px-5 h-20 shrink-0">
-          <span className="text-base font-semibold tracking-[0.06em] uppercase text-slate-900 dark:text-white leading-none">
+          <span className="text-base font-semibold tracking-[0.06em] uppercase text-brand-deep dark:text-brand-sage leading-none">
             Zentri
           </span>
         </div>
 
-        <div className="mx-4 h-px bg-slate-100 dark:bg-slate-800 shrink-0" />
+        <div className="mx-4 h-px bg-slate-200/70 dark:bg-slate-800 shrink-0" />
 
         <nav className="flex-1 flex flex-col py-4 overflow-y-auto">
           <p className="px-5 mb-2 text-[10px] font-semibold tracking-[0.12em] uppercase text-slate-400/70 dark:text-slate-500">

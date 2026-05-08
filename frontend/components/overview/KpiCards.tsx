@@ -21,7 +21,7 @@ function KpiCard({ label, value, pct, direction = "neutral" }: CardProps) {
 
   return (
     <div
-      className={cn("card-surface border border-border rounded-2xl p-5")}
+      className={cn("card-surface rounded-2xl p-5")}
       style={{
         backgroundColor: isPositive
           ? "var(--signal-gain-bg)"

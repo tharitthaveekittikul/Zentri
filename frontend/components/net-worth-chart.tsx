@@ -44,20 +44,20 @@ export function NetWorthChart({ privacyMode }: { privacyMode: boolean }) {
     const chart = createChart(containerRef.current, {
       width: containerRef.current.clientWidth,
       height: 280,
-      layout: { background: { color: "transparent" }, textColor: "#9ca3af" },
+      layout: { background: { color: "transparent" }, textColor: "#94a3b8" },
       grid: { vertLines: { visible: false }, horzLines: { visible: false } },
-      rightPriceScale: { borderColor: "#374151" },
-      timeScale: { borderColor: "#374151", timeVisible: false },
+      rightPriceScale: { borderColor: "transparent" },
+      timeScale: { borderColor: "transparent", timeVisible: false },
     });
 
     valueSeriesRef.current = chart.addSeries(AreaSeries, {
-      lineColor: "#6366f1",
-      topColor: "rgba(99,102,241,0.25)",
-      bottomColor: "rgba(99,102,241,0)",
+      lineColor: "#10B981",
+      topColor: "rgba(16,185,129,0.20)",
+      bottomColor: "rgba(16,185,129,0)",
       lineWidth: 2,
     });
     costSeriesRef.current = chart.addSeries(LineSeries, {
-      color: "#6b7280",
+      color: "#5fbd92",
       lineWidth: 1,
       lineStyle: 1,
     });
@@ -117,9 +117,10 @@ export function NetWorthChart({ privacyMode }: { privacyMode: boolean }) {
       : `${v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${primaryCurrency}`;
 
   const fmtPnl = () => {
-    if (privacyMode) return `****** ${primaryCurrency}`;
     const sign = pnl >= 0 ? "+" : "";
-    return `${sign}${fmt(pnl)} (${pnl >= 0 ? "+" : ""}${pnlPct.toFixed(2)}%)`;
+    const pctStr = `${sign}${pnlPct.toFixed(2)}%`;
+    if (privacyMode) return `****** ${primaryCurrency} (${pctStr})`;
+    return `${sign}${fmt(pnl)} (${pctStr})`;
   };
 
   return (
@@ -134,7 +135,7 @@ export function NetWorthChart({ privacyMode }: { privacyMode: boolean }) {
                 onClick={() => setRange(r)}
                 className={`px-2 py-0.5 rounded text-xs font-medium transition-colors ${
                   range === r
-                    ? "bg-indigo-600 text-white"
+                    ? "bg-brand-accent text-white"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
@@ -156,7 +157,7 @@ export function NetWorthChart({ privacyMode }: { privacyMode: boolean }) {
             <p className="text-xs text-muted-foreground">Unrealized PnL</p>
             <p
               className={`text-lg font-semibold tabular-nums ${
-                pnl >= 0 ? "text-green-500" : "text-red-500"
+                pnl >= 0 ? "text-brand-mid" : "text-brand-danger"
               }`}
             >
               {fmtPnl()}

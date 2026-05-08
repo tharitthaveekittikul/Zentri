@@ -15,14 +15,14 @@ export function BentoCard({ title, value, trend, className, onClick }: BentoCard
   return (
     <div
       className={cn(
-        "bg-slate-50/50 dark:bg-slate-900 rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-800 relative group",
+        "bg-page dark:bg-slate-900 rounded-2xl p-5 shadow-sm relative group",
         onClick && "cursor-pointer hover:shadow-md transition-shadow duration-200",
         className
       )}
       onClick={onClick}
     >
       <div className="flex items-start justify-between mb-4">
-        <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">
+        <p className="text-[11px] font-semibold text-ink-muted/50 dark:text-ink-muted/40 uppercase tracking-widest">
           {title}
         </p>
         {onClick && (
@@ -33,7 +33,7 @@ export function BentoCard({ title, value, trend, className, onClick }: BentoCard
         )}
       </div>
 
-      <p className="text-2xl font-bold text-slate-900 dark:text-white tabular-nums tracking-tight">
+      <p className="text-2xl font-bold text-ink dark:text-ink tabular-nums tracking-tight">
         {value}
       </p>
 
@@ -43,8 +43,8 @@ export function BentoCard({ title, value, trend, className, onClick }: BentoCard
             className={cn(
               "inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full",
               isPositive
-                ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400"
-                : "bg-red-50 text-red-600 dark:bg-red-950/30 dark:text-red-400"
+                ? "bg-brand-accent/10 text-brand-mid dark:bg-brand-accent/15 dark:text-brand-sage"
+                : "bg-brand-danger/10 text-brand-danger dark:bg-brand-danger/15 dark:text-brand-danger"
             )}
           >
             {isPositive ? (

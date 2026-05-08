@@ -5,6 +5,7 @@ import { PieChart as RechartsPieChart, Pie, Cell, Tooltip, ResponsiveContainer }
 import { PieChart as PieChartIcon } from "lucide-react";
 import { AllocationItem } from "@/lib/services/overview";
 import { useDualCurrency } from "@/hooks/useDualCurrency";
+import { usePrivacyStore } from "@/store/privacy";
 
 const COLORS = ["#6366f1", "#06b6d4", "#f59e0b", "#10b981", "#f43f5e", "#8b5cf6"];
 
@@ -20,6 +21,7 @@ interface Props {
 
 export const AllocationDonut = memo(function AllocationDonut({ allocation }: Props) {
   const { primaryCurrency } = useDualCurrency();
+  const { isPrivate } = usePrivacyStore();
 
   const data = useMemo(
     () => allocation.map((a) => ({
@@ -90,7 +92,7 @@ export const AllocationDonut = memo(function AllocationDonut({ allocation }: Pro
                   {item.name}
                 </span>
                 <span className="text-xs font-mono tabular-nums text-muted-foreground flex-shrink-0">
-                  {formatCompact(item.rawValue)} {primaryCurrency}
+                  {isPrivate ? "******" : formatCompact(item.rawValue)} {primaryCurrency}
                 </span>
                 <span
                   className="text-xs font-mono font-medium tabular-nums flex-shrink-0 w-10 text-right"

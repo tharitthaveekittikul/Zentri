@@ -27,12 +27,12 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
   }, [setOpen]);
 
   return (
-    <div className="flex h-screen bg-[#F2F4F7] dark:bg-slate-950">
+    <div className="flex h-screen bg-page dark:bg-page">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <TopNav />
         <main className="flex-1 overflow-hidden pt-3 px-3">
-          <div className="overflow-auto h-full p-6 md:p-8 pb-safe-tab bg-white dark:bg-slate-900 rounded-t-[28px] border-x border-t border-slate-200/60 dark:border-slate-800 [will-change:transform]">
+          <div className="overflow-auto h-full p-6 md:p-8 pb-safe-tab bg-shell dark:bg-shell rounded-t-[28px] [will-change:transform]">
             {children}
           </div>
         </main>

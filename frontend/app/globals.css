@@ -5,6 +5,17 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  /* ── Brand tokens ── */
+  --color-brand-deep: var(--brand-deep);
+  --color-brand-mid: var(--brand-mid);
+  --color-brand-sage: var(--brand-sage);
+  --color-brand-accent: var(--brand-accent);
+  --color-brand-danger: var(--brand-danger);
+  --color-shell: var(--shell-bg);
+  --color-page: var(--page-bg);
+  --color-ink: var(--ink-primary);
+  --color-ink-muted: var(--ink-secondary);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
@@ -58,10 +69,22 @@ html:root.dark {
 }
 
 :root {
+  /* ── Brand palette ── */
+  --brand-deep: oklch(0.28 0.088 152);    /* #13452d */
+  --brand-mid: oklch(0.49 0.108 152);     /* #227d53 */
+  --brand-sage: oklch(0.71 0.100 155);    /* #5fbd92 */
+  --brand-accent: oklch(0.696 0.170 162); /* #10B981 */
+  --brand-danger: oklch(0.636 0.222 15);  /* #F43F5E */
+  --shell-bg: oklch(0.972 0 0);           /* #F7F7F7 */
+  --page-bg: oklch(0.984 0.003 264);      /* #F8FAFC */
+  --ink-primary: oklch(0.06 0 0);         /* #050505 */
+  --ink-secondary: oklch(0.165 0 0);      /* #1A1A1A */
+  --gradient-brand: linear-gradient(135deg, var(--brand-accent), var(--brand-mid));
+
   /* ── Base palette (light) — iOS blue-gray ── */
   --background: oklch(0.955 0.006 264);
   --foreground: oklch(0.11 0 0);
-  --card: oklch(1 0 0);
+  --card: var(--page-bg);
   --card-foreground: oklch(0.11 0 0);
   --popover: oklch(1 0 0 / 94%);
   --popover-foreground: oklch(0.11 0 0);
@@ -98,8 +121,8 @@ html:root.dark {
   --sidebar-ring: oklch(0.11 0 0);
 
   /* ── Signal colors (light) ── */
-  --signal-gain-bg: oklch(0.95 0.05 145 / 12%);
-  --signal-gain-text: oklch(0.35 0.10 145);
+  --signal-gain-bg: oklch(0.696 0.170 162 / 12%);
+  --signal-gain-text: var(--brand-mid);
   --signal-loss-bg: oklch(0.577 0.245 27.325 / 8%);
 
   /* ── Glass tokens (light) ── */
@@ -111,6 +134,18 @@ html:root.dark {
 }
 
 .dark {
+  /* ── Brand palette (dark) ── */
+  --brand-deep: oklch(0.28 0.088 152);
+  --brand-mid: oklch(0.49 0.108 152);
+  --brand-sage: oklch(0.71 0.100 155);
+  --brand-accent: oklch(0.696 0.170 162);
+  --brand-danger: oklch(0.636 0.222 15);
+  --shell-bg: oklch(0.13 0.008 152);      /* dark green-tinted shell */
+  --page-bg: oklch(0 0 0);
+  --ink-primary: oklch(0.97 0 0);
+  --ink-secondary: oklch(0.85 0 0);
+  --gradient-brand: linear-gradient(135deg, var(--brand-accent), var(--brand-mid));
+
   /* ── Base palette (dark) — true black iOS ── */
   --background: oklch(0 0 0);
   --foreground: oklch(0.97 0 0);
@@ -140,8 +175,8 @@ html:root.dark {
   --card-shadow: 0 1px 0 oklch(1 0 0 / 5%), 0 4px 24px oklch(0 0 0 / 55%);
 
   /* ── Signal colors (dark) ── */
-  --signal-gain-bg: oklch(0.75 0.15 145 / 10%);
-  --signal-gain-text: oklch(0.78 0.15 145);
+  --signal-gain-bg: oklch(0.696 0.170 162 / 10%);
+  --signal-gain-text: var(--brand-sage);
   --signal-loss-bg: oklch(0.65 0.22 25 / 10%);
 
   /* ── Sidebar glass (dark true black) ── */

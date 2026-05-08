@@ -8,8 +8,10 @@ import { AllocationDonut } from "@/components/overview/AllocationDonut";
 import { Skeleton } from "@/components/ui/skeleton";
 import { NetWorthChart } from "@/components/net-worth-chart";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { usePrivacyStore } from "@/store/privacy";
 
 export default function OverviewPage() {
+  const { isPrivate } = usePrivacyStore();
   const { data: summary, isLoading: summaryLoading } = useQuery({
     queryKey: ["overview", "summary"],
     queryFn: fetchOverviewSummary,
@@ -35,13 +37,13 @@ export default function OverviewPage() {
         <KpiCards summary={summary} />
       ) : null}
 
-      <NetWorthChart privacyMode={false} />
+      <NetWorthChart privacyMode={isPrivate} />
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-        <div className="lg:col-span-3 bg-card card-surface rounded-2xl border border-border p-5 overflow-hidden">
+        <div className="lg:col-span-3 bg-card card-surface rounded-2xl p-5 overflow-hidden">
           <PerformanceChart />
         </div>
-        <div className="lg:col-span-2 bg-card card-surface rounded-2xl border border-border p-5 overflow-hidden">
+        <div className="lg:col-span-2 bg-card card-surface rounded-2xl p-5 overflow-hidden">
           <AllocationDonut allocation={allocation} />
         </div>
       </div>

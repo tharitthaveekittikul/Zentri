@@ -49,11 +49,11 @@ export function TopNav() {
   return (
     <header className="bg-transparent pt-4 px-4 shrink-0">
       {/* Card wrapper — mirrors the sidebar card */}
-      <div className="bg-white dark:bg-slate-900 rounded-[24px] border border-slate-200/60 dark:border-slate-800 flex items-center px-5 h-16 gap-3">
+      <div className="bg-shell dark:bg-shell rounded-[24px] flex items-center px-5 h-16 gap-3">
         {/* Search pill — tinted so it reads against the white card */}
         <button
           onClick={() => setOpen(true)}
-          className="flex flex-1 items-center gap-3 h-10 px-4 rounded-full bg-slate-100/70 dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-left min-w-0"
+          className="flex flex-1 items-center gap-3 h-10 px-4 rounded-full bg-page dark:bg-slate-800 hover:bg-page/80 dark:hover:bg-slate-700 transition-colors text-left min-w-0"
           title="Search (⌘K)"
         >
           <Search
@@ -63,7 +63,7 @@ export function TopNav() {
           <span className="text-sm text-slate-400 flex-1 truncate">
             Search assets, pages...
           </span>
-          <kbd className="hidden sm:flex items-center text-[11px] text-slate-400/60 font-mono bg-white dark:bg-slate-700 px-1.5 py-0.5 rounded-md border border-slate-200/60 dark:border-slate-600 shrink-0">
+          <kbd className="hidden sm:flex items-center text-[11px] text-slate-400/60 font-mono bg-slate-100 dark:bg-slate-700 px-1.5 py-0.5 rounded-md shrink-0">
             ⌘K
           </kbd>
         </button>
