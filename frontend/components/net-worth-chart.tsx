@@ -45,7 +45,7 @@ export function NetWorthChart({ privacyMode }: { privacyMode: boolean }) {
       width: containerRef.current.clientWidth,
       height: 280,
       layout: { background: { color: "transparent" }, textColor: "#9ca3af" },
-      grid: { vertLines: { color: "#1f2937" }, horzLines: { color: "#1f2937" } },
+      grid: { vertLines: { visible: false }, horzLines: { visible: false } },
       rightPriceScale: { borderColor: "#374151" },
       timeScale: { borderColor: "#374151", timeVisible: false },
     });
@@ -166,7 +166,7 @@ export function NetWorthChart({ privacyMode }: { privacyMode: boolean }) {
       </CardHeader>
       <CardContent className="pt-0">
         <div className="h-64 w-full relative">
-          <div ref={containerRef} className="w-full h-full" />
+          <div ref={containerRef} className="w-full h-full [&_a]:!hidden" />
           {loading && (
             <div className="absolute inset-0 flex items-center justify-center text-muted-foreground text-sm">
               Loading...

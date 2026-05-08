@@ -24,4 +24,5 @@ export const PAGES: PageEntry[] = [
   { label: "AI Usage → Analyses", url: "/ai-usage?tab=analyses", keywords: ["llm cost", "spend", "analysis"] },
   { label: "AI Usage → Call Logs", url: "/ai-usage?tab=call-logs", keywords: ["logs", "tokens"] },
   { label: "AI Usage → Import Mapping", url: "/ai-usage?tab=import-mapping", keywords: ["import", "mapping"] },
+  { label: "Backup", url: "/settings/backup", keywords: ["backup", "export", "restore", "data"] },
 ];

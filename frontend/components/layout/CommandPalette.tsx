@@ -27,7 +27,7 @@ export function CommandPalette() {
           p.label.toLowerCase().includes(q) ||
           p.keywords.some((k) => k.toLowerCase().includes(q)),
       )
-    : [];
+    : PAGES;
 
   const filteredAssets = q
     ? assets.filter(
@@ -35,7 +35,7 @@ export function CommandPalette() {
           a.symbol.toLowerCase().includes(q) ||
           a.name.toLowerCase().includes(q),
       )
-    : [];
+    : assets;
 
   const hasPages = filteredPages.length > 0;
   const hasAssets = filteredAssets.length > 0;
@@ -62,6 +62,9 @@ export function CommandPalette() {
       <CommandList>
         {q && !hasPages && !hasAssets && (
           <CommandEmpty>No results for &ldquo;{query}&rdquo;</CommandEmpty>
+        )}
+        {!q && !hasPages && !hasAssets && (
+          <CommandEmpty>No pages found.</CommandEmpty>
         )}
 
         {hasPages && (

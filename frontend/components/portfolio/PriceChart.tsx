@@ -25,8 +25,8 @@ export function PriceChart({ bars }: Props) {
         textColor: "#94a3b8",
       },
       grid: {
-        vertLines: { color: "#1e293b" },
-        horzLines: { color: "#1e293b" },
+        vertLines: { visible: false },
+        horzLines: { visible: false },
       },
       width: containerRef.current.clientWidth,
       height: 300,
@@ -75,5 +75,5 @@ export function PriceChart({ bars }: Props) {
     );
   }
 
-  return <div ref={containerRef} className="w-full" />;
+  return <div ref={containerRef} className="w-full [&_a]:!hidden" />;
 }
