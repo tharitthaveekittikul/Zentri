@@ -10,6 +10,7 @@ from app.core.database import Base
 FEATURE_KEYS = (
     "import_translator",
     "portfolio_analysis",
+    "overview_analysis",
     "chat",
     "watchlist_scan",
     "watchlist_discovery",

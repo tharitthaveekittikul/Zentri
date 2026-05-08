@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { NetWorthChart } from "@/components/net-worth-chart";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { usePrivacyStore } from "@/store/privacy";
+import { AIAnalysisCard } from "@/components/overview/AIAnalysisCard";
 
 export default function OverviewPage() {
   const { isPrivate } = usePrivacyStore();
@@ -47,6 +48,8 @@ export default function OverviewPage() {
           <AllocationDonut allocation={allocation} />
         </div>
       </div>
+
+      <AIAnalysisCard />
     </div>
   );
 }

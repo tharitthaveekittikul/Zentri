@@ -13,6 +13,7 @@ export interface FeatureLLMConfig {
 export const FEATURE_LABELS: Record<string, string> = {
   import_translator: "Import Translator",
   portfolio_analysis: "Portfolio Analysis",
+  overview_analysis: "Overview AI Analysis",
   chat: "Chat Assistant",
   watchlist_scan: "Watchlist Scanner",
   watchlist_discovery: "Watchlist Discovery",

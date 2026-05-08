@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/command";
 import { ChevronDownIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ModelTooltip } from "@/components/settings/ModelTooltip";
 import {
   ProviderConfig,
   Provider,
@@ -53,6 +54,7 @@ const PROVIDER_OPTIONS: { value: Provider; label: string }[] = [
 const FEATURE_KEYS = [
   "import_translator",
   "portfolio_analysis",
+  "overview_analysis",
   "chat",
   "watchlist_scan",
   "watchlist_discovery",
@@ -549,7 +551,10 @@ export function AISettings() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label>Model</Label>
+                      <div className="flex items-center gap-1.5">
+                        <Label>Model</Label>
+                        <ModelTooltip featureKey={featureKey} />
+                      </div>
                       {providerNoModels ? (
                         <p className="text-xs text-muted-foreground pt-1.5">
                           Test connection first to load models.

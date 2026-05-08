@@ -62,6 +62,7 @@ import { useDualCurrency } from "@/hooks/useDualCurrency";
 import { DualCurrencyAmount } from "@/components/ui/DualCurrencyAmount";
 import { useTableParams } from "@/hooks/useTableParams";
 import type { PaginatedResponse } from "@/lib/types";
+import { ConfirmLLMDialog } from "@/components/llm/ConfirmLLMDialog";
 
 const VERDICT_STYLE: Record<string, string> = {
   BUY: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
@@ -205,6 +206,7 @@ export default function WatchlistPage() {
   const [discovering, setDiscovering] = useState(false);
   const [scanningId, setScanningId] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
+  const [llmConfirm, setLlmConfirm] = useState<{ action: "scan" | "discover"; open: boolean }>({ action: "scan", open: false });
 
   const fetchAll = useCallback(async () => {
     const params: WatchlistParams = {
@@ -261,6 +263,7 @@ export default function WatchlistPage() {
   }, [searchInput]);
 
   const handleScanAll = async () => {
+    setLlmConfirm({ action: "scan", open: false });
     setScanningAll(true);
     await scanAll();
     toast.success("Scan queued — results will appear shortly");
@@ -269,6 +272,7 @@ export default function WatchlistPage() {
   };
 
   const handleDiscover = async () => {
+    setLlmConfirm({ action: "discover", open: false });
     setDiscovering(true);
     try {
       await discoverWatchlist();
@@ -391,7 +395,7 @@ export default function WatchlistPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={handleScanAll}
+              onClick={() => setLlmConfirm({ action: "scan", open: true })}
               disabled={scanningAll}
             >
               <Scan
@@ -402,7 +406,7 @@ export default function WatchlistPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={handleDiscover}
+              onClick={() => setLlmConfirm({ action: "discover", open: true })}
               disabled={discovering}
             >
               <Sparkles
@@ -665,6 +669,20 @@ export default function WatchlistPage() {
         open={addOpen}
         onClose={() => setAddOpen(false)}
         onAdded={fetchAll}
+      />
+
+      <ConfirmLLMDialog
+        open={llmConfirm.open}
+        title={llmConfirm.action === "scan" ? "Scan All Watchlist Items" : "Discover New Assets"}
+        description={
+          llmConfirm.action === "scan"
+            ? "Runs AI analysis on every item in your watchlist. Cost depends on the number of items."
+            : "Uses AI to suggest new assets based on your current portfolio holdings."
+        }
+        estimatedCost={llmConfirm.action === "scan" ? "~$0.01 per item" : "< $0.05 est."}
+        loading={llmConfirm.action === "scan" ? scanningAll : discovering}
+        onConfirm={llmConfirm.action === "scan" ? handleScanAll : handleDiscover}
+        onCancel={() => setLlmConfirm((p) => ({ ...p, open: false }))}
       />
     </div>
   );

@@ -33,6 +33,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { TickerLogo } from "@/components/ui/TickerLogo";
 import { useDualCurrency } from "@/hooks/useDualCurrency";
 import { DualCurrencyAmount } from "@/components/ui/DualCurrencyAmount";
+import { ConfirmLLMDialog } from "@/components/llm/ConfirmLLMDialog";
 
 const MONTH_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
@@ -169,12 +170,20 @@ function IpoPanel({
   const [analysis, setAnalysis] = useState<IpoAnalysisResult | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [analyzeError, setAnalyzeError] = useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingForce, setPendingForce] = useState(false);
 
-  const runAnalysis = async (force = false) => {
+  const requestAnalysis = (force = false) => {
+    setPendingForce(force);
+    setConfirmOpen(true);
+  };
+
+  const runAnalysis = async () => {
+    setConfirmOpen(false);
     setAnalyzing(true);
     setAnalyzeError(null);
     try {
-      const result = await analyzeIpo(event.id, force);
+      const result = await analyzeIpo(event.id, pendingForce);
       setAnalysis(result);
     } catch (err: unknown) {
       setAnalyzeError(err instanceof Error ? err.message : "Analysis failed");
@@ -228,7 +237,7 @@ function IpoPanel({
 
         <div className="border-t pt-3 space-y-3">
           {!analysis && !analyzing && (
-            <Button onClick={() => runAnalysis(false)} className="w-full" disabled={analyzing}>
+            <Button onClick={() => requestAnalysis(false)} className="w-full" disabled={analyzing}>
               Analyze with AI
             </Button>
           )}
@@ -254,7 +263,7 @@ function IpoPanel({
                 {analysis.cached && <span className="text-xs text-muted-foreground">cached</span>}
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">{analysis.reasoning}</p>
-              <Button variant="ghost" size="sm" onClick={() => runAnalysis(true)} disabled={analyzing}>
+              <Button variant="ghost" size="sm" onClick={() => requestAnalysis(true)} disabled={analyzing}>
                 Re-analyze
               </Button>
             </div>
@@ -265,6 +274,16 @@ function IpoPanel({
           <Button variant="outline" onClick={onClose}>Close</Button>
         </DialogFooter>
       </DialogContent>
+
+      <ConfirmLLMDialog
+        open={confirmOpen}
+        title="Analyze IPO"
+        description={`Run AI analysis on ${event.symbol} IPO. Uses your configured LLM.`}
+        estimatedCost="< $0.01 est."
+        loading={analyzing}
+        onConfirm={runAnalysis}
+        onCancel={() => setConfirmOpen(false)}
+      />
     </Dialog>
   );
 }

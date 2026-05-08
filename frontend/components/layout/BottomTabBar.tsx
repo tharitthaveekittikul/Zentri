@@ -7,7 +7,7 @@ import {
   LayoutDashboard,
   Briefcase,
   Star,
-  TrendingUp,
+  MessageSquare,
   Settings,
 } from "lucide-react";
 
@@ -15,7 +15,7 @@ const tabs = [
   { href: "/overview", label: "Overview", icon: LayoutDashboard },
   { href: "/portfolio", label: "Portfolio", icon: Briefcase },
   { href: "/watchlist", label: "Watchlist", icon: Star },
-  { href: "/net-worth", label: "Net Worth", icon: TrendingUp },
+  { href: "/chat", label: "Chat", icon: MessageSquare },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
