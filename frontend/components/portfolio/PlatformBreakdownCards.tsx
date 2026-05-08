@@ -43,7 +43,7 @@ export function PlatformBreakdownCards({ holdings }: Props) {
               <div
                 key={group.platform}
                 title={group.platform}
-                className="card-surface flex min-h-[108px] min-w-[168px] flex-shrink-0 flex-col gap-2.5 rounded-2xl border border-border bg-card p-4"
+                className="card-surface flex min-h-[108px] min-w-[168px] flex-shrink-0 flex-col gap-2.5 rounded-2xl bg-card p-4"
               >
                 {/* Header row: name + count badge */}
                 <div className="flex items-center justify-between gap-2">

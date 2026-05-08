@@ -106,7 +106,7 @@ export function AddHoldingDialog({ primaryCurrency, onAdded }: Props) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
         render={
-          <Button size="sm">
+          <Button size="sm" className="h-9 rounded-full text-sm font-medium">
             <Plus className="h-4 w-4 mr-1" />
             Add Holding
           </Button>

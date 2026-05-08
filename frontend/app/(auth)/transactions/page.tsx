@@ -181,58 +181,60 @@ export default function TransactionsPage() {
     <div className="space-y-4">
       <PageHeader title="Transactions" />
 
-      {/* Filter bar */}
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="relative flex-1 min-w-[180px]">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            className="pl-8 h-9"
-            placeholder="Search symbol or name…"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
+      {/* Filter + Table card */}
+      <div className="bg-card card-surface rounded-2xl overflow-hidden">
+        {/* Filter bar */}
+        <div className="flex flex-wrap items-center gap-3 p-4 border-b border-border">
+          <div className="relative flex-1 min-w-[180px]">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              className="pl-8 h-9"
+              placeholder="Search symbol or name…"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+            />
+          </div>
+          <Select
+            value={get("type") || "all"}
+            onValueChange={(v) => setParam({ type: v === "all" ? null : v })}
+          >
+            <SelectTrigger className="h-9 w-[140px]">
+              <span className="truncate">{get("type") || "All Types"}</span>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Types</SelectItem>
+              {["buy", "sell", "dividend", "reward", "fee", "transfer"].map((t) => (
+                <SelectItem key={t} value={t}>
+                  {t}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={get("platform") || "all"}
+            onValueChange={(v) => setParam({ platform: v === "all" ? null : v })}
+          >
+            <SelectTrigger className="h-9 w-[140px]">
+              <span className="truncate">{get("platform") || "All Platforms"}</span>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Platforms</SelectItem>
+              {platforms.map((p) => (
+                <SelectItem key={p} value={p}>
+                  {p}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <DateRangePicker
+            from={get("date_from")}
+            to={get("date_to")}
+            onChange={({ from, to }) => setParam({ date_from: from, date_to: to })}
           />
         </div>
-        <Select
-          value={get("type") || "all"}
-          onValueChange={(v) => setParam({ type: v === "all" ? null : v })}
-        >
-          <SelectTrigger className="h-9 w-[140px]">
-            <span className="truncate">{get("type") || "All Types"}</span>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Types</SelectItem>
-            {["buy", "sell", "dividend", "reward", "fee", "transfer"].map((t) => (
-              <SelectItem key={t} value={t}>
-                {t}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select
-          value={get("platform") || "all"}
-          onValueChange={(v) => setParam({ platform: v === "all" ? null : v })}
-        >
-          <SelectTrigger className="h-9 w-[140px]">
-            <span className="truncate">{get("platform") || "All Platforms"}</span>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Platforms</SelectItem>
-            {platforms.map((p) => (
-              <SelectItem key={p} value={p}>
-                {p}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <DateRangePicker
-          from={get("date_from")}
-          to={get("date_to")}
-          onChange={({ from, to }) => setParam({ date_from: from, date_to: to })}
-        />
-      </div>
 
-      {loading ? (
-        <div className="rounded-md border">
+        {/* Table or skeleton */}
+        {loading ? (
           <div className="p-4 space-y-3">
             <div className="flex gap-4 pb-2 border-b">
               {Array.from({ length: 8 }).map((_, i) => (
@@ -247,11 +249,9 @@ export default function TransactionsPage() {
               </div>
             ))}
           </div>
-        </div>
-      ) : (
-        <>
+        ) : (
           <div
-            className={`rounded-md border overflow-x-auto transition-opacity ${
+            className={`overflow-x-auto transition-opacity ${
               fetching ? "opacity-60" : ""
             }`}
           >
@@ -338,40 +338,42 @@ export default function TransactionsPage() {
               </TableBody>
             </Table>
           </div>
+        )}
+      </div>
 
-          {/* Pagination */}
-          <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <span>
-              {data.total > 0
-                ? `${(data.page - 1) * data.page_size + 1}–${Math.min(
-                    data.page * data.page_size,
-                    data.total,
-                  )} of ${data.total}`
-                : "0 results"}
+      {/* Pagination */}
+      {!loading && (
+        <div className="flex items-center justify-between text-sm text-muted-foreground">
+          <span>
+            {data.total > 0
+              ? `${(data.page - 1) * data.page_size + 1}–${Math.min(
+                  data.page * data.page_size,
+                  data.total,
+                )} of ${data.total}`
+              : "0 results"}
+          </span>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setParam({ page: data.page - 1 }, false)}
+              disabled={data.page <= 1}
+            >
+              ← Prev
+            </Button>
+            <span className="flex items-center px-2">
+              Page {data.page} of {totalPages}
             </span>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setParam({ page: data.page - 1 }, false)}
-                disabled={data.page <= 1}
-              >
-                ← Prev
-              </Button>
-              <span className="flex items-center px-2">
-                Page {data.page} of {totalPages}
-              </span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setParam({ page: data.page + 1 }, false)}
-                disabled={data.page >= totalPages}
-              >
-                Next →
-              </Button>
-            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setParam({ page: data.page + 1 }, false)}
+              disabled={data.page >= totalPages}
+            >
+              Next →
+            </Button>
           </div>
-        </>
+        </div>
       )}
 
       {/* Edit Dialog */}

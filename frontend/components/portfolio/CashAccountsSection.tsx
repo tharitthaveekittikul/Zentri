@@ -101,7 +101,7 @@ export function CashAccountsSection() {
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
           {accounts.map(({ asset, latest }) => (
-            <Card key={asset.id} className="rounded-2xl border border-border">
+            <Card key={asset.id} className="rounded-2xl">
               <CardHeader className="pb-2 px-5 pt-5">
                 <div className="flex items-start justify-between">
                   <div>

@@ -84,7 +84,7 @@ html:root.dark {
   /* ── Base palette (light) — iOS blue-gray ── */
   --background: oklch(0.955 0.006 264);
   --foreground: oklch(0.11 0 0);
-  --card: var(--page-bg);
+  --card: oklch(1 0 0);
   --card-foreground: oklch(0.11 0 0);
   --popover: oklch(1 0 0 / 94%);
   --popover-foreground: oklch(0.11 0 0);
@@ -233,6 +233,12 @@ html:root.dark {
   [data-slot="card"],
   .card-surface {
     box-shadow: var(--card-shadow);
+  }
+
+  /* Borderless cards — shadow provides depth */
+  [data-slot="card"],
+  .card-surface {
+    border-width: 0;
   }
 
   /* Theme switch — smooth cross-fade on key surfaces */

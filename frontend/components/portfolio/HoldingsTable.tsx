@@ -376,106 +376,109 @@ export function HoldingsTable({
 
   return (
     <div className="space-y-3">
-      {/* Filter bar */}
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="relative flex-1 min-w-[180px]">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            className="pl-8 h-9"
-            placeholder="Search symbol or name…"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-          />
-        </div>
-        <Select
-          value={params.platform || "all"}
-          onValueChange={(v) => onParamChange({ platform: v === "all" ? null : v })}
-        >
-          <SelectTrigger className="h-9 w-[160px]">
-            <span className="truncate">{params.platform || "All Platforms"}</span>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Platforms</SelectItem>
-            {platforms.map((p) => (
-              <SelectItem key={p} value={p}>{p}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select
-          value={params.asset_type || "all"}
-          onValueChange={(v) => onParamChange({ asset_type: v === "all" ? null : v })}
-        >
-          <SelectTrigger className="h-9 w-[160px]">
-            <span className="truncate">{params.asset_type || "All Types"}</span>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Types</SelectItem>
-            {ASSET_TYPES.map((t) => (
-              <SelectItem key={t} value={t}>{t}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Rows:</span>
+      {/* Filter + Table card */}
+      <div className="bg-card card-surface rounded-2xl overflow-hidden">
+        {/* Filter row */}
+        <div className="flex flex-wrap items-center gap-3 p-4 border-b border-border">
+          <div className="relative flex-1 min-w-[180px]">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              className="pl-8 h-9"
+              placeholder="Search symbol or name…"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+            />
+          </div>
           <Select
-            value={String(params.page_size)}
-            onValueChange={(v) => onParamChange({ page_size: Number(v), page: 1 }, false)}
+            value={params.platform || "all"}
+            onValueChange={(v) => onParamChange({ platform: v === "all" ? null : v })}
           >
-            <SelectTrigger className="h-8 w-[80px]">
-              <SelectValue />
+            <SelectTrigger className="h-9 w-[160px]">
+              <span className="truncate">{params.platform || "All Platforms"}</span>
             </SelectTrigger>
             <SelectContent>
-              {[25, 50, 100].map((n) => (
-                <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+              <SelectItem value="all">All Platforms</SelectItem>
+              {platforms.map((p) => (
+                <SelectItem key={p} value={p}>{p}</SelectItem>
               ))}
             </SelectContent>
           </Select>
-        </div>
-      </div>
-
-      {/* Table */}
-      <div className={`bg-card card-surface rounded-2xl border border-border overflow-x-auto transition-opacity ${isFetching ? "opacity-60" : ""}`}>
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((hg) => (
-              <TableRow key={hg.id}>
-                {hg.headers.map((h) => (
-                  <TableHead key={h.id}>
-                    {flexRender(h.column.columnDef.header, h.getContext())}
-                  </TableHead>
+          <Select
+            value={params.asset_type || "all"}
+            onValueChange={(v) => onParamChange({ asset_type: v === "all" ? null : v })}
+          >
+            <SelectTrigger className="h-9 w-[160px]">
+              <span className="truncate">{params.asset_type || "All Types"}</span>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Types</SelectItem>
+              {ASSET_TYPES.map((t) => (
+                <SelectItem key={t} value={t}>{t}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">Rows:</span>
+            <Select
+              value={String(params.page_size)}
+              onValueChange={(v) => onParamChange({ page_size: Number(v), page: 1 }, false)}
+            >
+              <SelectTrigger className="h-8 w-[80px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {[25, 50, 100].map((n) => (
+                  <SelectItem key={n} value={String(n)}>{n}</SelectItem>
                 ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows.length > 0 ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  className="hover:bg-muted/40 transition-colors duration-150"
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Table */}
+        <div className={`overflow-x-auto transition-opacity ${isFetching ? "opacity-60" : ""}`}>
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((hg) => (
+                <TableRow key={hg.id}>
+                  {hg.headers.map((h) => (
+                    <TableHead key={h.id}>
+                      {flexRender(h.column.columnDef.header, h.getContext())}
+                    </TableHead>
                   ))}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="py-12">
-                  <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                    <span className="text-2xl">📋</span>
-                    <span className="text-sm font-medium">No holdings found</span>
-                    <span className="text-xs">
-                      Add one above or import from the Import page.
-                    </span>
-                  </div>
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows.length > 0 ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    className="hover:bg-muted/40 transition-colors duration-150"
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className="py-12">
+                    <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                      <span className="text-2xl">📋</span>
+                      <span className="text-sm font-medium">No holdings found</span>
+                      <span className="text-xs">
+                        Add one above or import from the Import page.
+                      </span>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
       {/* Pagination */}

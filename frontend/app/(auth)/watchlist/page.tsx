@@ -342,80 +342,83 @@ export default function WatchlistPage() {
     <div className="space-y-8">
       <PageHeader title="Watchlist" />
 
-      {/* Filter bar */}
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="relative flex-1 min-w-[180px]">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            className="pl-8 h-9"
-            placeholder="Search symbol or name…"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-          />
+      {/* Filter + actions + table card */}
+      <div className="bg-card card-surface rounded-2xl overflow-hidden">
+        {/* Filter + actions header */}
+        <div className="flex flex-wrap items-center justify-between gap-3 p-4 border-b border-border">
+          {/* Left: search + type + status selects */}
+          <div className="flex flex-wrap items-center gap-3 flex-1">
+            <div className="relative flex-1 min-w-[180px]">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                className="pl-8 h-9"
+                placeholder="Search symbol or name…"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+              />
+            </div>
+            <Select
+              value={get("asset_type") || "all"}
+              onValueChange={(v) => setParam({ asset_type: v === "all" ? null : v })}
+            >
+              <SelectTrigger className="h-9 w-[150px]">
+                <span className="truncate">{get("asset_type") || "All Types"}</span>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                {["us_stock", "thai_stock", "crypto", "etf", "bond", "fund"].map((t) => (
+                  <SelectItem key={t} value={t}>{t}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select
+              value={get("alert_status") || "all"}
+              onValueChange={(v) => setParam({ alert_status: v === "all" ? null : v })}
+            >
+              <SelectTrigger className="h-9 w-[150px]">
+                <span className="truncate">{get("alert_status") || "All Statuses"}</span>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Statuses</SelectItem>
+                <SelectItem value="enabled">Enabled</SelectItem>
+                <SelectItem value="triggered">Triggered</SelectItem>
+                <SelectItem value="disabled">Disabled</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          {/* Right: Scan All, Discover New, Add buttons */}
+          <div className="flex flex-wrap gap-2 shrink-0">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleScanAll}
+              disabled={scanningAll}
+            >
+              <Scan
+                className={`h-4 w-4 mr-2 ${scanningAll ? "animate-pulse" : ""}`}
+              />
+              {scanningAll ? "Scanning…" : "Scan All"}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleDiscover}
+              disabled={discovering}
+            >
+              <Sparkles
+                className={`h-4 w-4 mr-2 ${discovering ? "animate-pulse" : ""}`}
+              />
+              {discovering ? "Discovering…" : "Discover New"}
+            </Button>
+            <Button size="sm" onClick={() => setAddOpen(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add
+            </Button>
+          </div>
         </div>
-        <Select
-          value={get("asset_type") || "all"}
-          onValueChange={(v) => setParam({ asset_type: v === "all" ? null : v })}
-        >
-          <SelectTrigger className="h-9 w-[150px]">
-            <span className="truncate">{get("asset_type") || "All Types"}</span>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Types</SelectItem>
-            {["us_stock", "thai_stock", "crypto", "etf", "bond", "fund"].map((t) => (
-              <SelectItem key={t} value={t}>{t}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select
-          value={get("alert_status") || "all"}
-          onValueChange={(v) => setParam({ alert_status: v === "all" ? null : v })}
-        >
-          <SelectTrigger className="h-9 w-[150px]">
-            <span className="truncate">{get("alert_status") || "All Statuses"}</span>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Statuses</SelectItem>
-            <SelectItem value="enabled">Enabled</SelectItem>
-            <SelectItem value="triggered">Triggered</SelectItem>
-            <SelectItem value="disabled">Disabled</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
 
-      <div className="flex flex-wrap items-center justify-end gap-3">
-        <div className="flex flex-wrap gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleScanAll}
-            disabled={scanningAll}
-          >
-            <Scan
-              className={`h-4 w-4 mr-2 ${scanningAll ? "animate-pulse" : ""}`}
-            />
-            {scanningAll ? "Scanning…" : "Scan All"}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleDiscover}
-            disabled={discovering}
-          >
-            <Sparkles
-              className={`h-4 w-4 mr-2 ${discovering ? "animate-pulse" : ""}`}
-            />
-            {discovering ? "Discovering…" : "Discover New"}
-          </Button>
-          <Button size="sm" onClick={() => setAddOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add
-          </Button>
-        </div>
-      </div>
-
-      {loading ? (
-        <div className="rounded-md border">
+        {/* Table or skeleton */}
+        {loading ? (
           <div className="p-4 space-y-3">
             <div className="flex gap-4 pb-2 border-b">
               {Array.from({ length: 8 }).map((_, i) => (
@@ -430,146 +433,146 @@ export default function WatchlistPage() {
               </div>
             ))}
           </div>
-        </div>
-      ) : itemsPage.items.length === 0 ? (
-        <p className="text-muted-foreground text-sm">
-          No items on your watchlist. Click Add to start watching an asset, or
-          Discover New for AI suggestions.
-        </p>
-      ) : (
-        <div className="rounded-md border overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Ticker</TableHead>
-                <TableHead className="text-right">Price</TableHead>
-                <TableHead className="text-right">Target</TableHead>
-                <TableHead className="text-right">% to Target</TableHead>
-                <TableHead>AI Verdict</TableHead>
-                <TableHead className="text-right">AI Price</TableHead>
-                <TableHead>Last Scanned</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {itemsPage.items.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <TickerLogo symbol={item.asset.symbol} logoUrl={item.asset.metadata_?.logo_url as string | undefined} />
-                      <span className="font-medium">{item.asset.symbol}</span>
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      {item.asset.name}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {item.current_price
-                      ? <DualCurrencyAmount
-                          value={formatNative(item.current_price, item.currency)}
-                        />
-                      : "—"}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {item.target_price
-                      ? <DualCurrencyAmount
-                          value={formatNative(item.target_price, item.currency)}
-                        />
-                      : "—"}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {item.pct_from_target !== null ? (
-                      <span
-                        className={
-                          item.pct_from_target <= 0
-                            ? "text-green-600"
-                            : "text-muted-foreground"
-                        }
-                      >
-                        {item.pct_from_target > 0 ? "+" : ""}
-                        {item.pct_from_target.toFixed(1)}%
-                      </span>
-                    ) : (
-                      "—"
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {item.last_verdict ? (
-                      <span
-                        className={`text-xs font-medium px-2 py-1 rounded-full ${VERDICT_STYLE[item.last_verdict]}`}
-                      >
-                        {item.last_verdict}
-                      </span>
-                    ) : (
-                      <span className="text-muted-foreground text-xs">—</span>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {item.ai_suggested_price
-                      ? <DualCurrencyAmount
-                          value={formatNative(item.ai_suggested_price, item.currency ?? "USD")}
-                        />
-                      : "—"}
-                  </TableCell>
-                  <TableCell className="text-xs text-muted-foreground">
-                    {item.last_scanned_at
-                      ? new Date(item.last_scanned_at).toLocaleDateString("en-GB")
-                      : "Never"}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex justify-end gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        title="Scan"
-                        disabled={scanningId === item.id}
-                        onClick={() => handleScanItem(item.id)}
-                      >
-                        <Scan
-                          className={`h-4 w-4 ${scanningId === item.id ? "animate-pulse" : ""}`}
-                        />
-                      </Button>
-                      {item.ai_suggested_price && (
+        ) : itemsPage.items.length === 0 ? (
+          <p className="text-muted-foreground text-sm p-4">
+            No items on your watchlist. Click Add to start watching an asset, or
+            Discover New for AI suggestions.
+          </p>
+        ) : (
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Ticker</TableHead>
+                  <TableHead className="text-right">Price</TableHead>
+                  <TableHead className="text-right">Target</TableHead>
+                  <TableHead className="text-right">% to Target</TableHead>
+                  <TableHead>AI Verdict</TableHead>
+                  <TableHead className="text-right">AI Price</TableHead>
+                  <TableHead>Last Scanned</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {itemsPage.items.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <TickerLogo symbol={item.asset.symbol} logoUrl={item.asset.metadata_?.logo_url as string | undefined} />
+                        <span className="font-medium">{item.asset.symbol}</span>
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {item.asset.name}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {item.current_price
+                        ? <DualCurrencyAmount
+                            value={formatNative(item.current_price, item.currency)}
+                          />
+                        : "—"}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {item.target_price
+                        ? <DualCurrencyAmount
+                            value={formatNative(item.target_price, item.currency)}
+                          />
+                        : "—"}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {item.pct_from_target !== null ? (
+                        <span
+                          className={
+                            item.pct_from_target <= 0
+                              ? "text-green-600"
+                              : "text-muted-foreground"
+                          }
+                        >
+                          {item.pct_from_target > 0 ? "+" : ""}
+                          {item.pct_from_target.toFixed(1)}%
+                        </span>
+                      ) : (
+                        "—"
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {item.last_verdict ? (
+                        <span
+                          className={`text-xs font-medium px-2 py-1 rounded-full ${VERDICT_STYLE[item.last_verdict]}`}
+                        >
+                          {item.last_verdict}
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground text-xs">—</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {item.ai_suggested_price
+                        ? <DualCurrencyAmount
+                            value={formatNative(item.ai_suggested_price, item.currency ?? "USD")}
+                          />
+                        : "—"}
+                    </TableCell>
+                    <TableCell className="text-xs text-muted-foreground">
+                      {item.last_scanned_at
+                        ? new Date(item.last_scanned_at).toLocaleDateString("en-GB")
+                        : "Never"}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex justify-end gap-1">
                         <Button
                           variant="ghost"
-                          size="sm"
-                          className="text-xs h-8 px-2"
-                          title="Apply AI price as target alert"
-                          onClick={() => handleApplyPrice(item)}
+                          size="icon"
+                          title="Scan"
+                          disabled={scanningId === item.id}
+                          onClick={() => handleScanItem(item.id)}
                         >
-                          Apply
+                          <Scan
+                            className={`h-4 w-4 ${scanningId === item.id ? "animate-pulse" : ""}`}
+                          />
                         </Button>
-                      )}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        title={
-                          item.alert_enabled ? "Disable alert" : "Enable alert"
-                        }
-                        onClick={() => handleToggleAlert(item)}
-                      >
-                        {item.alert_enabled ? (
-                          <Bell className="h-4 w-4 text-blue-500" />
-                        ) : (
-                          <BellOff className="h-4 w-4 text-muted-foreground" />
+                        {item.ai_suggested_price && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-xs h-8 px-2"
+                            title="Apply AI price as target alert"
+                            onClick={() => handleApplyPrice(item)}
+                          >
+                            Apply
+                          </Button>
                         )}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        title="Remove"
-                        onClick={() => handleDelete(item.id)}
-                      >
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      )}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title={
+                            item.alert_enabled ? "Disable alert" : "Enable alert"
+                          }
+                          onClick={() => handleToggleAlert(item)}
+                        >
+                          {item.alert_enabled ? (
+                            <Bell className="h-4 w-4 text-blue-500" />
+                          ) : (
+                            <BellOff className="h-4 w-4 text-muted-foreground" />
+                          )}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title="Remove"
+                          onClick={() => handleDelete(item.id)}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
+      </div>
 
       {/* Pagination */}
       {itemsPage.total > 0 && (
@@ -608,7 +611,7 @@ export default function WatchlistPage() {
       )}
 
       {suggestions.length > 0 && (
-        <div className="space-y-3">
+        <div className="bg-card card-surface rounded-2xl p-5 space-y-4">
           <h2 className="text-lg font-semibold flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-purple-500" />
             AI Suggestions

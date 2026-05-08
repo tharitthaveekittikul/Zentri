@@ -133,110 +133,113 @@ export function ScheduleTab() {
 
   return (
     <div className="space-y-6">
-      {/* Timezone */}
-      <div className="border rounded-lg p-4 space-y-3">
-        <span className="font-medium">Timezone</span>
-        <div className="flex items-center gap-3 mt-2">
-          <Label className="text-sm text-muted-foreground w-28 shrink-0">
-            Your timezone
-          </Label>
-          <Select value={timezone} onValueChange={setTimezone}>
-            <SelectTrigger className="w-56">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {TIMEZONES.map((tz) => (
-                <SelectItem key={tz} value={tz}>
-                  {tz}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+      {/* Single list-card containing all schedule items */}
+      <div className="bg-card card-surface rounded-2xl overflow-hidden divide-y divide-border">
+        {/* Timezone item */}
+        <div className="p-5 space-y-3">
+          <span className="font-medium">Timezone</span>
+          <div className="flex items-center gap-3 mt-2">
+            <Label className="text-sm text-muted-foreground w-28 shrink-0">
+              Your timezone
+            </Label>
+            <Select value={timezone} onValueChange={setTimezone}>
+              <SelectTrigger className="w-56">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {TIMEZONES.map((tz) => (
+                  <SelectItem key={tz} value={tz}>
+                    {tz}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
-      </div>
 
-      {/* Job cards */}
-      {ordered.map((config) => (
-        <div key={config.job_key} className="border rounded-lg p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="font-medium">
-              {JOB_LABELS[config.job_key] ?? config.job_key}
-            </span>
-            <Switch
-              checked={config.enabled}
-              onCheckedChange={(v) => updateConfig(config.job_key, { enabled: v })}
-            />
-          </div>
+        {/* Job items */}
+        {ordered.map((config) => (
+          <div key={config.job_key} className="p-5 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="font-medium">
+                {JOB_LABELS[config.job_key] ?? config.job_key}
+              </span>
+              <Switch
+                checked={config.enabled}
+                onCheckedChange={(v) => updateConfig(config.job_key, { enabled: v })}
+              />
+            </div>
 
-          {/* Interval */}
-          <div className="flex items-center gap-3">
-            <Label className="text-sm text-muted-foreground w-28 shrink-0">
-              Interval
-            </Label>
-            <Select
-              value={intervalToValue(config.interval_minutes)}
-              onValueChange={(v) =>
-                updateConfig(config.job_key, { interval_minutes: valueToInterval(v) })
-              }
-            >
-              <SelectTrigger className="w-40">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {INTERVAL_OPTIONS.map((opt) => (
-                  <SelectItem key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </SelectItem>
+            {/* Interval */}
+            <div className="flex items-center gap-3">
+              <Label className="text-sm text-muted-foreground w-28 shrink-0">
+                Interval
+              </Label>
+              <Select
+                value={intervalToValue(config.interval_minutes)}
+                onValueChange={(v) =>
+                  updateConfig(config.job_key, { interval_minutes: valueToInterval(v) })
+                }
+              >
+                <SelectTrigger className="w-40">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {INTERVAL_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Time */}
+            <div className="flex items-center gap-3">
+              <Label className="text-sm text-muted-foreground w-28 shrink-0">
+                Start time
+              </Label>
+              <Select
+                value={String(config.run_at_hour)}
+                onValueChange={(v) =>
+                  updateConfig(config.job_key, { run_at_hour: Number(v) })
+                }
+              >
+                <SelectTrigger className="w-24">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Array.from({ length: 24 }, (_, i) => (
+                    <SelectItem key={i} value={String(i)}>
+                      {String(i).padStart(2, "0")}:00
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Days */}
+            <div className="flex items-center gap-3">
+              <Label className="text-sm text-muted-foreground w-28 shrink-0">
+                Days
+              </Label>
+              <div className="flex gap-1">
+                {DAY_LABELS.map((day, i) => (
+                  <Button
+                    key={day}
+                    variant={config.days.includes(i) ? "default" : "outline"}
+                    size="sm"
+                    className="w-10 px-0 text-xs"
+                    onClick={() => toggleDay(config.job_key, i)}
+                  >
+                    {day}
+                  </Button>
                 ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Time */}
-          <div className="flex items-center gap-3">
-            <Label className="text-sm text-muted-foreground w-28 shrink-0">
-              Start time
-            </Label>
-            <Select
-              value={String(config.run_at_hour)}
-              onValueChange={(v) =>
-                updateConfig(config.job_key, { run_at_hour: Number(v) })
-              }
-            >
-              <SelectTrigger className="w-24">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {Array.from({ length: 24 }, (_, i) => (
-                  <SelectItem key={i} value={String(i)}>
-                    {String(i).padStart(2, "0")}:00
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Days */}
-          <div className="flex items-center gap-3">
-            <Label className="text-sm text-muted-foreground w-28 shrink-0">
-              Days
-            </Label>
-            <div className="flex gap-1">
-              {DAY_LABELS.map((day, i) => (
-                <Button
-                  key={day}
-                  variant={config.days.includes(i) ? "default" : "outline"}
-                  size="sm"
-                  className="w-10 px-0 text-xs"
-                  onClick={() => toggleDay(config.job_key, i)}
-                >
-                  {day}
-                </Button>
-              ))}
+              </div>
             </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
 
       <Button onClick={() => saveConfigs()} disabled={savingConfigs}>
         {savingConfigs ? "Saving…" : "Save Schedule"}

@@ -169,88 +169,90 @@ export default function DocumentsPage() {
         </Dialog>
       </div>
 
-      <Input
-        placeholder="Filter by asset symbol…"
-        value={filter}
-        onChange={(e) => setFilter(e.target.value)}
-        className="max-w-xs"
-      />
+      <div className="bg-card card-surface rounded-2xl p-5 space-y-4">
+        <Input
+          placeholder="Filter by asset symbol…"
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          className="max-w-xs"
+        />
 
-      {loading ? (
-        <div className="space-y-3">
-          <div className="flex gap-4 pb-2 border-b">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Skeleton key={i} className="h-4 flex-1" />
-            ))}
-          </div>
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="flex gap-4">
-              {Array.from({ length: 5 }).map((_, j) => (
-                <Skeleton key={j} className="h-4 flex-1" />
+        {loading ? (
+          <div className="space-y-3">
+            <div className="flex gap-4 pb-2 border-b">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="h-4 flex-1" />
               ))}
             </div>
-          ))}
-        </div>
-      ) : (
-      <div className="overflow-x-auto">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Filename</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Chunks</TableHead>
-            <TableHead>Uploaded</TableHead>
-            <TableHead />
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {docs.map((doc) => (
-            <TableRow key={doc.id}>
-              <TableCell className="font-mono text-sm">{doc.filename}</TableCell>
-              <TableCell>
-                <Badge className={STATUS_BADGE[doc.status]}>{doc.status}</Badge>
-                {doc.error_msg && (
-                  <p className="text-xs text-red-500 mt-1">{doc.error_msg}</p>
-                )}
-              </TableCell>
-              <TableCell>{doc.chunk_count ?? "—"}</TableCell>
-              <TableCell className="text-sm text-muted-foreground">
-                {new Date(doc.created_at).toLocaleDateString("en-GB")}
-              </TableCell>
-              <TableCell className="flex gap-2">
-                {doc.status === "failed" && (
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="flex gap-4">
+                {Array.from({ length: 5 }).map((_, j) => (
+                  <Skeleton key={j} className="h-4 flex-1" />
+                ))}
+              </div>
+            ))}
+          </div>
+        ) : (
+        <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Filename</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Chunks</TableHead>
+              <TableHead>Uploaded</TableHead>
+              <TableHead />
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {docs.map((doc) => (
+              <TableRow key={doc.id}>
+                <TableCell className="font-mono text-sm">{doc.filename}</TableCell>
+                <TableCell>
+                  <Badge className={STATUS_BADGE[doc.status]}>{doc.status}</Badge>
+                  {doc.error_msg && (
+                    <p className="text-xs text-red-500 mt-1">{doc.error_msg}</p>
+                  )}
+                </TableCell>
+                <TableCell>{doc.chunk_count ?? "—"}</TableCell>
+                <TableCell className="text-sm text-muted-foreground">
+                  {new Date(doc.created_at).toLocaleDateString("en-GB")}
+                </TableCell>
+                <TableCell className="flex gap-2">
+                  {doc.status === "failed" && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleReingest(doc.id)}
+                    >
+                      Re-ingest
+                    </Button>
+                  )}
                   <Button
                     size="sm"
-                    variant="outline"
-                    onClick={() => handleReingest(doc.id)}
+                    variant="destructive"
+                    onClick={() => handleDelete(doc.id)}
                   >
-                    Re-ingest
+                    Delete
                   </Button>
-                )}
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  onClick={() => handleDelete(doc.id)}
+                </TableCell>
+              </TableRow>
+            ))}
+            {docs.length === 0 && (
+              <TableRow>
+                <TableCell
+                  colSpan={5}
+                  className="text-center text-muted-foreground py-8"
                 >
-                  Delete
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-          {docs.length === 0 && (
-            <TableRow>
-              <TableCell
-                colSpan={5}
-                className="text-center text-muted-foreground py-8"
-              >
-                No documents yet. Upload a PDF to get started.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+                  No documents yet. Upload a PDF to get started.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+        </div>
+        )}
       </div>
-      )}
     </div>
   );
 }

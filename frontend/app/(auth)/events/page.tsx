@@ -106,7 +106,7 @@ function CalendarGrid({
   }, [firstDay, daysInMonth]);
 
   return (
-    <div className="border rounded-lg overflow-hidden">
+    <div className="overflow-hidden">
       <div className="flex items-center justify-between px-4 py-2 border-b bg-muted/30">
         <Button variant="ghost" size="icon" onClick={prev}><ChevronLeft className="h-4 w-4" /></Button>
         <span className="font-semibold text-sm">
@@ -388,7 +388,7 @@ export default function EventsPage() {
       )}
 
       {loading ? (
-        <div className="border rounded-lg overflow-hidden">
+        <div className="bg-card card-surface rounded-2xl overflow-hidden">
           <div className="flex items-center justify-between px-4 py-2 border-b">
             <Skeleton className="h-8 w-8 rounded-full" />
             <Skeleton className="h-4 w-32" />
@@ -410,15 +410,20 @@ export default function EventsPage() {
           </div>
         </div>
       ) : (
-        <CalendarGrid
-          events={filtered}
-          onSelectDividend={openDividend}
-          onSelectIpo={setSelectedIpo}
-        />
+        <div className="bg-card card-surface rounded-2xl overflow-hidden">
+          <CalendarGrid
+            events={filtered}
+            onSelectDividend={openDividend}
+            onSelectIpo={setSelectedIpo}
+          />
+        </div>
       )}
 
-      <div>
-        <h2 className="text-lg font-semibold mb-2">Upcoming Events</h2>
+      <div className="bg-card card-surface rounded-2xl overflow-hidden">
+        <div className="p-5">
+          <h2 className="text-lg font-semibold mb-2">Upcoming Events</h2>
+        </div>
+        <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
@@ -491,6 +496,7 @@ export default function EventsPage() {
               ))}
           </TableBody>
         </Table>
+        </div>
       </div>
 
       {selectedIpo && (

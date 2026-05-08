@@ -104,7 +104,7 @@ export function AddTransactionDialog({ primaryCurrency, onAdded }: Props) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
         render={
-          <Button size="sm" variant="outline">
+          <Button size="sm" variant="outline" className="h-9 rounded-full text-sm font-medium">
             <ArrowRightLeft className="h-4 w-4 mr-1" />
             Add Transaction
           </Button>

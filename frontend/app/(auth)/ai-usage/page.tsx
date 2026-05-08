@@ -262,238 +262,240 @@ function AIUsageContent() {
         </>
       ) : null}
 
-      <Tabs value={tab} onValueChange={(v) => router.replace(`/ai-usage?tab=${v}`)}>
-        <TabsList>
-          <TabsTrigger value="analyses">Analyses</TabsTrigger>
-          <TabsTrigger value="call-logs">LLM Call Logs</TabsTrigger>
-          <TabsTrigger value="import-mapping">Import Mapping</TabsTrigger>
-        </TabsList>
+      <div className="bg-card card-surface rounded-2xl p-5">
+        <Tabs value={tab} onValueChange={(v) => router.replace(`/ai-usage?tab=${v}`)}>
+          <TabsList>
+            <TabsTrigger value="analyses">Analyses</TabsTrigger>
+            <TabsTrigger value="call-logs">LLM Call Logs</TabsTrigger>
+            <TabsTrigger value="import-mapping">Import Mapping</TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="analyses" className="space-y-4 pt-2">
-          <div className="flex items-center gap-3">
-            <Select
-              value={filterProvider}
-              onValueChange={(v) => setFilterProvider(v ?? "all")}
-            >
-              <SelectTrigger className="w-40">
-                <span className="truncate">{filterProvider === "all" ? "All Providers" : filterProvider}</span>
-              </SelectTrigger>
-              <SelectContent>
-                {providers.map((p) => (
-                  <SelectItem key={p} value={p}>
-                    {p === "all" ? "All Providers" : p}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <TabsContent value="analyses" className="space-y-4 pt-2">
+            <div className="flex items-center gap-3">
+              <Select
+                value={filterProvider}
+                onValueChange={(v) => setFilterProvider(v ?? "all")}
+              >
+                <SelectTrigger className="w-40">
+                  <span className="truncate">{filterProvider === "all" ? "All Providers" : filterProvider}</span>
+                </SelectTrigger>
+                <SelectContent>
+                  {providers.map((p) => (
+                    <SelectItem key={p} value={p}>
+                      {p === "all" ? "All Providers" : p}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          {loading ? (
-            <div className="space-y-3">
-              <div className="flex gap-4 pb-2 border-b">
-                {Array.from({ length: 7 }).map((_, i) => (
-                  <Skeleton key={i} className="h-4 flex-1" />
-                ))}
-              </div>
-              {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="flex gap-4">
-                  {Array.from({ length: 7 }).map((_, j) => (
-                    <Skeleton key={j} className="h-4 flex-1" />
+            {loading ? (
+              <div className="space-y-3">
+                <div className="flex gap-4 pb-2 border-b">
+                  {Array.from({ length: 7 }).map((_, i) => (
+                    <Skeleton key={i} className="h-4 flex-1" />
                   ))}
                 </div>
-              ))}
-            </div>
-          ) : (
-          <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Verdict</TableHead>
-                <TableHead>Model</TableHead>
-                <TableHead>Tokens In</TableHead>
-                <TableHead>Tokens Out</TableHead>
-                <TableHead>Cost</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead />
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {logs.map((a) => (
-                <React.Fragment key={a.id}>
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div key={i} className="flex gap-4">
+                    {Array.from({ length: 7 }).map((_, j) => (
+                      <Skeleton key={j} className="h-4 flex-1" />
+                    ))}
+                  </div>
+                ))}
+              </div>
+            ) : (
+            <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Verdict</TableHead>
+                  <TableHead>Model</TableHead>
+                  <TableHead>Tokens In</TableHead>
+                  <TableHead>Tokens Out</TableHead>
+                  <TableHead>Cost</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead />
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {logs.map((a) => (
+                  <React.Fragment key={a.id}>
+                    <TableRow>
+                      <TableCell>
+                        <span
+                          className={
+                            a.verdict === "BUY"
+                              ? "text-green-500"
+                              : a.verdict === "SELL"
+                                ? "text-red-500"
+                                : "text-yellow-500"
+                          }
+                        >
+                          {a.verdict}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-sm">{a.model}</TableCell>
+                      <TableCell>{a.tokens_in.toLocaleString()}</TableCell>
+                      <TableCell>{a.tokens_out.toLocaleString()}</TableCell>
+                      <TableCell>
+                        <DualCurrencyAmount value={formatNative(a.cost_usd, "USD", 6)} />
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {new Date(a.created_at).toLocaleString()}
+                      </TableCell>
+                      <TableCell>
+                        <button
+                          className="text-xs text-muted-foreground underline"
+                          onClick={() => toggleConversation(a.id)}
+                        >
+                          {openRows.has(a.id) ? "Hide" : "View"} log
+                        </button>
+                      </TableCell>
+                    </TableRow>
+                    {openRows.has(a.id) && (
+                      <TableRow key={`${a.id}-conv`}>
+                        <TableCell colSpan={7}>
+                          <div className="space-y-1 max-h-48 overflow-y-auto py-1">
+                            {(conversations[a.id] ?? []).map((m, i) => (
+                              <div key={i} className="text-xs bg-muted rounded p-2">
+                                <span className="font-semibold capitalize">
+                                  {m.role}:{" "}
+                                </span>
+                                {m.content}
+                              </div>
+                            ))}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </React.Fragment>
+                ))}
+                {logs.length === 0 && (
                   <TableRow>
-                    <TableCell>
-                      <span
-                        className={
-                          a.verdict === "BUY"
-                            ? "text-green-500"
-                            : a.verdict === "SELL"
-                              ? "text-red-500"
-                              : "text-yellow-500"
-                        }
-                      >
-                        {a.verdict}
-                      </span>
+                    <TableCell
+                      colSpan={7}
+                      className="text-center text-muted-foreground py-8"
+                    >
+                      No analyses yet.
                     </TableCell>
-                    <TableCell className="text-sm">{a.model}</TableCell>
-                    <TableCell>{a.tokens_in.toLocaleString()}</TableCell>
-                    <TableCell>{a.tokens_out.toLocaleString()}</TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+            </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="call-logs" className="pt-2">
+            <div className="flex justify-end mb-2">
+              <Button variant="outline" size="sm" onClick={loadCallLogs}>
+                Refresh
+              </Button>
+            </div>
+            <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Feature</TableHead>
+                  <TableHead>Provider</TableHead>
+                  <TableHead>Model</TableHead>
+                  <TableHead>Tokens In</TableHead>
+                  <TableHead>Tokens Out</TableHead>
+                  <TableHead>Cost (USD)</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead />
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {callLogs.map((log) => (
+                  <TableRow key={log.id}>
+                    <TableCell className="text-sm">{log.feature_key}</TableCell>
+                    <TableCell className="text-sm">{log.provider}</TableCell>
+                    <TableCell className="text-sm">{log.model}</TableCell>
+                    <TableCell>{log.tokens_in.toLocaleString()}</TableCell>
+                    <TableCell>{log.tokens_out.toLocaleString()}</TableCell>
                     <TableCell>
-                      <DualCurrencyAmount value={formatNative(a.cost_usd, "USD", 6)} />
+                      <DualCurrencyAmount value={formatNative(log.cost_usd, "USD", 6)} />
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
-                      {new Date(a.created_at).toLocaleString()}
+                      {new Date(log.created_at).toLocaleString()}
                     </TableCell>
                     <TableCell>
                       <button
                         className="text-xs text-muted-foreground underline"
-                        onClick={() => toggleConversation(a.id)}
+                        onClick={() => viewPayload(log.id)}
                       >
-                        {openRows.has(a.id) ? "Hide" : "View"} log
+                        View payload
                       </button>
                     </TableCell>
                   </TableRow>
-                  {openRows.has(a.id) && (
-                    <TableRow key={`${a.id}-conv`}>
-                      <TableCell colSpan={7}>
-                        <div className="space-y-1 max-h-48 overflow-y-auto py-1">
-                          {(conversations[a.id] ?? []).map((m, i) => (
-                            <div key={i} className="text-xs bg-muted rounded p-2">
-                              <span className="font-semibold capitalize">
-                                {m.role}:{" "}
-                              </span>
-                              {m.content}
-                            </div>
-                          ))}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </React.Fragment>
-              ))}
-              {logs.length === 0 && (
-                <TableRow>
-                  <TableCell
-                    colSpan={7}
-                    className="text-center text-muted-foreground py-8"
-                  >
-                    No analyses yet.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-          </div>
-          )}
-        </TabsContent>
-
-        <TabsContent value="call-logs" className="pt-2">
-          <div className="flex justify-end mb-2">
-            <Button variant="outline" size="sm" onClick={loadCallLogs}>
-              Refresh
-            </Button>
-          </div>
-          <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Feature</TableHead>
-                <TableHead>Provider</TableHead>
-                <TableHead>Model</TableHead>
-                <TableHead>Tokens In</TableHead>
-                <TableHead>Tokens Out</TableHead>
-                <TableHead>Cost (USD)</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead />
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {callLogs.map((log) => (
-                <TableRow key={log.id}>
-                  <TableCell className="text-sm">{log.feature_key}</TableCell>
-                  <TableCell className="text-sm">{log.provider}</TableCell>
-                  <TableCell className="text-sm">{log.model}</TableCell>
-                  <TableCell>{log.tokens_in.toLocaleString()}</TableCell>
-                  <TableCell>{log.tokens_out.toLocaleString()}</TableCell>
-                  <TableCell>
-                    <DualCurrencyAmount value={formatNative(log.cost_usd, "USD", 6)} />
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {new Date(log.created_at).toLocaleString()}
-                  </TableCell>
-                  <TableCell>
-                    <button
-                      className="text-xs text-muted-foreground underline"
-                      onClick={() => viewPayload(log.id)}
+                ))}
+                {callLogs.length === 0 && (
+                  <TableRow>
+                    <TableCell
+                      colSpan={8}
+                      className="text-center text-muted-foreground py-8"
                     >
-                      View payload
-                    </button>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {callLogs.length === 0 && (
-                <TableRow>
-                  <TableCell
-                    colSpan={8}
-                    className="text-center text-muted-foreground py-8"
-                  >
-                    No LLM calls yet.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-          </div>
-        </TabsContent>
+                      No LLM calls yet.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+            </div>
+          </TabsContent>
 
-        <TabsContent value="import-mapping" className="pt-2">
-          {importLoading ? (
-            <div className="space-y-3 mt-4">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="flex gap-4">
-                  {Array.from({ length: 6 }).map((_, j) => (
-                    <div key={j} className="h-4 flex-1 bg-muted animate-pulse rounded" />
-                  ))}
-                </div>
-              ))}
-            </div>
-          ) : importLogs.length === 0 ? (
-            <p className="text-muted-foreground py-8 text-center text-sm">
-              No import mapping calls yet.
-            </p>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm mt-4">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left py-2">Date</th>
-                    <th className="text-left py-2">Feature</th>
-                    <th className="text-left py-2">Provider / Model</th>
-                    <th className="text-right py-2">Tokens In</th>
-                    <th className="text-right py-2">Tokens Out</th>
-                    <th className="text-right py-2">Cost (THB)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {importLogs.map((log) => (
-                    <tr key={log.id} className="border-b hover:bg-muted/50">
-                      <td className="py-2">
-                        {new Date(log.created_at).toLocaleDateString("en-GB")}
-                      </td>
-                      <td className="py-2">{log.feature_key.replace(/_/g, " ")}</td>
-                      <td className="py-2">
-                        {log.provider} / {log.model}
-                      </td>
-                      <td className="py-2 text-right">{log.tokens_in.toLocaleString()}</td>
-                      <td className="py-2 text-right">{log.tokens_out.toLocaleString()}</td>
-                      <td className="py-2 text-right">฿{log.cost_thb.toFixed(4)}</td>
+          <TabsContent value="import-mapping" className="pt-2">
+            {importLoading ? (
+              <div className="space-y-3 mt-4">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="flex gap-4">
+                    {Array.from({ length: 6 }).map((_, j) => (
+                      <div key={j} className="h-4 flex-1 bg-muted animate-pulse rounded" />
+                    ))}
+                  </div>
+                ))}
+              </div>
+            ) : importLogs.length === 0 ? (
+              <p className="text-muted-foreground py-8 text-center text-sm">
+                No import mapping calls yet.
+              </p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm mt-4">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-2">Date</th>
+                      <th className="text-left py-2">Feature</th>
+                      <th className="text-left py-2">Provider / Model</th>
+                      <th className="text-right py-2">Tokens In</th>
+                      <th className="text-right py-2">Tokens Out</th>
+                      <th className="text-right py-2">Cost (THB)</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
+                  </thead>
+                  <tbody>
+                    {importLogs.map((log) => (
+                      <tr key={log.id} className="border-b hover:bg-muted/50">
+                        <td className="py-2">
+                          {new Date(log.created_at).toLocaleDateString("en-GB")}
+                        </td>
+                        <td className="py-2">{log.feature_key.replace(/_/g, " ")}</td>
+                        <td className="py-2">
+                          {log.provider} / {log.model}
+                        </td>
+                        <td className="py-2 text-right">{log.tokens_in.toLocaleString()}</td>
+                        <td className="py-2 text-right">{log.tokens_out.toLocaleString()}</td>
+                        <td className="py-2 text-right">฿{log.cost_thb.toFixed(4)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
+      </div>
 
       <Dialog open={payloadOpen} onOpenChange={setPayloadOpen}>
         <DialogContent className="max-w-5xl w-[90vw] max-h-[90vh] flex flex-col">

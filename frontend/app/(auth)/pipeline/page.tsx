@@ -66,7 +66,9 @@ export default function PipelinePage() {
         Live price fetch job status. Updates every 3 seconds via SSE.
       </p>
       <TriggerButtons />
-      <JobsTable jobs={jobs} />
+      <div className="bg-card card-surface rounded-2xl overflow-hidden overflow-x-auto">
+        <JobsTable jobs={jobs} />
+      </div>
     </div>
   );
 }

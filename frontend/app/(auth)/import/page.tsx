@@ -101,14 +101,14 @@ export default function ImportPage() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center gap-6 py-16 px-6">
+    <div className="flex flex-col items-center justify-center gap-6 py-8 sm:py-16 px-4 sm:px-6">
       <PageHeader title="Import" />
       <p className="text-muted-foreground text-center max-w-md">
         Upload a CSV or JSON file. If the headers match the canonical format they
         import directly. Other formats are translated by AI.
       </p>
       <div
-        className="border-2 border-dashed rounded-xl p-12 flex flex-col items-center gap-4
+        className="border-2 border-dashed rounded-xl p-8 sm:p-12 flex flex-col items-center gap-4
                    cursor-pointer hover:border-primary transition-colors w-full max-w-md"
         onDrop={(e) => {
           e.preventDefault();
