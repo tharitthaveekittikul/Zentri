@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import (
     analysis, assets, auth, cash_balance, chat, dividends, documents,
-    events, feature_llm_config, health, import_pipeline, ipos, llm_usage,
+    events, feature_llm_config, health, import_pipeline, ipos, llm_pricing, llm_usage,
     overview, pipeline, platforms, portfolio, provider_config, research, settings, system, watchlist,
 )
 from app.core.logging import get_logger, setup_logging
@@ -36,6 +36,7 @@ app.include_router(feature_llm_config.router, prefix="/api/v1")
 app.include_router(cash_balance.router, prefix="/api/v1")
 app.include_router(import_pipeline.router, prefix="/api/v1")
 app.include_router(llm_usage.router, prefix="/api/v1")
+app.include_router(llm_pricing.router, prefix="/api/v1")
 app.include_router(dividends.router, prefix="/api/v1")
 app.include_router(events.router, prefix="/api/v1")
 app.include_router(ipos.router, prefix="/api/v1")

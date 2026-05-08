@@ -471,7 +471,7 @@ function AIUsageContent() {
                       <th className="text-left py-2">Provider / Model</th>
                       <th className="text-right py-2">Tokens In</th>
                       <th className="text-right py-2">Tokens Out</th>
-                      <th className="text-right py-2">Cost (THB)</th>
+                      <th className="text-right py-2">Cost</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -486,7 +486,7 @@ function AIUsageContent() {
                         </td>
                         <td className="py-2 text-right">{log.tokens_in.toLocaleString()}</td>
                         <td className="py-2 text-right">{log.tokens_out.toLocaleString()}</td>
-                        <td className="py-2 text-right">฿{log.cost_thb.toFixed(4)}</td>
+                        <td className="py-2 text-right"><DualCurrencyAmount value={formatNative(log.cost_usd, "USD", 6)} inline /></td>
                       </tr>
                     ))}
                   </tbody>

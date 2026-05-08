@@ -636,7 +636,7 @@ export default function WatchlistPage() {
                     </span>
                     {s.suggested_price && (
                       <span className="text-xs text-muted-foreground">
-                        suggested ${parseFloat(s.suggested_price).toFixed(2)}
+                        suggested {parseFloat(s.suggested_price).toFixed(2)} USD
                       </span>
                     )}
                   </div>

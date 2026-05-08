@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { usePrivacyStore } from "@/store/privacy";
+import { useDualCurrency } from "@/hooks/useDualCurrency";
 
 interface Analysis {
   id: string;
@@ -40,6 +41,7 @@ const VERDICT_COLORS = {
 
 export function VerdictCard({ symbol }: VerdictCardProps) {
   const { isPrivate } = usePrivacyStore();
+  const { formatNative } = useDualCurrency();
   const [latest, setLatest] = useState<Analysis | null>(null);
   const [history, setHistory] = useState<Analysis[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -146,13 +148,13 @@ export function VerdictCard({ symbol }: VerdictCardProps) {
                   Target:{" "}
                   {isPrivate
                     ? "••••"
-                    : `$${displayed.target_price.toFixed(2)}`}
+                    : `${displayed.target_price.toFixed(2)} USD`}
                 </span>
               )}
             </div>
             <p className="text-sm">{displayed.reasoning}</p>
             <p className="text-xs text-muted-foreground">
-              {displayed.model} · ${displayed.cost_usd.toFixed(4)} ·{" "}
+              {displayed.model} · {formatNative(displayed.cost_usd, "USD", 4).primary} ·{" "}
               {new Date(displayed.created_at).toLocaleDateString()}
             </p>
 

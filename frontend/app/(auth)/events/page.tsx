@@ -258,7 +258,7 @@ function IpoPanel({
                   {analysis.verdict}
                 </span>
                 {analysis.suggested_price && (
-                  <span className="text-sm font-medium">Target: ${analysis.suggested_price}</span>
+                  <span className="text-sm font-medium">Target: {parseFloat(analysis.suggested_price).toFixed(2)} USD</span>
                 )}
                 {analysis.cached && <span className="text-xs text-muted-foreground">cached</span>}
               </div>

@@ -25,6 +25,7 @@ import {
 import { ChevronDownIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ModelTooltip } from "@/components/settings/ModelTooltip";
+import { loadPricing } from "@/lib/llmPricing";
 import {
   ProviderConfig,
   Provider,
@@ -170,6 +171,10 @@ export function AISettings() {
   const [featureErrors, setFeatureErrors] = useState<Record<string, string>>(
     {},
   );
+
+  useEffect(() => {
+    loadPricing();
+  }, []);
 
   useEffect(() => {
     listProviderConfigs()

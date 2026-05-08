@@ -6,8 +6,8 @@ from app.services.llm_service import (
     OpenAIProvider,
     LLMResponse,
     LLMQuotaExceededError,
-    calc_cost as _calc_cost,
 )
+from app.core.llm_pricing import calc_cost as _calc_cost
 
 
 def test_calc_cost_known_model():
