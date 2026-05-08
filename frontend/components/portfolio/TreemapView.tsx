@@ -6,6 +6,7 @@ import { Treemap } from "@/lib/visualizations/treemap";
 import { getHoldingColor, PortfolioViewItem } from "@/lib/visualizations/types";
 import { useResizeObserver } from "@/hooks/useResizeObserver";
 import { TickerLogo } from "@/components/ui/TickerLogo";
+import { usePrivacyStore } from "@/store/privacy";
 
 interface Props {
   items: PortfolioViewItem[];
@@ -13,6 +14,7 @@ interface Props {
 
 export function TreemapView({ items }: Props) {
   const router = useRouter();
+  const { isPrivate } = usePrivacyStore();
   const { ref, width, height } = useResizeObserver<HTMLDivElement>();
 
   const cells = useMemo(() => {
@@ -56,9 +58,9 @@ export function TreemapView({ items }: Props) {
             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20 whitespace-nowrap">
               <div className="bg-popover text-popover-foreground text-xs rounded-lg px-3 py-2 shadow-xl border border-border">
                 <div className="font-semibold">{cell.symbol}</div>
-                <div className="text-muted-foreground">{cell.displayValue}</div>
+                <div className="text-muted-foreground">{isPrivate ? "••••••" : cell.displayValue}</div>
                 <div className="text-muted-foreground">
-                  {cell.portfolioPct.toFixed(1)}% of portfolio
+                  {isPrivate ? "••••••" : `${cell.portfolioPct.toFixed(1)}% of portfolio`}
                 </div>
                 <div style={{ color: color.accent }}>
                   {cell.pnlPct >= 0 ? "+" : ""}
@@ -89,7 +91,7 @@ export function TreemapView({ items }: Props) {
                     className="text-white/80 font-medium"
                     style={{ fontSize: valueSize }}
                   >
-                    {cell.displayValue}
+                    {isPrivate ? "••••••" : cell.displayValue}
                   </span>
                 )}
               </div>

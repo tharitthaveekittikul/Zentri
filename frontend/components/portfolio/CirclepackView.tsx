@@ -6,6 +6,7 @@ import { CirclePack } from "@/lib/visualizations/circlepack";
 import { getHoldingColor, PortfolioViewItem } from "@/lib/visualizations/types";
 import { useResizeObserver } from "@/hooks/useResizeObserver";
 import { TickerLogo } from "@/components/ui/TickerLogo";
+import { usePrivacyStore } from "@/store/privacy";
 
 interface Props {
   items: PortfolioViewItem[];
@@ -13,6 +14,7 @@ interface Props {
 
 export function CirclepackView({ items }: Props) {
   const router = useRouter();
+  const { isPrivate } = usePrivacyStore();
   const { ref, width, height } = useResizeObserver<HTMLDivElement>();
 
   const circles = useMemo(() => {
@@ -53,9 +55,9 @@ export function CirclepackView({ items }: Props) {
             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20 whitespace-nowrap">
               <div className="bg-popover text-popover-foreground text-xs rounded-lg px-3 py-2 shadow-xl border border-border">
                 <div className="font-semibold">{circle.symbol}</div>
-                <div className="text-muted-foreground">{circle.displayValue}</div>
+                <div className="text-muted-foreground">{isPrivate ? "••••••" : circle.displayValue}</div>
                 <div className="text-muted-foreground">
-                  {circle.portfolioPct.toFixed(1)}% of portfolio
+                  {isPrivate ? "••••••" : `${circle.portfolioPct.toFixed(1)}% of portfolio`}
                 </div>
                 <div style={{ color: color.accent }}>
                   {circle.pnlPct >= 0 ? "+" : ""}

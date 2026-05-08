@@ -77,10 +77,11 @@ export function holdingsToViewItems(
           Number(h.total_cost) > 0
             ? (Number(h.unrealized_pnl ?? 0) / Number(h.total_cost)) * 100
             : 0,
-        displayValue: primaryVal.toLocaleString(undefined, {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        }),
+        displayValue:
+          primaryVal.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }) + (options?.primaryCurrency ? ` ${options.primaryCurrency}` : ""),
         logoUrl: h.metadata_?.logo_url as string | undefined,
       };
     });
