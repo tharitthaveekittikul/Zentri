@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
@@ -33,7 +34,10 @@ interface HardwareInfo {
   recommendation: HardwareRecommendation;
 }
 
-export default function SettingsPage() {
+function SettingsContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const tab = searchParams.get("tab") ?? "general";
   const [hardware, setHardware] = useState<HardwareInfo | null>(null);
   const CURRENCIES = ["THB", "USD", "EUR", "GBP", "JPY", "SGD"];
   const [currencyPrimary, setCurrencyPrimary] = useState("THB");
@@ -219,7 +223,8 @@ export default function SettingsPage() {
     <div className="space-y-6 max-w-2xl">
       <PageHeader title="Settings" />
 
-      <Tabs defaultValue="general">
+      <Tabs value={tab} onValueChange={(v) => router.replace(`/settings?tab=${v}`)}>
+
         <TabsList>
           <TabsTrigger value="general">General</TabsTrigger>
           <TabsTrigger value="ai">AI & LLM</TabsTrigger>
@@ -565,5 +570,13 @@ export default function SettingsPage() {
         </TabsContent>
       </Tabs>
     </div>
+  );
+}
+
+export default function SettingsPage() {
+  return (
+    <Suspense fallback={null}>
+      <SettingsContent />
+    </Suspense>
   );
 }

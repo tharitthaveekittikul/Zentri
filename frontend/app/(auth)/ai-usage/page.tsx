@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
@@ -76,7 +77,14 @@ interface CallLogDetail extends CallLog {
   response_out: string;
 }
 
-export default function AIUsagePage() {
+function AIUsageContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const tab = searchParams.get("tab") ?? "analyses";
+
+  const [importLogs, setImportLogs] = useState<CallLog[]>([]);
+  const [importLoading, setImportLoading] = useState(false);
+
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState<Summary | null>(null);
   const [logs, setLogs] = useState<Analysis[]>([]);
@@ -134,6 +142,18 @@ export default function AIUsagePage() {
     loadCallLogs();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterProvider]);
+
+  useEffect(() => {
+    if (tab !== "import-mapping" || importLogs.length > 0) return;
+    setImportLoading(true);
+    api
+      .get("/api/v1/llm/call-logs?feature_key=import_mapping")
+      .then((r) => (r.ok ? r.json() : { logs: [] }))
+      .then((d) => setImportLogs(d.logs ?? []))
+      .catch(() => setImportLogs([]))
+      .finally(() => setImportLoading(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab]);
 
   async function toggleConversation(id: string) {
     const next = new Set(openRows);
@@ -242,10 +262,11 @@ export default function AIUsagePage() {
         </>
       ) : null}
 
-      <Tabs defaultValue="analyses">
+      <Tabs value={tab} onValueChange={(v) => router.replace(`/ai-usage?tab=${v}`)}>
         <TabsList>
           <TabsTrigger value="analyses">Analyses</TabsTrigger>
           <TabsTrigger value="call-logs">LLM Call Logs</TabsTrigger>
+          <TabsTrigger value="import-mapping">Import Mapping</TabsTrigger>
         </TabsList>
 
         <TabsContent value="analyses" className="space-y-4 pt-2">
@@ -423,6 +444,55 @@ export default function AIUsagePage() {
           </Table>
           </div>
         </TabsContent>
+
+        <TabsContent value="import-mapping" className="pt-2">
+          {importLoading ? (
+            <div className="space-y-3 mt-4">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="flex gap-4">
+                  {Array.from({ length: 6 }).map((_, j) => (
+                    <div key={j} className="h-4 flex-1 bg-muted animate-pulse rounded" />
+                  ))}
+                </div>
+              ))}
+            </div>
+          ) : importLogs.length === 0 ? (
+            <p className="text-muted-foreground py-8 text-center text-sm">
+              No import mapping calls yet.
+            </p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm mt-4">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-2">Date</th>
+                    <th className="text-left py-2">Feature</th>
+                    <th className="text-left py-2">Provider / Model</th>
+                    <th className="text-right py-2">Tokens In</th>
+                    <th className="text-right py-2">Tokens Out</th>
+                    <th className="text-right py-2">Cost (THB)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {importLogs.map((log) => (
+                    <tr key={log.id} className="border-b hover:bg-muted/50">
+                      <td className="py-2">
+                        {new Date(log.created_at).toLocaleDateString("en-GB")}
+                      </td>
+                      <td className="py-2">{log.feature_key.replace(/_/g, " ")}</td>
+                      <td className="py-2">
+                        {log.provider} / {log.model}
+                      </td>
+                      <td className="py-2 text-right">{log.tokens_in.toLocaleString()}</td>
+                      <td className="py-2 text-right">{log.tokens_out.toLocaleString()}</td>
+                      <td className="py-2 text-right">฿{log.cost_thb.toFixed(4)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </TabsContent>
       </Tabs>
 
       <Dialog open={payloadOpen} onOpenChange={setPayloadOpen}>
@@ -474,5 +544,13 @@ export default function AIUsagePage() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+export default function AIUsagePage() {
+  return (
+    <Suspense fallback={null}>
+      <AIUsageContent />
+    </Suspense>
   );
 }
