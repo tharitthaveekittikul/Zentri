@@ -10,6 +10,7 @@ from worker.jobs.ingest_document import job_ingest_document
 from worker.jobs.net_worth_snapshot import job_snapshot_net_worth
 from worker.jobs.run_analysis import job_run_analysis
 from worker.jobs.price_fetch import (
+    job_backfill_historical_prices,
     job_fetch_benchmark_prices,
     job_fetch_price_gold,
     job_fetch_prices_crypto,
@@ -48,6 +49,7 @@ class WorkerSettings:
         job_fetch_benchmark_prices,
         job_fetch_prices_th_fund,
         job_fetch_prices_thai_stock,
+        job_backfill_historical_prices,
         job_ingest_document,
         job_run_analysis,
         job_snapshot_net_worth,

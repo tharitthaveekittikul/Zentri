@@ -6,12 +6,13 @@ from decimal import Decimal
 
 import httpx
 import yfinance as yf
-from sqlalchemy import select, text
+from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.encryption import decrypt
 from app.core.logging import get_logger
 from app.models.asset import Asset
+from app.models.transaction import Transaction
 from app.models.benchmark import Benchmark, BenchmarkPrice
 from app.models.price import Price
 from app.models.user import User
@@ -287,7 +288,7 @@ BENCHMARK_YFINANCE_SYMBOLS = {
 }
 
 
-async def fetch_benchmark_prices(db: AsyncSession) -> int:
+async def fetch_benchmark_prices(db: AsyncSession, period: str = "5d") -> int:
     """Fetch benchmark prices (S&P500 and SET) via yfinance."""
     result = await db.execute(select(Benchmark))
     benchmarks = list(result.scalars().all())
@@ -297,7 +298,7 @@ async def fetch_benchmark_prices(db: AsyncSession) -> int:
 
     def _fetch(symbol: str):
         ticker = yf.Ticker(symbol)
-        return ticker.history(period="5d", interval="1d")
+        return ticker.history(period=period, interval="1d")
 
     rows = []
     for bm in benchmarks:
@@ -436,3 +437,74 @@ async def fetch_th_fund_prices(db: AsyncSession) -> dict:
     inserted = await _upsert_prices(db, all_rows)
     logger.info("fetch_th_fund_prices: upserted %d rows for %d funds", inserted, len(all_fetched))
     return {"table": "prices", "inserted": inserted, "funds": all_fetched, "skipped": all_skipped}
+
+
+# ---------------------------------------------------------------------------
+# Historical prices (back-fill from earliest transaction)
+# ---------------------------------------------------------------------------
+
+_HISTORICAL_ASSET_TYPES = frozenset({"us_stock", "etf", "crypto", "gold"})
+
+
+async def fetch_historical_prices(db: AsyncSession) -> dict:
+    """Fetch full yfinance history for all priced assets, back to their earliest transaction."""
+    assets_result = await db.execute(
+        select(Asset).where(Asset.asset_type.in_(_HISTORICAL_ASSET_TYPES))
+    )
+    assets = list(assets_result.scalars().all())
+
+    if not assets:
+        logger.info("fetch_historical_prices: no priced assets found")
+        return {"inserted": 0, "assets_processed": 0}
+
+    total_inserted = 0
+    processed = 0
+
+    for asset in assets:
+        earliest_result = await db.execute(
+            select(func.min(Transaction.executed_at)).where(Transaction.asset_id == asset.id)
+        )
+        earliest_dt = earliest_result.scalar_one_or_none()
+        if earliest_dt is None:
+            logger.debug("fetch_historical_prices: no transactions for %s, skipping", asset.symbol)
+            continue
+
+        start_str = str(earliest_dt.date())
+
+        def _fetch(symbol: str, start: str):
+            ticker = yf.Ticker(symbol)
+            return ticker.history(start=start, interval="1d")
+
+        try:
+            hist = await asyncio.get_event_loop().run_in_executor(None, _fetch, asset.symbol, start_str)
+        except Exception as e:
+            logger.warning("fetch_historical_prices: yfinance failed for %s: %s", asset.symbol, e)
+            continue
+
+        if hist.empty:
+            logger.warning("fetch_historical_prices: empty history for %s from %s", asset.symbol, start_str)
+            continue
+
+        rows = []
+        for ts, row in hist.iterrows():
+            rows.append({
+                "asset_id": asset.id,
+                "timestamp": ts.to_pydatetime().replace(tzinfo=timezone.utc),
+                "open": _to_decimal(row.get("Open")),
+                "high": _to_decimal(row.get("High")),
+                "low": _to_decimal(row.get("Low")),
+                "close": _to_decimal(row.get("Close")),
+                "volume": _to_decimal(row.get("Volume")),
+            })
+
+        if rows:
+            inserted = await _upsert_prices(db, rows)
+            total_inserted += inserted
+            logger.info(
+                "fetch_historical_prices: %s inserted=%d from=%s",
+                asset.symbol, inserted, start_str,
+            )
+
+        processed += 1
+
+    return {"inserted": total_inserted, "assets_processed": processed}

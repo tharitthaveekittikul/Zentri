@@ -6,6 +6,7 @@ from app.services.price_feed import (
     fetch_benchmark_prices,
     fetch_crypto_prices,
     fetch_gold_price,
+    fetch_historical_prices,
     fetch_th_fund_prices,
     fetch_thai_stock_prices,
     fetch_us_prices,
@@ -135,12 +136,31 @@ async def job_fetch_benchmark_prices(ctx: dict, manual: bool = False) -> dict:
         log = await create_log(db, "price_fetch_benchmark")
         step = await create_step(db, log.id, "fetch_and_store")
         try:
-            result = await fetch_benchmark_prices(db)
+            result = await fetch_benchmark_prices(db, period="2y" if manual else "5d")
             await finish_step(db, step, success=True, metadata=result)
             await finish_log(db, log, success=True)
             return {"inserted": result["inserted"]}
         except Exception as e:
             logger.exception("job_fetch_benchmark_prices failed: %s", e)
+            await finish_step(db, step, success=False, error=str(e))
+            await finish_log(db, log, success=False, error_message=str(e))
+            raise
+
+
+async def job_backfill_historical_prices(ctx: dict, manual: bool = False) -> dict:
+    """ARQ job: fetch full yfinance price history for all priced assets."""
+    SessionLocal: async_sessionmaker = ctx["session_factory"]
+    async with SessionLocal() as db:
+        log = await create_log(db, "backfill_historical_prices")
+        step = await create_step(db, log.id, "fetch_and_store")
+        try:
+            result = await fetch_historical_prices(db)
+            await finish_step(db, step, success=True, metadata=result)
+            await finish_log(db, log, success=True)
+            logger.info("job_backfill_historical_prices done: %s", result)
+            return result
+        except Exception as e:
+            logger.exception("job_backfill_historical_prices failed: %s", e)
             await finish_step(db, step, success=False, error=str(e))
             await finish_log(db, log, success=False, error_message=str(e))
             raise

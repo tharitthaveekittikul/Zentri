@@ -12,6 +12,8 @@ const JOBS: { key: JobType; label: string }[] = [
   { key: "price_fetch_thai_stock", label: "Thai Stock/DR" },
   { key: "price_fetch_th_fund", label: "Thai Fund" },
   { key: "price_fetch_benchmark", label: "Benchmark" },
+  { key: "snapshot_net_worth", label: "Net Worth Snapshot" },
+  { key: "backfill_historical_prices", label: "Backfill Price History" },
 ];
 
 export function TriggerButtons() {

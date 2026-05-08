@@ -12,7 +12,7 @@ from app.services.pipeline import create_log, finish_log
 logger = get_logger(__name__)
 
 
-async def job_snapshot_net_worth(ctx: dict) -> dict:
+async def job_snapshot_net_worth(ctx: dict, manual: bool = False) -> dict:
     """ARQ job: take daily net worth snapshots for all users."""
     SessionLocal: async_sessionmaker = ctx["session_factory"]
     async with SessionLocal() as db:

@@ -8,7 +8,7 @@ JobType = Literal[
     "price_fetch_us", "price_fetch_crypto",
     "price_fetch_gold", "price_fetch_benchmark",
     "price_fetch_thai_stock", "price_fetch_th_fund",
-    "snapshot_net_worth",
+    "snapshot_net_worth", "backfill_historical_prices",
     "watchlist_discovery", "watchlist_scan",
     "run_analysis", "ingest_document",
     "dividend_fetch", "dividend_alert", "ipo_fetch",

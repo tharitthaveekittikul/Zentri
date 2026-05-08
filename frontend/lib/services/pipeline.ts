@@ -10,7 +10,9 @@ export type JobType =
   | "watchlist_discovery"
   | "watchlist_scan"
   | "run_analysis"
-  | "ingest_document";
+  | "ingest_document"
+  | "snapshot_net_worth"
+  | "backfill_historical_prices";
 
 export type JobStatus = "queued" | "running" | "done" | "failed";
 export type StepStatus = "running" | "done" | "failed";

@@ -30,6 +30,8 @@ const JOB_LABELS: Record<JobType, string> = {
   ingest_document: "Ingest Document",
   price_fetch_thai_stock: "Thai Stock/DR",
   price_fetch_th_fund: "Thai Fund",
+  snapshot_net_worth: "Net Worth Snapshot",
+  backfill_historical_prices: "Backfill Price History",
 };
 
 interface JobsTableProps {

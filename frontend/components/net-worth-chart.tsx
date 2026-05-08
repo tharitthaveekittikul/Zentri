@@ -95,6 +95,9 @@ export function NetWorthChart({ privacyMode }: { privacyMode: boolean }) {
         }));
         valueSeriesRef.current.setData(valueData);
         costSeriesRef.current.setData(costData);
+        if (containerRef.current) {
+          chartRef.current?.applyOptions({ width: containerRef.current.clientWidth });
+        }
         chartRef.current?.timeScale().fitContent();
       })
       .catch(console.error)
@@ -162,19 +165,19 @@ export function NetWorthChart({ privacyMode }: { privacyMode: boolean }) {
         </div>
       </CardHeader>
       <CardContent className="pt-0">
-        <div className="h-64 w-full">
+        <div className="h-64 w-full relative">
+          <div ref={containerRef} className="w-full h-full" />
           {loading && (
-            <div className="h-full flex items-center justify-center text-muted-foreground text-sm">
+            <div className="absolute inset-0 flex items-center justify-center text-muted-foreground text-sm">
               Loading...
             </div>
           )}
           {!loading && data.length === 0 && (
-            <div className="h-full flex flex-col items-center justify-center gap-2 text-muted-foreground">
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-muted-foreground">
               <TrendingUp className="h-6 w-6 opacity-30" />
               <span className="text-xs">No net worth data yet</span>
             </div>
           )}
-          <div ref={containerRef} className={loading || data.length === 0 ? "hidden" : "w-full h-full"} />
         </div>
       </CardContent>
     </Card>
