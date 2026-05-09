@@ -17,9 +17,5 @@ export interface ChatResponse {
 
 export async function sendChatMessage(messages: ChatMessage[]): Promise<ChatResponse> {
   const r = await api.post("/api/v1/chat", { messages });
-  if (!r.ok) {
-    const body = await r.json().catch(() => ({}));
-    throw new Error(body.detail ?? "Chat request failed");
-  }
   return r.json();
 }

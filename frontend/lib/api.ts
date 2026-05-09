@@ -5,6 +5,13 @@ const API_BASE = "";
 // Prevents concurrent 401s from triggering multiple simultaneous refresh calls.
 let refreshPromise: Promise<boolean> | null = null;
 
+export class ApiError extends Error {
+  constructor(public status: number, message: string) {
+    super(message);
+    this.name = "ApiError";
+  }
+}
+
 async function fetchWithAuth(
   path: string,
   options: RequestInit = {}
@@ -18,10 +25,7 @@ async function fetchWithAuth(
   };
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
-  const response = await fetch(`${API_BASE}${path}`, {
-    ...options,
-    headers,
-  });
+  let response = await fetch(`${API_BASE}${path}`, { ...options, headers });
 
   if (response.status === 401) {
     if (!refreshPromise) {
@@ -30,9 +34,19 @@ async function fetchWithAuth(
     const refreshed = await refreshPromise;
     if (refreshed) {
       headers["Authorization"] = `Bearer ${localStorage.getItem("access_token")}`;
-      return fetch(`${API_BASE}${path}`, { ...options, headers });
+      response = await fetch(`${API_BASE}${path}`, { ...options, headers });
+    } else {
+      if (typeof window !== "undefined") window.location.href = "/login";
+      throw new ApiError(401, "Session expired");
     }
-    if (typeof window !== "undefined") window.location.href = "/login";
+  }
+
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    const message = typeof body.detail === "string"
+      ? body.detail
+      : JSON.stringify(body.detail ?? `Request failed (${response.status})`);
+    throw new ApiError(response.status, message);
   }
 
   return response;

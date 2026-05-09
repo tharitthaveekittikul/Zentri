@@ -397,7 +397,50 @@ class GeminiAdapter(LLMAdapter):
     async def complete_with_tools(
         self, system: str, messages: list[dict], model: str, tools: list[dict]
     ) -> ToolLLMResponse:
-        raise NotImplementedError("Gemini tool calling not yet supported — use Anthropic or OpenAI.")
+        import asyncio
+        gemini_tools = [{
+            "function_declarations": [
+                {"name": t["name"], "description": t["description"], "parameters": t["parameters"]}
+                for t in tools
+            ]
+        }]
+        m = self._genai.GenerativeModel(
+            model_name=model,
+            system_instruction=system,
+            tools=gemini_tools,
+        )
+        history = []
+        for msg in messages[:-1]:
+            role = "model" if msg["role"] == "assistant" else msg["role"]
+            history.append({"role": role, "parts": [{"text": msg["content"] or ""}]})
+        last_content = messages[-1]["content"] if messages else ""
+        chat_session = m.start_chat(history=history)
+        response = await asyncio.to_thread(chat_session.send_message, last_content)
+        tool_calls = []
+        content_text = None
+        for part in response.parts:
+            if hasattr(part, "function_call") and part.function_call.name:
+                fc = part.function_call
+                tool_calls.append(ToolCall(
+                    id=f"gemini_{fc.name}_{uuid.uuid4().hex[:8]}",
+                    name=fc.name,
+                    arguments=dict(fc.args),
+                ))
+            elif hasattr(part, "text") and part.text:
+                content_text = part.text
+        usage = response.usage_metadata
+        tokens_in = usage.prompt_token_count if usage else 0
+        tokens_out = usage.candidates_token_count if usage else 0
+        cost_usd = calc_cost(model, tokens_in, tokens_out)
+        logger.info("Gemini tool call: model=%s tools_called=%d tokens=%d/%d", model, len(tool_calls), tokens_in, tokens_out)
+        return ToolLLMResponse(
+            content=content_text,
+            tool_calls=tool_calls,
+            tokens_in=tokens_in,
+            tokens_out=tokens_out,
+            cost_usd=cost_usd,
+            stop_reason="tool_use" if tool_calls else "end_turn",
+        )
 
 
 class OllamaAdapter(LLMAdapter):

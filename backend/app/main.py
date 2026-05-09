@@ -1,5 +1,8 @@
-from fastapi import FastAPI
+import uuid
+
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from app.api import (
     analysis, assets, auth, cash_balance, chat, dividends, documents,
@@ -13,6 +16,19 @@ logger = get_logger(__name__)
 
 app = FastAPI(title="Zentri API", version="0.1.0")
 logger.info("Zentri API starting up")
+
+
+# Catch-all for any unhandled exception — FastAPI already handles HTTPException and
+# RequestValidationError with correct {"detail": ...} JSON responses, so we only need
+# this one handler for truly unexpected errors.
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    error_id = uuid.uuid4().hex[:8]
+    logger.exception("Unhandled error [%s] on %s %s", error_id, request.method, request.url.path)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": f"{type(exc).__name__}: {exc}", "error_id": error_id},
+    )
 
 app.add_middleware(
     CORSMiddleware,
