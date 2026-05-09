@@ -23,6 +23,7 @@ services:
       - DATABASE_URL=postgresql+asyncpg://postgres:${POSTGRES_PASSWORD}@postgres:5432/zentri
       - REDIS_URL=redis://redis:6379
       - LOG_LEVEL=${LOG_LEVEL:-info}
+      - CHROMA_HOST=chromadb
     depends_on:
       postgres:
         condition: service_healthy
@@ -35,6 +36,7 @@ services:
     environment:
       - DATABASE_URL=postgresql+asyncpg://postgres:${POSTGRES_PASSWORD}@postgres:5432/zentri
       - REDIS_URL=redis://redis:6379
+      - CHROMA_HOST=chromadb
     depends_on:
       postgres:
         condition: service_healthy
