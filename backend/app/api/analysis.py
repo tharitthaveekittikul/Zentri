@@ -9,6 +9,7 @@ from app.core.database import get_db
 from app.core.logging import get_logger
 from app.models.ai_analysis import AIAnalysis
 from app.models.asset import Asset
+from app.models.llm_call_log import LLMCallLog
 from app.models.llm_conversation import LLMConversation
 from app.models.user import User
 
@@ -23,13 +24,13 @@ async def get_usage_summary(
 ):
     from datetime import datetime, timezone
     from sqlalchemy import func
-    total = await db.execute(select(func.sum(AIAnalysis.cost_usd)))
+    total = await db.execute(select(func.sum(LLMCallLog.cost_usd)))
     total_cost = float(total.scalar() or 0)
 
     now = datetime.now(timezone.utc)
     month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     monthly = await db.execute(
-        select(func.sum(AIAnalysis.cost_usd)).where(AIAnalysis.created_at >= month_start)
+        select(func.sum(LLMCallLog.cost_usd)).where(LLMCallLog.created_at >= month_start)
     )
     monthly_cost = float(monthly.scalar() or 0)
 
@@ -37,8 +38,8 @@ async def get_usage_summary(
     total_analyses = int(count.scalar() or 0)
 
     by_provider = await db.execute(
-        select(AIAnalysis.provider, func.sum(AIAnalysis.cost_usd).label("cost"))
-        .group_by(AIAnalysis.provider)
+        select(LLMCallLog.provider, func.sum(LLMCallLog.cost_usd).label("cost"))
+        .group_by(LLMCallLog.provider)
     )
     return {
         "total_cost_usd": total_cost,
