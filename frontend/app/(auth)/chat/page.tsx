@@ -1,3 +1,4 @@
+// frontend/app/(auth)/chat/page.tsx
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
@@ -5,8 +6,16 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
 import { SendIcon, BotIcon, UserIcon, AlertCircleIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { ChatMessage, sendChatMessage } from "@/lib/services/chat";
+import {
+  ChatMessageWithMeta,
+  sendChatMessage,
+  listChatSessions,
+  createChatSession,
+  getChatMessages,
+  ChatSessionSummary,
+} from "@/lib/services/chat";
 import { ChatCostBadge } from "@/components/llm/ChatCostBadge";
+import { SessionStrip } from "@/components/chat/SessionStrip";
 
 const OUT_OF_SCOPE_TYPE = "out_of_scope";
 
@@ -19,7 +28,36 @@ function isOutOfScope(content: string): boolean {
   }
 }
 
-function MessageBubble({ message }: { message: ChatMessage & { error?: boolean } }) {
+function MessageMetaRow({ msg }: { msg: ChatMessageWithMeta }) {
+  if (msg.role !== "assistant" || msg.tokens_in == null) return null;
+  if (isOutOfScope(msg.content)) return null;
+
+  const formatTokens = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n));
+  const formatCost = (usd?: number, thb?: number) => {
+    if (usd == null) return "";
+    const usdStr = usd < 0.001 ? "< $0.001" : `$${usd.toFixed(3)}`;
+    const thbStr = thb && thb > 0 ? ` / ฿${thb.toFixed(2)}` : "";
+    return `${usdStr}${thbStr}`;
+  };
+
+  return (
+    <div className="ml-10 mt-0.5 flex items-center gap-1 text-[10px] text-muted-foreground/60">
+      <span>
+        ↑{formatTokens(msg.tokens_in!)} ↓{formatTokens(msg.tokens_out ?? 0)}
+      </span>
+      <span>·</span>
+      <span>{formatCost(msg.cost_usd, msg.cost_thb)}</span>
+      {msg.model && (
+        <>
+          <span>·</span>
+          <span>{msg.model}</span>
+        </>
+      )}
+    </div>
+  );
+}
+
+function MessageBubble({ message }: { message: ChatMessageWithMeta }) {
   const isUser = message.role === "user";
   const outOfScope = !isUser && isOutOfScope(message.content);
   const displayContent = outOfScope
@@ -53,44 +91,119 @@ function MessageBubble({ message }: { message: ChatMessage & { error?: boolean }
 }
 
 export default function ChatPage() {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [sessions, setSessions] = useState<ChatSessionSummary[]>([]);
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<ChatMessageWithMeta[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [sessionCost, setSessionCost] = useState({ costUsd: 0, costThb: 0, messageCount: 0 });
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const sessionCost = {
+    costUsd: messages.reduce((s, m) => s + (m.cost_usd ?? 0), 0),
+    costThb: messages.reduce((s, m) => s + (m.cost_thb ?? 0), 0),
+    messageCount: messages.filter((m) => m.role === "assistant").length,
+    tokensIn: messages.reduce((s, m) => s + (m.tokens_in ?? 0), 0),
+    tokensOut: messages.reduce((s, m) => s + (m.tokens_out ?? 0), 0),
+  };
+
+  const loadSession = useCallback(async (id: string) => {
+    setActiveSessionId(id);
+    setMessages([]);
+    setError(null);
+    const msgs = await getChatMessages(id);
+    setMessages(msgs);
+  }, []);
+
+  useEffect(() => {
+    listChatSessions().then((s) => {
+      setSessions(s);
+      if (s.length > 0) loadSession(s[0].id);
+    });
+  }, [loadSession]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
+  function handleNewChat() {
+    setActiveSessionId(null);
+    setMessages([]);
+    setError(null);
+  }
+
+  function handleSessionRenamed(id: string, title: string) {
+    setSessions((prev) => prev.map((s) => (s.id === id ? { ...s, title } : s)));
+  }
+
+  function handleSessionDeleted(id: string) {
+    setSessions((prev) => {
+      const remaining = prev.filter((s) => s.id !== id);
+      if (activeSessionId === id) {
+        if (remaining.length > 0) {
+          loadSession(remaining[0].id);
+        } else {
+          setActiveSessionId(null);
+          setMessages([]);
+          setError(null);
+        }
+      }
+      return remaining;
+    });
+  }
+
   const handleSend = useCallback(async () => {
     const text = input.trim();
     if (!text || loading) return;
 
-    const userMessage: ChatMessage = { role: "user", content: text };
-    const updatedMessages = [...messages, userMessage];
-    setMessages(updatedMessages);
-    setInput("");
+    let sessionId = activeSessionId;
+
     setLoading(true);
     setError(null);
 
     try {
-      const result = await sendChatMessage(updatedMessages);
-      setMessages((prev) => [...prev, { role: "assistant", content: result.content }]);
-      setSessionCost((prev) => ({
-        costUsd: prev.costUsd + result.cost_usd,
-        costThb: prev.costThb + result.cost_thb,
-        messageCount: prev.messageCount + 1,
-      }));
+      if (!sessionId) {
+        const created = await createChatSession(text);
+        sessionId = created.id;
+        setActiveSessionId(sessionId);
+        const newSession: ChatSessionSummary = {
+          id: sessionId,
+          title: text.slice(0, 60),
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+        setSessions((prev) => [newSession, ...prev]);
+      }
+
+      const userMessage: ChatMessageWithMeta = { role: "user", content: text };
+      const updatedMessages = [...messages, userMessage];
+      setMessages(updatedMessages);
+      setInput("");
+      const result = await sendChatMessage(sessionId, updatedMessages);
+      const assistantMessage: ChatMessageWithMeta = {
+        role: "assistant",
+        content: result.content,
+        tokens_in: result.tokens_in,
+        tokens_out: result.tokens_out,
+        cost_usd: result.cost_usd,
+        cost_thb: result.cost_thb,
+        model: result.model,
+        provider: result.provider,
+      };
+      setMessages((prev) => [...prev, assistantMessage]);
+      setSessions((prev) =>
+        prev.map((s) =>
+          s.id === sessionId ? { ...s, updated_at: new Date().toISOString() } : s,
+        ),
+      );
     } catch (e) {
       setError((e as Error).message ?? "Something went wrong. Try again.");
     } finally {
       setLoading(false);
       textareaRef.current?.focus();
     }
-  }, [input, loading, messages]);
+  }, [input, loading, messages, activeSessionId]);
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -100,10 +213,19 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)] max-w-3xl mx-auto">
+    <div className="flex flex-col h-full max-w-3xl mx-auto">
       <PageHeader title="Chat" />
 
-      <div className="flex-1 overflow-y-auto py-4 space-y-4 px-1">
+      <SessionStrip
+        sessions={sessions}
+        activeSessionId={activeSessionId}
+        onSelectSession={loadSession}
+        onNewChat={handleNewChat}
+        onSessionRenamed={handleSessionRenamed}
+        onSessionDeleted={handleSessionDeleted}
+      />
+
+      <div className="flex-1 min-h-0 overflow-y-auto py-4 space-y-1 px-1">
         {messages.length === 0 && !loading && (
           <div className="flex flex-col items-center justify-center h-full gap-3 text-center text-muted-foreground pb-16">
             <BotIcon className="size-10 opacity-30" />
@@ -133,7 +255,10 @@ export default function ChatPage() {
         )}
 
         {messages.map((msg, i) => (
-          <MessageBubble key={i} message={msg} />
+          <div key={i} className="space-y-0.5">
+            <MessageBubble message={msg} />
+            <MessageMetaRow msg={msg} />
+          </div>
         ))}
 
         {loading && (
@@ -165,32 +290,34 @@ export default function ChatPage() {
         <div ref={bottomRef} />
       </div>
 
-      <div className="border-t bg-background py-3">
-        <div className="flex gap-2 items-end">
+      <div className="pt-3 pb-4 shrink-0">
+        <div className="rounded-2xl border border-input bg-background focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/20 transition-shadow">
           <textarea
             ref={textareaRef}
             rows={1}
-            className="flex-1 resize-none rounded-xl border border-input bg-transparent px-3 py-2 text-sm placeholder:text-muted-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 max-h-40 overflow-y-auto"
+            className="w-full resize-none bg-transparent px-4 pt-3 pb-2 text-sm placeholder:text-muted-foreground outline-none max-h-40 overflow-y-auto"
             placeholder="Ask about your portfolio..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             disabled={loading}
           />
-          <Button
-            size="sm"
-            disabled={!input.trim() || loading}
-            onClick={handleSend}
-            className="h-9 w-9 p-0 rounded-xl shrink-0"
-          >
-            <SendIcon className="size-4" />
-          </Button>
-        </div>
-        <div className="flex items-center justify-between mt-1.5 px-1">
-          <p className="text-[11px] text-muted-foreground">
-            Finance topics only — portfolio, investments, markets. Press Enter to send.
-          </p>
-          <ChatCostBadge session={sessionCost} />
+          <div className="flex items-center justify-between px-3 pb-2">
+            <p className="text-[11px] text-muted-foreground/60">
+              Finance topics only · Enter to send
+            </p>
+            <div className="flex items-center gap-2">
+              <ChatCostBadge session={sessionCost} />
+              <Button
+                size="sm"
+                disabled={!input.trim() || loading}
+                onClick={handleSend}
+                className="h-7 w-7 p-0 rounded-lg shrink-0"
+              >
+                <SendIcon className="size-3.5" />
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

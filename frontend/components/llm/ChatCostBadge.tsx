@@ -1,3 +1,4 @@
+// frontend/components/llm/ChatCostBadge.tsx
 "use client";
 
 import { CoinsIcon } from "lucide-react";
@@ -7,6 +8,8 @@ interface SessionCost {
   costUsd: number;
   costThb?: number;
   messageCount: number;
+  tokensIn?: number;
+  tokensOut?: number;
 }
 
 interface ChatCostBadgeProps {
@@ -23,6 +26,9 @@ export function ChatCostBadge({ session, className }: ChatCostBadgeProps) {
   const formatThb = (thb: number) =>
     thb < 0.1 ? "< ฿0.10" : `฿${thb.toFixed(2)}`;
 
+  const formatTokens = (n: number) =>
+    n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n);
+
   return (
     <div
       className={cn(
@@ -31,6 +37,11 @@ export function ChatCostBadge({ session, className }: ChatCostBadgeProps) {
       )}
     >
       <CoinsIcon className="size-3 text-amber-500 shrink-0" />
+      {session.tokensIn !== undefined && session.tokensOut !== undefined && (
+        <span className="text-muted-foreground/70">
+          ↑{formatTokens(session.tokensIn)} ↓{formatTokens(session.tokensOut)} ·
+        </span>
+      )}
       <span>
         {formatUsd(session.costUsd)}
         {session.costThb !== undefined && session.costThb > 0

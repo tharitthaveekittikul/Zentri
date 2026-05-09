@@ -409,11 +409,44 @@ class GeminiAdapter(LLMAdapter):
             system_instruction=system,
             tools=gemini_tools,
         )
+        import json as _json
+
+        def _func_name_for_tool_call(msgs, tool_call_id, up_to):
+            for prev in reversed(msgs[:up_to]):
+                for tc in (prev.get("tool_calls") or []):
+                    if tc.get("id") == tool_call_id:
+                        return tc.get("function", {}).get("name") or tc.get("name", "unknown")
+            return "unknown"
+
         history = []
-        for msg in messages[:-1]:
-            role = "model" if msg["role"] == "assistant" else msg["role"]
-            history.append({"role": role, "parts": [{"text": msg["content"] or ""}]})
-        last_content = messages[-1]["content"] if messages else ""
+        for i, msg in enumerate(messages[:-1]):
+            msg_role = msg["role"]
+            if msg_role == "assistant":
+                parts = []
+                if msg.get("content"):
+                    parts.append({"text": msg["content"]})
+                for tc in (msg.get("tool_calls") or []):
+                    func = tc.get("function", {})
+                    name = func.get("name") or tc.get("name", "")
+                    args_raw = func.get("arguments") or tc.get("arguments") or "{}"
+                    args = _json.loads(args_raw) if isinstance(args_raw, str) else (args_raw or {})
+                    parts.append({"function_call": {"name": name, "args": args}})
+                history.append({"role": "model", "parts": parts if parts else [{"text": ""}]})
+            elif msg_role == "tool":
+                fname = _func_name_for_tool_call(messages, msg.get("tool_call_id", ""), i)
+                history.append({"role": "user", "parts": [
+                    {"function_response": {"name": fname, "response": {"result": msg.get("content", "")}}}
+                ]})
+            else:
+                history.append({"role": "user", "parts": [{"text": msg.get("content") or ""}]})
+
+        last_msg = messages[-1] if messages else {}
+        if last_msg.get("role") == "tool":
+            fname = _func_name_for_tool_call(messages, last_msg.get("tool_call_id", ""), len(messages) - 1)
+            last_content = [{"function_response": {"name": fname, "response": {"result": last_msg.get("content", "")}}}]
+        else:
+            last_content = last_msg.get("content") or ""
+
         chat_session = m.start_chat(history=history)
         response = await asyncio.to_thread(chat_session.send_message, last_content)
         tool_calls = []
