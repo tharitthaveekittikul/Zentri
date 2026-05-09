@@ -7,35 +7,35 @@ export interface ModelPricing {
 // Bundled fallback — used synchronously before fetch completes or on fetch failure.
 // Keep in sync with backend/app/core/llm_pricing.py whenever models change.
 const BUNDLED_PRICING: Record<string, ModelPricing> = {
-  // Anthropic
-  "claude-opus-4-7":           { inputPerMToken: 5.0,   outputPerMToken: 25.0  },
-  "claude-sonnet-4-6":         { inputPerMToken: 3.0,   outputPerMToken: 15.0  },
-  "claude-haiku-4-5-20251001": { inputPerMToken: 1.0,   outputPerMToken: 5.0   },
-  // OpenAI GPT-5 series
-  "gpt-5":                     { inputPerMToken: 5.0,   outputPerMToken: 20.0  },
-  "gpt-5.5":                   { inputPerMToken: 5.0,   outputPerMToken: 30.0  },
-  "gpt-5.4":                   { inputPerMToken: 2.5,   outputPerMToken: 15.0  },
-  "gpt-5.4-pro":               { inputPerMToken: 30.0,  outputPerMToken: 180.0 },
-  "gpt-5.4-mini":              { inputPerMToken: 0.75,  outputPerMToken: 4.5   },
-  "gpt-5.4-nano":              { inputPerMToken: 0.2,   outputPerMToken: 1.25  },
-  // OpenAI GPT-4o series
-  "gpt-4o":                    { inputPerMToken: 2.5,   outputPerMToken: 10.0  },
-  "gpt-4o-mini":               { inputPerMToken: 0.15,  outputPerMToken: 0.6   },
-  // OpenAI reasoning
-  "o3-mini":                   { inputPerMToken: 1.1,   outputPerMToken: 4.4   },
-  // Google Gemini 3.x series
-  "gemini-3-pro":              { inputPerMToken: 2.0,   outputPerMToken: 12.0  },
-  "gemini-3-flash":            { inputPerMToken: 0.5,   outputPerMToken: 3.0   },
-  "gemini-3.1-pro":            { inputPerMToken: 2.0,   outputPerMToken: 12.0  },
-  "gemini-3.1-flash-lite":     { inputPerMToken: 0.25,  outputPerMToken: 1.5   },
-  // Google Gemini 2.5 series
-  "gemini-2.5-pro":            { inputPerMToken: 1.25,  outputPerMToken: 10.0  },
-  "gemini-2.5-flash":          { inputPerMToken: 0.3,   outputPerMToken: 2.5   },
-  "gemini-2.5-flash-lite":     { inputPerMToken: 0.1,   outputPerMToken: 0.4   },
-  // Google Gemini legacy
-  "gemini-1.5-pro":            { inputPerMToken: 1.25,  outputPerMToken: 5.0   },
-  "gemini-1.5-flash":          { inputPerMToken: 0.075, outputPerMToken: 0.3   },
-  "gemini-2.0-flash":          { inputPerMToken: 0.1,   outputPerMToken: 0.4   },
+  // Anthropic Claude 4 Series
+  "claude-opus-4-7":               { inputPerMToken: 5.0,   outputPerMToken: 25.0 },
+  "claude-opus-4-6":               { inputPerMToken: 5.0,   outputPerMToken: 25.0 },
+  "claude-sonnet-4-6":             { inputPerMToken: 3.0,   outputPerMToken: 15.0 },
+  "claude-haiku-4-5-20251001":     { inputPerMToken: 1.0,   outputPerMToken: 5.0  },
+  // OpenAI GPT-5 & Reasoning Series
+  "gpt-5.5":                       { inputPerMToken: 5.0,   outputPerMToken: 30.0 },
+  "gpt-5.4":                       { inputPerMToken: 2.5,   outputPerMToken: 15.0 },
+  "gpt-5.4-mini":                  { inputPerMToken: 0.75,  outputPerMToken: 4.5  },
+  "gpt-5.4-nano":                  { inputPerMToken: 0.2,   outputPerMToken: 1.25 },
+  "o3-deep-research":              { inputPerMToken: 10.0,  outputPerMToken: 40.0 },
+  "o3":                            { inputPerMToken: 2.0,   outputPerMToken: 8.0  },
+  "o3-mini":                       { inputPerMToken: 1.1,   outputPerMToken: 4.4  },
+  "o1":                            { inputPerMToken: 15.0,  outputPerMToken: 60.0 },
+  // Google Gemini 3 Series
+  "gemini-3.1-pro-preview":        { inputPerMToken: 2.0,   outputPerMToken: 12.0 },
+  "gemini-3.1-flash-lite-preview": { inputPerMToken: 0.25,  outputPerMToken: 1.5  },
+  "gemini-3-flash-preview":        { inputPerMToken: 0.5,   outputPerMToken: 3.0  },
+  // Google Gemini 2.5 Series
+  "gemini-2.5-pro":                { inputPerMToken: 1.25,  outputPerMToken: 10.0 },
+  "gemini-2.5-flash":              { inputPerMToken: 0.3,   outputPerMToken: 2.5  },
+  "gemini-2.5-flash-lite":         { inputPerMToken: 0.1,   outputPerMToken: 0.4  },
+  // OpenAI Legacy / Special Series
+  "gpt-4.1":                       { inputPerMToken: 2.0,   outputPerMToken: 8.0  },
+  "gpt-4.1-mini":                  { inputPerMToken: 0.4,   outputPerMToken: 1.6  },
+  "gpt-4.1-nano":                  { inputPerMToken: 0.1,   outputPerMToken: 0.4  },
+  "gpt-4o":                        { inputPerMToken: 2.5,   outputPerMToken: 10.0 },
+  "gpt-4o-mini":                   { inputPerMToken: 0.15,  outputPerMToken: 0.6  },
+  "gpt-3.5-turbo":                 { inputPerMToken: 0.5,   outputPerMToken: 1.5  },
 };
 
 let _cache: Record<string, ModelPricing> = { ...BUNDLED_PRICING };
