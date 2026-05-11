@@ -102,8 +102,6 @@ scanning cannot.
 - **Finding relationships**: `query_graph` with callers_of/callees_of/imports_of/tests_for
 - **Architecture questions**: `get_architecture_overview` + `list_communities`
 
-Fall back to Grep/Glob/Read **only** when the graph doesn't cover what you need.
-
 ### Key Tools
 
 | Tool                        | Use when                                               |
@@ -123,3 +121,31 @@ Fall back to Grep/Glob/Read **only** when the graph doesn't cover what you need.
 2. Use `detect_changes` for code review.
 3. Use `get_affected_flows` to understand impact.
 4. Use `query_graph` pattern="tests_for" to check coverage.
+
+---
+
+## MCP Tools: Serena
+
+Use Serena for **precise symbol-level navigation** when code-review-graph doesn't have enough detail.
+
+| Tool                       | Use when                                              |
+| -------------------------- | ----------------------------------------------------- |
+| `find_symbol`              | Locate a function/class/variable by name              |
+| `find_declaration`         | Go-to-definition for a symbol                         |
+| `find_referencing_symbols` | Find all usages of a symbol across the codebase       |
+| `find_implementations`     | Find all implementations of an interface/base class   |
+| `get_diagnostics_for_file` | Check type errors and lint issues in a file           |
+| `get_symbols_overview`     | List all symbols in a file                            |
+| `rename_symbol`            | Rename a symbol safely across the codebase            |
+
+**CRITICAL:** Call `initial_instructions` at the start of any coding task to load the Serena manual.
+
+---
+
+## Tool Priority for Code Exploration
+
+Follow this order — stop at the first layer that answers the question:
+
+1. **code-review-graph** — impact analysis, architecture, relationships, code review
+2. **Serena** — precise symbol lookup, find-usages, diagnostics, rename
+3. **Grep/Glob/Read** — only if both MCP tools don't cover the need
