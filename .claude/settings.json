@@ -10,6 +10,17 @@
             "timeout": 30
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // empty' | grep -qE '\\.(ts|tsx)$' && cd /Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend && npx tsc --noEmit 2>&1 | head -30 || true",
+            "timeout": 60,
+            "statusMessage": "Type-checking TypeScript..."
+          }
+        ]
       }
     ],
     "SessionStart": [

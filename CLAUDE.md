@@ -78,9 +78,44 @@ Required in `.env` before first run:
 - `bcrypt` is pinned `<5` due to passlib compatibility — don't upgrade without testing auth.
 - Frontend `NEXT_PUBLIC_API_URL` is baked at build time in Docker; change it in `docker-compose.yml` environment, not `.env`.
 
+## Documentation Structure
+
+When generating or placing documentation files:
+- Backend docs → `docs/Backend/` (endpoints → `docs/Backend/Endpoints/`)
+- Frontend docs → `docs/Frontend/`
+- Database docs → `docs/Database/`
+- DevOps docs → `docs/DevOps/`
+
+## Design System
+
+- All colors must use CSS variables from `frontend/app/globals.css` — never hardcode hex values, `green`, `red`, or Tailwind color literals
+- P&L colors, brand colors, chart colors, and elevation shadows all come from CSS tokens defined there
+- Before adding any color, check `globals.css` for the correct variable name
+- Dark mode: cards must contrast against the page background — test both modes when touching background/card colors
+- Check for per-component `border` classes when adjusting global border CSS — they override base rules
+
+## Multi-Currency
+
+- Any sizing, sorting, or aggregation across positions MUST normalize to a single currency first
+- Display currency as ISO codes (USD, THB, etc.) — never symbols ($, ฿, €)
+
+## Quality Checks
+
+After any significant implementation, run a self-review pass before declaring done:
+
+1. **Cache/state** — no overwrite bugs where new data silently drops existing entries
+2. **TypeScript** — no type errors (hook runs `tsc --noEmit` automatically, check its output)
+3. **Currency** — cross-position math is normalized
+4. **Design tokens** — no hardcoded colors; all values from `globals.css`
+5. **Visualizations** — verify axis orientation, alternation logic, and fallback positioning with 3 test cases: (a) mixed currencies, (b) single item, (c) extreme aspect ratio
+
 ## Git
 
-User handles all git operations manually — do NOT run `git add`, `git commit`, or `git push`.
+User handles all git operations manually.
+
+- NEVER run `git add`, `git commit`, or `git push` — not even as a final step
+- NEVER include commit/push steps in plans, brainstorms, or task lists — omit them entirely, not just mark them optional
+- If a plan naturally ends at "implementation complete", stop there — git is the user's responsibility
 
 ---
 
