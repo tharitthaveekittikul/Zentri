@@ -98,6 +98,12 @@ When generating or placing documentation files:
 
 - Any sizing, sorting, or aggregation across positions MUST normalize to a single currency first
 - Display currency as ISO codes (USD, THB, etc.) — never symbols ($, ฿, €)
+- LLM pricing is centralized — update `backend/llm_pricing.py` and `frontend/llmPricing.ts` together and keep them in sync
+
+## Migrations & Schema
+
+- Never edit an already-applied migration file — always create a new `alembic revision` for schema changes
+- Use `Decimal` (not `float`) for all monetary and financial fields in Python models and Pydantic schemas
 
 ## Quality Checks
 
