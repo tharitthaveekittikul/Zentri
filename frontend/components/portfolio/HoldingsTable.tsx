@@ -36,6 +36,7 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Search,
+  AlertTriangle,
 } from "lucide-react";
 import { HoldingRow } from "@/lib/services/portfolio";
 import { PaginatedResponse } from "@/lib/types";
@@ -65,16 +66,27 @@ interface TableParams {
 interface Props {
   data: PaginatedResponse<HoldingRow>;
   params: TableParams;
-  onParamChange: (updates: Record<string, string | number | null>, resetPage?: boolean) => void;
+  onParamChange: (
+    updates: Record<string, string | number | null>,
+    resetPage?: boolean,
+  ) => void;
   onDelete: (id: string) => void;
   onUpdated: () => void;
   isFetching?: boolean;
   platformColors?: Record<string, string>;
 }
 
-const secondaryCls = "text-xs text-muted-foreground font-mono tabular-nums mt-0.5";
+const secondaryCls =
+  "text-xs text-muted-foreground font-mono tabular-nums mt-0.5";
 
-const ASSET_TYPES = ["us_stock", "thai_stock", "crypto", "etf", "bond", "fund"];
+const ASSET_TYPES = [
+  "us_stock",
+  "thai_stock",
+  "crypto",
+  "etf",
+  "bond",
+  "th_fund",
+];
 
 export function HoldingsTable({
   data,
@@ -110,7 +122,10 @@ export function HoldingsTable({
 
   // Derive unique platforms from current page for the platform dropdown
   const platforms = useMemo(
-    () => Array.from(new Set(data.items.map((h) => h.platform).filter(Boolean) as string[])).sort(),
+    () =>
+      Array.from(
+        new Set(data.items.map((h) => h.platform).filter(Boolean) as string[]),
+      ).sort(),
     [data.items],
   );
 
@@ -128,7 +143,8 @@ export function HoldingsTable({
   }
 
   function SortIcon({ isSorted }: { isSorted: false | "asc" | "desc" }) {
-    if (!isSorted) return <ArrowUpDown className="ml-1 h-3 w-3 inline opacity-40" />;
+    if (!isSorted)
+      return <ArrowUpDown className="ml-1 h-3 w-3 inline opacity-40" />;
     if (isSorted === "asc") return <ArrowUp className="ml-1 h-3 w-3 inline" />;
     return <ArrowDown className="ml-1 h-3 w-3 inline" />;
   }
@@ -154,8 +170,17 @@ export function HoldingsTable({
             prefetch={false}
           >
             <div className="flex items-center gap-2 flex-wrap">
-              <TickerLogo symbol={row.original.symbol} logoUrl={row.original.metadata_?.logo_url as string | undefined} />
+              <TickerLogo
+                symbol={row.original.symbol}
+                logoUrl={row.original.metadata_?.logo_url as string | undefined}
+              />
               <span>{row.original.symbol}</span>
+              {row.original.asset_type === "th_fund" &&
+                !row.original.metadata_?.proj_id && (
+                  <span title="SEC Project ID missing — NAV price won't update">
+                    <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
+                  </span>
+                )}
               {platform && (
                 <span
                   className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium max-w-[96px] truncate ${
@@ -163,7 +188,10 @@ export function HoldingsTable({
                   }`}
                   style={
                     bgColor
-                      ? { backgroundColor: bgColor, color: contrastColor(bgColor) }
+                      ? {
+                          backgroundColor: bgColor,
+                          color: contrastColor(bgColor),
+                        }
                       : undefined
                   }
                 >
@@ -208,7 +236,10 @@ export function HoldingsTable({
           <span>—</span>
         ) : (
           <DualCurrencyAmount
-            value={formatNative(row.original.cost_per_share, row.original.currency)}
+            value={formatNative(
+              row.original.cost_per_share,
+              row.original.currency,
+            )}
             secondaryClassName={secondaryCls}
           />
         ),
@@ -250,7 +281,10 @@ export function HoldingsTable({
           <span>—</span>
         ) : (
           <DualCurrencyAmount
-            value={formatNative(row.original.current_price, row.original.currency)}
+            value={formatNative(
+              row.original.current_price,
+              row.original.currency,
+            )}
             secondaryClassName={secondaryCls}
           />
         ),
@@ -265,14 +299,25 @@ export function HoldingsTable({
       cell: ({ row }) => {
         const val = row.original.price_1d_change;
         if (val == null)
-          return <span className="font-mono tabular-nums text-muted-foreground">—</span>;
+          return (
+            <span className="font-mono tabular-nums text-muted-foreground">
+              —
+            </span>
+          );
         const num = Number(val);
-        const color = num >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-destructive";
+        const color =
+          num >= 0
+            ? "text-emerald-600 dark:text-emerald-400"
+            : "text-destructive";
         return (
-          <span className={`${color} font-mono tabular-nums inline-flex items-center gap-0.5`}>
-            {num >= 0
-              ? <ArrowUpRight className="h-3 w-3" strokeWidth={2.5} />
-              : <ArrowDownRight className="h-3 w-3" strokeWidth={2.5} />}
+          <span
+            className={`${color} font-mono tabular-nums inline-flex items-center gap-0.5`}
+          >
+            {num >= 0 ? (
+              <ArrowUpRight className="h-3 w-3" strokeWidth={2.5} />
+            ) : (
+              <ArrowDownRight className="h-3 w-3" strokeWidth={2.5} />
+            )}
             {Math.abs(num).toFixed(2)}%
           </span>
         );
@@ -294,7 +339,10 @@ export function HoldingsTable({
           <span>—</span>
         ) : (
           <DualCurrencyAmount
-            value={formatNative(row.original.holding_value, row.original.currency)}
+            value={formatNative(
+              row.original.holding_value,
+              row.original.currency,
+            )}
             secondaryClassName={secondaryCls}
           />
         ),
@@ -313,11 +361,18 @@ export function HoldingsTable({
       cell: ({ row }) => {
         const val = row.original.unrealized_pnl;
         if (val == null)
-          return <span className="font-mono tabular-nums text-muted-foreground">—</span>;
+          return (
+            <span className="font-mono tabular-nums text-muted-foreground">
+              —
+            </span>
+          );
         const num = Number(val);
         const totalCost = Number(row.original.total_cost);
         const pct = totalCost !== 0 ? (num / totalCost) * 100 : null;
-        const color = num >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-destructive";
+        const color =
+          num >= 0
+            ? "text-emerald-600 dark:text-emerald-400"
+            : "text-destructive";
         return (
           <div className={color}>
             <DualCurrencyAmount
@@ -327,9 +382,11 @@ export function HoldingsTable({
             />
             {pct != null && (
               <span className="flex items-center gap-0.5 text-xs opacity-75">
-                {pct >= 0
-                  ? <ArrowUpRight className="h-3 w-3" strokeWidth={2.5} />
-                  : <ArrowDownRight className="h-3 w-3" strokeWidth={2.5} />}
+                {pct >= 0 ? (
+                  <ArrowUpRight className="h-3 w-3" strokeWidth={2.5} />
+                ) : (
+                  <ArrowDownRight className="h-3 w-3" strokeWidth={2.5} />
+                )}
                 {Math.abs(pct).toFixed(2)}%
               </span>
             )}
@@ -391,29 +448,41 @@ export function HoldingsTable({
           </div>
           <Select
             value={params.platform || "all"}
-            onValueChange={(v) => onParamChange({ platform: v === "all" ? null : v })}
+            onValueChange={(v) =>
+              onParamChange({ platform: v === "all" ? null : v })
+            }
           >
             <SelectTrigger className="h-9 w-[160px]">
-              <span className="truncate">{params.platform || "All Platforms"}</span>
+              <span className="truncate">
+                {params.platform || "All Platforms"}
+              </span>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Platforms</SelectItem>
               {platforms.map((p) => (
-                <SelectItem key={p} value={p}>{p}</SelectItem>
+                <SelectItem key={p} value={p}>
+                  {p}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
           <Select
             value={params.asset_type || "all"}
-            onValueChange={(v) => onParamChange({ asset_type: v === "all" ? null : v })}
+            onValueChange={(v) =>
+              onParamChange({ asset_type: v === "all" ? null : v })
+            }
           >
             <SelectTrigger className="h-9 w-[160px]">
-              <span className="truncate">{params.asset_type || "All Types"}</span>
+              <span className="truncate">
+                {params.asset_type || "All Types"}
+              </span>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Types</SelectItem>
               {ASSET_TYPES.map((t) => (
-                <SelectItem key={t} value={t}>{t}</SelectItem>
+                <SelectItem key={t} value={t}>
+                  {t}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -421,14 +490,18 @@ export function HoldingsTable({
             <span className="text-sm text-muted-foreground">Rows:</span>
             <Select
               value={String(params.page_size)}
-              onValueChange={(v) => onParamChange({ page_size: Number(v), page: 1 }, false)}
+              onValueChange={(v) =>
+                onParamChange({ page_size: Number(v), page: 1 }, false)
+              }
             >
               <SelectTrigger className="h-8 w-[80px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 {[25, 50, 100].map((n) => (
-                  <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                  <SelectItem key={n} value={String(n)}>
+                    {n}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -436,7 +509,9 @@ export function HoldingsTable({
         </div>
 
         {/* Table */}
-        <div className={`overflow-x-auto transition-opacity ${isFetching ? "opacity-60" : ""}`}>
+        <div
+          className={`overflow-x-auto transition-opacity ${isFetching ? "opacity-60" : ""}`}
+        >
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((hg) => (
@@ -458,7 +533,10 @@ export function HoldingsTable({
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
                       </TableCell>
                     ))}
                   </TableRow>
@@ -468,7 +546,9 @@ export function HoldingsTable({
                   <TableCell colSpan={columns.length} className="py-12">
                     <div className="flex flex-col items-center gap-2 text-muted-foreground">
                       <span className="text-2xl">📋</span>
-                      <span className="text-sm font-medium">No holdings found</span>
+                      <span className="text-sm font-medium">
+                        No holdings found
+                      </span>
                       <span className="text-xs">
                         Add one above or import from the Import page.
                       </span>
@@ -520,7 +600,9 @@ export function HoldingsTable({
 
       <AlertDialog
         open={deleteTarget !== null}
-        onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
       >
         <AlertDialogContent>
           <AlertDialogHeader>

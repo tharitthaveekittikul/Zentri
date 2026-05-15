@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import httpx
 
 from app.core.logging import get_logger
@@ -8,6 +9,10 @@ logger = get_logger(__name__)
 
 SEC_BASE_URL = "https://api.sec.or.th"
 ACTIVE_STATUSES = {"Registered", "IPO"}
+
+
+def _strip_parens(query: str) -> str:
+    return re.sub(r"\s*\([^)]*\)", "", query).strip()
 
 
 async def search_th_funds(query: str, api_key: str) -> list[dict]:
@@ -27,17 +32,26 @@ async def search_th_funds(query: str, api_key: str) -> list[dict]:
     }
 
     async with httpx.AsyncClient(timeout=15) as client:
-        resp = await client.get(
-            f"{SEC_BASE_URL}/v2/fund/general-info/profiles",
-            headers=headers,
-            params={"project_info": query, "page_size": 20},
-        )
-        resp.raise_for_status()
-        data = resp.json()
+        async def _fetch(q: str) -> list:
+            resp = await client.get(
+                f"{SEC_BASE_URL}/v2/fund/general-info/profiles",
+                headers=headers,
+                params={"project_info": q, "page_size": 20},
+            )
+            resp.raise_for_status()
+            if not resp.content:
+                return []
+            return resp.json().get("items", [])
+
+        items = await _fetch(query)
+        stripped = _strip_parens(query)
+        if not items and stripped and stripped != query:
+            logger.info("search_th_funds: retrying without parens: %r → %r", query, stripped)
+            items = await _fetch(stripped)
 
     results = []
     seen_proj_ids: set[str] = set()
-    for item in data.get("items", []):
+    for item in items:
         if item.get("fund_status") not in ACTIVE_STATUSES:
             continue
         proj_id = item.get("proj_id", "")

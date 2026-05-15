@@ -13,7 +13,7 @@ JOB_TYPES = (
     "price_fetch_thai_stock", "price_fetch_th_fund",
     "snapshot_net_worth", "backfill_historical_prices",
     "ingest_document", "run_analysis",
-    "watchlist_discovery", "watchlist_scan",
+    "watchlist_discovery", "watchlist_scan", "watchlist_alert",
     "dividend_fetch", "ipo_fetch", "dividend_alert",
 )
 JOB_STATUSES = ("queued", "running", "done", "failed")

@@ -38,6 +38,7 @@ export function EditHoldingDialog({
   const [lookupResults, setLookupResults] = useState<ThFundMatch[]>([]);
   const [coingeckoId, setCoingeckoId] = useState("");
   const [coinResults, setCoinResults] = useState<CoinGeckoResult[]>([]);
+  const [lookupQuery, setLookupQuery] = useState("");
   const [lookupLoading, setLookupLoading] = useState(false);
   const [assetLoading, setAssetLoading] = useState(false);
 
@@ -80,6 +81,7 @@ export function EditHoldingDialog({
         const fetchedSymbol = asset.symbol;
         const fetchedProjId = (asset.metadata_?.proj_id as string) ?? "";
         setSymbol(fetchedSymbol);
+        setLookupQuery(fetchedSymbol);
         setAssetName(asset.name);
         setAssetType(asset.asset_type);
         setProjId(fetchedProjId);
@@ -189,15 +191,23 @@ export function EditHoldingDialog({
             </div>
             {assetType === "th_fund" && (
               <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <Label>SEC Project ID</Label>
+                <Label>SEC Project ID</Label>
+                <div className="flex gap-2">
+                  <Input
+                    value={lookupQuery}
+                    onChange={(e) => setLookupQuery(e.target.value.toUpperCase())}
+                    onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); triggerLookup(lookupQuery); } }}
+                    placeholder="Search SEC…"
+                    disabled={assetLoading}
+                    className="text-sm h-8"
+                  />
                   <button
                     type="button"
-                    onClick={() => triggerLookup(symbol)}
-                    disabled={lookupLoading || assetLoading || !symbol}
-                    className="text-xs text-primary hover:underline disabled:opacity-40"
+                    onClick={() => triggerLookup(lookupQuery)}
+                    disabled={lookupLoading || assetLoading || !lookupQuery}
+                    className="text-xs text-primary hover:underline disabled:opacity-40 whitespace-nowrap"
                   >
-                    {lookupLoading ? "Searching…" : "Lookup by symbol"}
+                    {lookupLoading ? "Searching…" : "Lookup"}
                   </button>
                 </div>
                 <Input
