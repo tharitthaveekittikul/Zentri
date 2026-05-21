@@ -11,6 +11,8 @@
   --color-brand-sage: var(--brand-sage);
   --color-brand-accent: var(--brand-accent);
   --color-brand-danger: var(--brand-danger);
+  --color-success: var(--color-brand-accent);
+  --color-warning: var(--warning);
   --color-shell: var(--shell-bg);
   --color-page: var(--page-bg);
   --color-ink: var(--ink-primary);
@@ -124,6 +126,7 @@ html:root.dark {
   --signal-gain-bg: oklch(0.696 0.170 162 / 12%);
   --signal-gain-text: var(--brand-mid);
   --signal-loss-bg: oklch(0.577 0.245 27.325 / 8%);
+  --warning: oklch(0.72 0.19 75);    /* amber #F59E0B */
 
   /* ── Glass tokens (light) ── */
   --glass-blur: 12px;
@@ -178,6 +181,7 @@ html:root.dark {
   --signal-gain-bg: oklch(0.696 0.170 162 / 10%);
   --signal-gain-text: var(--brand-sage);
   --signal-loss-bg: oklch(0.65 0.22 25 / 10%);
+  --warning: oklch(0.72 0.19 75);    /* amber #F59E0B */
 
   /* ── Sidebar glass (dark true black) ── */
   --sidebar: oklch(1 0 0 / 11%);

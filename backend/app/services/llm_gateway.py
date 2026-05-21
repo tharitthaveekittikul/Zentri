@@ -320,7 +320,11 @@ HUMAN_PROMPTS: dict[str, str] = {
         "{deep_dive_summary}"
         "{peer_comparison_summary}"
         "{bear_case_summary}"
-        "\nProvide a final investment verdict.\n\n"
+        "\nProvide a final investment verdict with actionable price targets.\n"
+        "For entry_price: recommend a specific buy zone based on current valuation and pullback context.\n"
+        "For target_price: 12-month price target based on fundamentals and peer multiples.\n"
+        "For stop_loss: price where the thesis is invalidated (support level or % below entry).\n"
+        "For risk_reward: (target_price - entry_price) / (entry_price - stop_loss). Use null if price data is insufficient.\n\n"
         'Respond ONLY with this JSON:\n'
         '{{\n'
         '  "verdict": "strong_buy|buy|hold|sell|strong_sell",\n'
@@ -329,7 +333,11 @@ HUMAN_PROMPTS: dict[str, str] = {
         '  "bear_thesis": "...",\n'
         '  "key_risks": ["...", "..."],\n'
         '  "reasoning": "...",\n'
-        '  "based_on": ["top_down_analysis", "deep_dive"]\n'
+        '  "based_on": ["top_down_analysis", "deep_dive"],\n'
+        '  "entry_price": 580.00,\n'
+        '  "target_price": 700.00,\n'
+        '  "stop_loss": 520.00,\n'
+        '  "risk_reward": 2.0\n'
         '}}'
     ),
 }

@@ -98,6 +98,10 @@ export interface CombinedVerdictData {
   key_risks: string[]
   reasoning: string
   based_on: string[]
+  entry_price: number | null
+  target_price: number | null
+  stop_loss: number | null
+  risk_reward: number | null
   provider: string
   model: string
   tokens_in: number

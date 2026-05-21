@@ -96,6 +96,46 @@ export function CombinedVerdictCard({
             </div>
           </div>
 
+          {/* Price targets */}
+          {(data.entry_price != null || data.target_price != null || data.stop_loss != null) && (
+            <div className="grid grid-cols-4 gap-2 rounded-lg border border-[var(--border)] p-3">
+              <div className="text-center">
+                <p className="text-xs text-[var(--color-text-muted)] mb-0.5">Entry</p>
+                <p className="text-sm font-semibold text-[var(--color-text-primary)]">
+                  {data.entry_price != null ? `$${data.entry_price.toFixed(2)}` : "—"}
+                </p>
+              </div>
+              <div className="text-center">
+                <p className="text-xs text-[var(--color-text-muted)] mb-0.5">Target</p>
+                <p className="text-sm font-semibold text-[var(--color-signal-gain)]">
+                  {data.target_price != null ? `$${data.target_price.toFixed(2)}` : "—"}
+                </p>
+                {data.entry_price != null && data.target_price != null && (
+                  <p className="text-xs text-[var(--color-signal-gain)]">
+                    +{(((data.target_price - data.entry_price) / data.entry_price) * 100).toFixed(1)}%
+                  </p>
+                )}
+              </div>
+              <div className="text-center">
+                <p className="text-xs text-[var(--color-text-muted)] mb-0.5">Stop</p>
+                <p className="text-sm font-semibold text-[var(--brand-danger)]">
+                  {data.stop_loss != null ? `$${data.stop_loss.toFixed(2)}` : "—"}
+                </p>
+                {data.entry_price != null && data.stop_loss != null && (
+                  <p className="text-xs text-[var(--brand-danger)]">
+                    {(((data.stop_loss - data.entry_price) / data.entry_price) * 100).toFixed(1)}%
+                  </p>
+                )}
+              </div>
+              <div className="text-center">
+                <p className="text-xs text-[var(--color-text-muted)] mb-0.5">R/R</p>
+                <p className="text-sm font-semibold text-[var(--color-text-primary)]">
+                  {data.risk_reward != null ? `${data.risk_reward.toFixed(1)}x` : "—"}
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Based on */}
           <div className="flex gap-1.5 flex-wrap">
             {data.based_on.map((key) => (

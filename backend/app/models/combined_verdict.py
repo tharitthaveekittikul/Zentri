@@ -21,6 +21,10 @@ class CombinedVerdict(Base):
 
     verdict: Mapped[str] = mapped_column(String(20), nullable=False)
     conviction: Mapped[int] = mapped_column(Integer, nullable=False)
+    entry_price: Mapped[Decimal | None] = mapped_column(Numeric(12, 2), nullable=True)
+    target_price: Mapped[Decimal | None] = mapped_column(Numeric(12, 2), nullable=True)
+    stop_loss: Mapped[Decimal | None] = mapped_column(Numeric(12, 2), nullable=True)
+    risk_reward: Mapped[Decimal | None] = mapped_column(Numeric(6, 2), nullable=True)
     bull_thesis: Mapped[str] = mapped_column(Text, nullable=False)
     bear_thesis: Mapped[str] = mapped_column(Text, nullable=False)
     key_risks: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
