@@ -8,6 +8,7 @@ from app.api import (
     analysis, assets, auth, cash_balance, chat, dividends, documents,
     events, feature_llm_config, health, import_pipeline, ipos, llm_pricing, llm_usage,
     overview, pipeline, platforms, portfolio, provider_config, research, settings, system, top_down_analysis, watchlist,
+    deep_dive_analysis, bear_case_analysis, peer_comparison_analysis, combined_verdict,
 )
 from app.core.logging import get_logger, setup_logging
 
@@ -62,3 +63,7 @@ app.include_router(platforms.router, prefix="/api/v1")
 app.include_router(chat.router, prefix="/api/v1")
 app.include_router(research.router, prefix="/api/v1")
 app.include_router(top_down_analysis.router, prefix="/api/v1")
+app.include_router(deep_dive_analysis.router, prefix="/api/v1")
+app.include_router(bear_case_analysis.router, prefix="/api/v1")
+app.include_router(peer_comparison_analysis.router, prefix="/api/v1")
+app.include_router(combined_verdict.router, prefix="/api/v1")

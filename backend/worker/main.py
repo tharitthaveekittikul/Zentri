@@ -24,6 +24,10 @@ from worker.jobs.watchlist_discover import job_discover_watchlist
 from worker.jobs.watchlist_scan import job_scan_watchlist_batch, job_scan_watchlist_item
 from worker.jobs.run_top_down_analysis import job_run_top_down_analysis
 from worker.jobs.discover_top_down import job_discover_top_down
+from worker.jobs.run_deep_dive import job_run_deep_dive
+from worker.jobs.run_bear_case import job_run_bear_case
+from worker.jobs.run_peer_comparison import job_run_peer_comparison
+from worker.jobs.run_combined_verdict import job_run_combined_verdict
 
 setup_logging()
 logger = get_logger(__name__)
@@ -55,6 +59,10 @@ class WorkerSettings:
         job_ingest_document,
         job_run_analysis,
         job_run_top_down_analysis,
+        job_run_deep_dive,
+        job_run_bear_case,
+        job_run_peer_comparison,
+        job_run_combined_verdict,
         job_snapshot_net_worth,
         job_fetch_dividends,
         job_fetch_ipos,

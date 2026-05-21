@@ -20,6 +20,10 @@ export const FEATURE_LABELS: Record<string, string> = {
   ipo_analysis: "IPO Analysis",
   top_down_analysis: "Top-Down Analysis",
   top_down_discovery: "Top-Down Discovery",
+  deep_dive: "Deep Dive Analysis",
+  peer_comparison: "Peer Comparison",
+  bear_case: "Bear Case",
+  combined_verdict: "Combined Verdict",
 };
 
 export async function listFeatureConfigs(): Promise<FeatureLLMConfig[]> {

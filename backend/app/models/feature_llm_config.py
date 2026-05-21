@@ -17,6 +17,10 @@ FEATURE_KEYS = (
     "ipo_analysis",
     "top_down_analysis",
     "top_down_discovery",
+    "deep_dive",
+    "peer_comparison",
+    "bear_case",
+    "combined_verdict",
 )
 
 

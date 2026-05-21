@@ -69,6 +69,12 @@ FEATURE_KEYS = (
     "watchlist_scan",
     "watchlist_discovery",
     "ipo_analysis",
+    "top_down_analysis",
+    "top_down_discovery",
+    "deep_dive",
+    "peer_comparison",
+    "bear_case",
+    "combined_verdict",
 )
 
 FEATURES_WITH_AGE_CONTEXT: frozenset = frozenset({
@@ -191,6 +197,26 @@ DEFAULT_SYSTEM_PROMPTS: dict[str, str] = {
         "identify the most promising ones for a full top-down analysis. "
         "Focus on mega trends, sector momentum, and the quality of the pullback."
     ),
+    "deep_dive": (
+        "You are a senior equity analyst specializing in business model assessment. "
+        "You provide clear, structured company breakdowns focused on fundamentals and competitive positioning. "
+        "Always respond with valid JSON matching the specified schema exactly. No markdown, no explanation outside JSON."
+    ),
+    "peer_comparison": (
+        "You are a quantitative equity analyst specializing in relative valuation. "
+        "You build precise peer comparison tables using financial data to identify the best value/growth opportunities. "
+        "Always respond with valid JSON matching the specified schema exactly. No markdown, no explanation outside JSON."
+    ),
+    "bear_case": (
+        "You are a skeptical short-seller conducting fundamental risk analysis. "
+        "You identify the most serious structural and financial red flags, citing data where available. "
+        "Always respond with valid JSON matching the specified schema exactly. No markdown, no explanation outside JSON."
+    ),
+    "combined_verdict": (
+        "You are a chief investment officer synthesizing multiple research reports into a final investment verdict. "
+        "You weigh evidence from all available analyses and provide a clear, actionable recommendation. "
+        "Always respond with valid JSON matching the specified schema exactly. No markdown, no explanation outside JSON."
+    ),
 }
 
 HUMAN_PROMPTS: dict[str, str] = {
@@ -233,6 +259,78 @@ HUMAN_PROMPTS: dict[str, str] = {
         "Business Description: {description}\n"
         "Market Cap: {market_cap}\n"
         "Trailing P/E: {pe_ratio}"
+    ),
+    "deep_dive": (
+        "Analyze {company_name} ({symbol}) in the {sector} sector.\n\n"
+        "Provide a 4-part deep dive:\n"
+        "1. Business Model: How do they actually make money? Core product in plain English.\n"
+        "2. Moat: Top 3 competitors. Does {symbol} have a durable edge "
+        "(patent, switching_cost, network_effect, cost_structure) that rivals can't copy?\n"
+        "3. Catalysts: Upcoming launches, earnings, regulatory events, or partnerships in the next 12 months.\n"
+        "4. Asymmetry: Is there a low valuation floor vs high growth ceiling? Why or why not?\n\n"
+        'Respond ONLY with this JSON:\n'
+        '{{\n'
+        '  "business_model": "...",\n'
+        '  "moat": {{"edge_type": "patent|switching_cost|network_effect|cost_structure|none", '
+        '"summary": "...", "competitors": ["T1", "T2", "T3"]}},\n'
+        '  "catalysts": [{{"title": "...", "timeframe": "...", "impact": "high|medium|low"}}],\n'
+        '  "asymmetry": {{"verdict": "yes|no|mixed", "floor": "...", "ceiling": "...", "reasoning": "..."}}\n'
+        '}}'
+    ),
+    "peer_comparison": (
+        "Analyze {symbol} ({sector}) relative to its peers using this financial data:\n\n"
+        "{financial_table}\n\n"
+        "Value/Growth Score = P/S TTM / YoY Revenue Growth %. Lower = better.\n"
+        'Label: "BEST" for lowest score, "AVOID" for highest, "FAIR" for all others.\n\n'
+        'Respond ONLY with this JSON:\n'
+        '{{\n'
+        '  "sector_label": "...",\n'
+        '  "methodology_note": "Value/Growth Score = P/S TTM / YoY Revenue Growth %",\n'
+        '  "ranked": [\n'
+        '    {{"ticker": "...", "company_name": "...", "ps_ttm": 0.0, "ps_forward": 0.0,\n'
+        '      "ev_ebitda": 0.0, "gross_margin_pct": 0.0, "yoy_revenue_growth_pct": 0.0,\n'
+        '      "revenue_trend": "Reaccelerating|Accelerating|Stable|Decelerating|Declining",\n'
+        '      "value_growth_score": 0.00, "label": "BEST|FAIR|AVOID", "notes": "..."}}\n'
+        '  ]\n'
+        '}}'
+    ),
+    "bear_case": (
+        "Conduct a bear case analysis for {company_name} ({symbol}) in the {sector} sector.\n\n"
+        "Financial data (yfinance):\n"
+        "- Gross margins last 4 quarters: {gross_margins_4q}\n"
+        "- YoY revenue growth: {revenue_growth_yoy}%\n"
+        "- Operating margin: {operating_margin}%\n"
+        "- Debt/Equity ratio: {debt_equity}\n"
+        "- Short interest: {short_interest_pct}%\n\n"
+        "Identify the 3 most serious red flags ranked by severity.\n"
+        'Mark data_source "yfinance" if supported by data above, "llm_knowledge" otherwise.\n\n'
+        'Respond ONLY with this JSON:\n'
+        '{{\n'
+        '  "red_flags": [\n'
+        '    {{"rank": 1, "title": "...", "severity": "high|medium|low",\n'
+        '      "data_source": "yfinance|llm_knowledge", "evidence": "...", "detail": "..."}}\n'
+        '  ],\n'
+        '  "summary": "..."\n'
+        '}}'
+    ),
+    "combined_verdict": (
+        "Synthesize the following research on {symbol} into a final verdict.\n"
+        "Available analyses: {available_analyses}\n\n"
+        "{top_down_summary}"
+        "{deep_dive_summary}"
+        "{peer_comparison_summary}"
+        "{bear_case_summary}"
+        "\nProvide a final investment verdict.\n\n"
+        'Respond ONLY with this JSON:\n'
+        '{{\n'
+        '  "verdict": "strong_buy|buy|hold|sell|strong_sell",\n'
+        '  "conviction": 7,\n'
+        '  "bull_thesis": "...",\n'
+        '  "bear_thesis": "...",\n'
+        '  "key_risks": ["...", "..."],\n'
+        '  "reasoning": "...",\n'
+        '  "based_on": ["top_down_analysis", "deep_dive"]\n'
+        '}}'
     ),
 }
 

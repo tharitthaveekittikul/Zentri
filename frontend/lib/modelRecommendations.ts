@@ -135,6 +135,66 @@ export const MODEL_RECOMMENDATIONS: Record<string, ModelRecommendation> = {
     ],
     cost_tier: "low",
   },
+  deep_dive: {
+    recommended: "claude-sonnet-4-6",
+    why: "Deep Dive requires structured multi-section reasoning (business model, moat, catalysts, asymmetry) from LLM knowledge alone — no data injection. Sonnet delivers narrative depth and JSON reliability at a sensible cost.",
+    alternatives: [
+      {
+        model: "claude-opus-4-7",
+        note: "Best narrative quality for flagship companies (AAPL, NVDA, TSLA)",
+      },
+      {
+        model: "gemini-2.5-flash",
+        note: "Budget option — adequate for well-known large caps",
+      },
+    ],
+    cost_tier: "medium",
+  },
+  peer_comparison: {
+    recommended: "claude-sonnet-4-6",
+    why: "Runs 2 LLM calls per analysis — peer discovery then financial table scoring. Sonnet handles live P/S, EV/EBITDA, and YoY growth tables reliably without frontier cost.",
+    alternatives: [
+      {
+        model: "gpt-4o",
+        note: "Strong alternative for financial table interpretation",
+      },
+      {
+        model: "gemini-2.5-flash-lite",
+        note: "Cost-optimized — peer discovery sub-call is lightweight",
+      },
+    ],
+    cost_tier: "medium",
+  },
+  bear_case: {
+    recommended: "claude-sonnet-4-6",
+    why: "Interprets injected yfinance metrics (margins, short interest, debt/equity) combined with LLM structural risk knowledge. Sonnet ranks severity nuances well without needing a frontier model.",
+    alternatives: [
+      {
+        model: "gpt-4o",
+        note: "Equally strong at structured risk assessment",
+      },
+      {
+        model: "claude-haiku-4-5-20251001",
+        note: "Fine for large-cap stocks with obvious risk profiles",
+      },
+    ],
+    cost_tier: "medium",
+  },
+  combined_verdict: {
+    recommended: "claude-sonnet-4-6",
+    why: "Synthesizes up to 4 analyses (Top-Down, Deep Dive, Peer Comparison, Bear Case) into one conviction score — the highest-reasoning task in the pipeline. Sonnet holds multi-document context well; upgrade to Opus for high-stakes position sizing.",
+    alternatives: [
+      {
+        model: "claude-opus-4-7",
+        note: "Best synthesis quality — recommended when verdict drives real capital allocation",
+      },
+      {
+        model: "gpt-5",
+        note: "Superior multi-document reasoning if you prefer OpenAI",
+      },
+    ],
+    cost_tier: "medium",
+  },
 };
 
 export const COST_TIER_LABELS: Record<string, string> = {
