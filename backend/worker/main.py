@@ -22,6 +22,8 @@ from worker.jobs.dividend_alert import job_dividend_alert
 from worker.jobs.watchlist_alert import job_check_watchlist_alerts
 from worker.jobs.watchlist_discover import job_discover_watchlist
 from worker.jobs.watchlist_scan import job_scan_watchlist_batch, job_scan_watchlist_item
+from worker.jobs.run_top_down_analysis import job_run_top_down_analysis
+from worker.jobs.discover_top_down import job_discover_top_down
 
 setup_logging()
 logger = get_logger(__name__)
@@ -52,6 +54,7 @@ class WorkerSettings:
         job_backfill_historical_prices,
         job_ingest_document,
         job_run_analysis,
+        job_run_top_down_analysis,
         job_snapshot_net_worth,
         job_fetch_dividends,
         job_fetch_ipos,
@@ -60,6 +63,7 @@ class WorkerSettings:
         job_scan_watchlist_item,
         job_scan_watchlist_batch,
         job_discover_watchlist,
+        job_discover_top_down,
     ]
     cron_jobs = [
         cron(job_fetch_prices_us, minute={0, 15, 30, 45}),

@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 from app.api import (
     analysis, assets, auth, cash_balance, chat, dividends, documents,
     events, feature_llm_config, health, import_pipeline, ipos, llm_pricing, llm_usage,
-    overview, pipeline, platforms, portfolio, provider_config, research, settings, system, watchlist,
+    overview, pipeline, platforms, portfolio, provider_config, research, settings, system, top_down_analysis, watchlist,
 )
 from app.core.logging import get_logger, setup_logging
 
@@ -61,3 +61,4 @@ app.include_router(system.router, prefix="/api/v1")
 app.include_router(platforms.router, prefix="/api/v1")
 app.include_router(chat.router, prefix="/api/v1")
 app.include_router(research.router, prefix="/api/v1")
+app.include_router(top_down_analysis.router, prefix="/api/v1")

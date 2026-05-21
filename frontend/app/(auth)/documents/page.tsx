@@ -70,15 +70,24 @@ export default function DocumentsPage() {
   const [assetSymbol, setAssetSymbol] = useState("");
   const [docType, setDocType] = useState("research");
   const fileRef = useRef<HTMLInputElement>(null);
+  const [duplicateInfo, setDuplicateInfo] = useState<{ existing_id: string; existing_filename: string } | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   async function load() {
     setLoading(true);
+    setError(null);
     try {
       const url = filter
         ? `/api/v1/documents?asset=${filter.toUpperCase()}`
         : "/api/v1/documents";
       const res = await api.get(url);
-      if (res.ok) setDocs(await res.json());
+      if (res.ok) {
+        setDocs(await res.json());
+      } else {
+        setError("Failed to load documents. Please try again.");
+      }
+    } catch {
+      setError("Failed to load documents. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -89,7 +98,7 @@ export default function DocumentsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter]);
 
-  async function handleUpload() {
+  async function handleUpload(replaceId?: string) {
     const file = fileRef.current?.files?.[0];
     if (!file) return;
     setUploading(true);
@@ -97,9 +106,19 @@ export default function DocumentsPage() {
     form.append("file", file);
     form.append("doc_type", docType);
     if (assetSymbol) form.append("asset_symbol", assetSymbol.toUpperCase());
-    await uploadWithAuth("/api/v1/documents/upload", form);
+    const url = replaceId
+      ? `/api/v1/documents/upload?replace_id=${replaceId}`
+      : "/api/v1/documents/upload";
+    const res = await uploadWithAuth(url, form);
     setUploading(false);
+    if (res.status === 409) {
+      const data = await res.json();
+      setDuplicateInfo(data);
+      setUploadOpen(false);
+      return;
+    }
     setUploadOpen(false);
+    setDuplicateInfo(null);
     load();
   }
 
@@ -117,6 +136,11 @@ export default function DocumentsPage() {
   return (
     <div className="space-y-4">
       <PageHeader title="Documents" />
+      {error && (
+        <div className="rounded-lg bg-[color-mix(in_oklch,var(--color-destructive)_10%,transparent)] dark:bg-[color-mix(in_oklch,var(--color-destructive)_15%,transparent)] border border-[var(--color-brand-danger)] px-4 py-3 text-sm text-[var(--color-brand-danger)]">
+          {error}
+        </div>
+      )}
       <div className="flex flex-wrap items-center justify-end gap-3">
         <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
           <DialogTrigger render={<Button />}>Upload PDF</DialogTrigger>
@@ -158,7 +182,7 @@ export default function DocumentsPage() {
                 <Input type="file" accept=".pdf" ref={fileRef} />
               </div>
               <Button
-                onClick={handleUpload}
+                onClick={() => handleUpload()}
                 disabled={uploading}
                 className="w-full"
               >
@@ -168,6 +192,33 @@ export default function DocumentsPage() {
           </DialogContent>
         </Dialog>
       </div>
+
+      <Dialog open={!!duplicateInfo} onOpenChange={(open) => { if (!open) setDuplicateInfo(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Duplicate File Detected</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-[var(--color-ink-muted)] py-2">
+            A file with identical content already exists as{" "}
+            <span className="font-mono font-medium">{duplicateInfo?.existing_filename}</span>.
+            Replace it with the new upload?
+          </p>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button variant="outline" onClick={() => setDuplicateInfo(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              disabled={uploading}
+              onClick={() => {
+                if (duplicateInfo) handleUpload(duplicateInfo.existing_id);
+              }}
+            >
+              {uploading ? "Replacing…" : "Replace"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <div className="bg-card card-surface rounded-2xl p-5 space-y-4">
         <Input

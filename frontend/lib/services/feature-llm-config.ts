@@ -18,6 +18,8 @@ export const FEATURE_LABELS: Record<string, string> = {
   watchlist_scan: "Watchlist Scanner",
   watchlist_discovery: "Watchlist Discovery",
   ipo_analysis: "IPO Analysis",
+  top_down_analysis: "Top-Down Analysis",
+  top_down_discovery: "Top-Down Discovery",
 };
 
 export async function listFeatureConfigs(): Promise<FeatureLLMConfig[]> {

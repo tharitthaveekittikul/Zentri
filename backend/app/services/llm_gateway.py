@@ -169,6 +169,28 @@ DEFAULT_SYSTEM_PROMPTS: dict[str, str] = {
         "\"suggested_price\": <number or null>, "
         "\"reasoning\": \"<2-3 sentence explanation>\"}"
     ),
+    "top_down_analysis": (
+        "You are a professional financial analyst performing a top-down analysis.\n"
+        "Analyse the provided data and respond ONLY with valid JSON in this exact format — no text outside the object:\n"
+        "{\n"
+        "  \"mega_trend\": \"<industry trend and ATH pullback context, 2-3 sentences>\",\n"
+        "  \"financial_health\": \"<revenue and profit trend summary, 2-3 sentences>\",\n"
+        "  \"swot\": {\n"
+        "    \"strengths\": [\"<item>\"],\n"
+        "    \"weaknesses\": [\"<item>\"],\n"
+        "    \"opportunities\": [\"<item>\"],\n"
+        "    \"threats\": [\"<item>\"]\n"
+        "  },\n"
+        "  \"verdict\": \"BUY\" | \"SELL\" | \"HOLD\",\n"
+        "  \"target_price\": <number or null>\n"
+        "}"
+    ),
+    "top_down_discovery": (
+        "You are a market analyst identifying stocks pulling back from all-time highs. "
+        "Given a list of candidate stocks with their ATH drop percentages and price history, "
+        "identify the most promising ones for a full top-down analysis. "
+        "Focus on mega trends, sector momentum, and the quality of the pullback."
+    ),
 }
 
 HUMAN_PROMPTS: dict[str, str] = {

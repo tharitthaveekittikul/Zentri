@@ -1,8 +1,10 @@
+import hashlib
 import os
 import uuid
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
+from fastapi.responses import FileResponse, JSONResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -24,14 +26,47 @@ async def upload_document(
     file: UploadFile = File(...),
     doc_type: str = Form(default="general"),
     asset_symbol: str | None = Form(default=None),
+    replace_id: str | None = Query(default=None),
     db: AsyncSession = Depends(get_db),
     _: User = Depends(get_current_user),
 ):
+    content = await file.read()
+    content_hash = hashlib.sha256(content).hexdigest()
+
+    hash_result = await db.execute(
+        select(Document).where(Document.content_hash == content_hash)
+    )
+    existing = hash_result.scalar_one_or_none()
+    if existing and (not replace_id or existing.id != uuid.UUID(replace_id)):
+        return JSONResponse(
+            status_code=409,
+            content={"existing_id": str(existing.id), "existing_filename": existing.filename},
+        )
+
+    if replace_id:
+        old_result = await db.execute(
+            select(Document).where(Document.id == uuid.UUID(replace_id))
+        )
+        old_doc = old_result.scalar_one_or_none()
+        if not old_doc:
+            raise HTTPException(status_code=404, detail="Document to replace not found")
+        if old_doc:
+            if old_doc.chroma_collection_id:
+                try:
+                    from app.services.rag_service import _get_client
+                    client = _get_client()
+                    client.delete_collection(old_doc.chroma_collection_id)
+                except Exception:
+                    pass
+            if old_doc.file_path and Path(old_doc.file_path).exists():
+                Path(old_doc.file_path).unlink()
+            await db.delete(old_doc)
+            await db.flush()
+
     UPLOAD_DIR = _upload_dir()
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
     doc_id = uuid.uuid4()
     dest = UPLOAD_DIR / f"{doc_id}_{file.filename}"
-    content = await file.read()
     dest.write_bytes(content)
 
     asset_id = None
@@ -47,12 +82,12 @@ async def upload_document(
         filename=file.filename,
         file_path=str(dest),
         asset_id=asset_id,
+        content_hash=content_hash,
         status="pending",
     )
     db.add(doc)
     await db.commit()
 
-    # Enqueue ingest job
     try:
         from arq.connections import ArqRedis, RedisSettings, create_pool
         from app.core.config import settings
@@ -150,3 +185,23 @@ async def reingest_document(
         job_id = None
 
     return {"ok": True, "job_id": job_id}
+
+
+@router.get("/{doc_id}/file")
+async def serve_document_file(
+    doc_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    _: User = Depends(get_current_user),
+):
+    result = await db.execute(select(Document).where(Document.id == doc_id))
+    doc = result.scalar_one_or_none()
+    if not doc:
+        raise HTTPException(status_code=404, detail="Document not found")
+    p = Path(doc.file_path)
+    if not p.exists():
+        raise HTTPException(status_code=404, detail="File not found on disk")
+    upload_root = _upload_dir().resolve()
+    if not p.resolve().is_relative_to(upload_root):
+        raise HTTPException(status_code=403, detail="Access denied")
+    media_type = "application/pdf" if p.suffix.lower() == ".pdf" else "application/octet-stream"
+    return FileResponse(path=str(p), media_type=media_type, filename=doc.filename)

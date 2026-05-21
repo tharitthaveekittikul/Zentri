@@ -60,6 +60,8 @@ const FEATURE_KEYS = [
   "watchlist_scan",
   "watchlist_discovery",
   "ipo_analysis",
+  "top_down_analysis",
+  "top_down_discovery",
 ];
 
 type FeatureEdit = {

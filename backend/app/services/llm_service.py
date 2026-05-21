@@ -111,7 +111,20 @@ class GeminiProvider(LLMProvider):
         return LLMResponse(content=content, tokens_in=tokens_in, tokens_out=tokens_out, cost_usd=cost_usd)
 
 
-async def get_llm_provider(db) -> LLMProvider:
+def _build_provider(prov, feat, app_settings, decrypt):
+    api_key = decrypt(prov.encrypted_api_key) if prov.encrypted_api_key else None
+    if prov.provider == "anthropic":
+        return ClaudeProvider(api_key=api_key, model=feat.model)
+    elif prov.provider == "openai":
+        return OpenAIProvider(api_key=api_key, model=feat.model)
+    elif prov.provider == "gemini":
+        return GeminiProvider(api_key=api_key, model=feat.model)
+    elif prov.provider == "ollama":
+        return OllamaProvider(host=prov.host_url or app_settings.OLLAMA_HOST, model=feat.model)
+    return None
+
+
+async def get_llm_provider(db, feature_key: str | None = None) -> LLMProvider:
     from sqlalchemy import select
     from app.core.config import settings as app_settings
     from app.core.encryption import decrypt
@@ -119,17 +132,50 @@ async def get_llm_provider(db) -> LLMProvider:
 
     result = await db.execute(select(LLMSettings).where(LLMSettings.is_active == True))
     row = result.scalar_one_or_none()
-    if not row:
-        return OllamaProvider(host=app_settings.OLLAMA_HOST, model="llama3.2")
+    if row:
+        api_key = decrypt(row.encrypted_api_key) if row.encrypted_api_key else None
+        if row.provider == "ollama":
+            return OllamaProvider(host=app_settings.OLLAMA_HOST, model=row.model)
+        elif row.provider == "openai":
+            return OpenAIProvider(api_key=api_key, model=row.model)
+        elif row.provider == "claude":
+            return ClaudeProvider(api_key=api_key, model=row.model)
+        elif row.provider == "gemini":
+            return GeminiProvider(api_key=api_key, model=row.model)
+        else:
+            raise ValueError(f"Unknown LLM provider: {row.provider}")
 
-    api_key = decrypt(row.encrypted_api_key) if row.encrypted_api_key else None
-    if row.provider == "ollama":
-        return OllamaProvider(host=app_settings.OLLAMA_HOST, model=row.model)
-    elif row.provider == "openai":
-        return OpenAIProvider(api_key=api_key, model=row.model)
-    elif row.provider == "claude":
-        return ClaudeProvider(api_key=api_key, model=row.model)
-    elif row.provider == "gemini":
-        return GeminiProvider(api_key=api_key, model=row.model)
-    else:
-        raise ValueError(f"Unknown LLM provider: {row.provider}")
+    from app.models.feature_llm_config import FeatureLLMConfig
+    from app.models.provider_config import ProviderConfig
+
+    keys_to_try = []
+    if feature_key:
+        keys_to_try.append(feature_key)
+    if "portfolio_analysis" not in keys_to_try:
+        keys_to_try.append("portfolio_analysis")
+
+    for key in keys_to_try:
+        feat_result = await db.execute(
+            select(FeatureLLMConfig, ProviderConfig)
+            .join(ProviderConfig, FeatureLLMConfig.provider_config_id == ProviderConfig.id)
+            .where(FeatureLLMConfig.feature_key == key)
+            .limit(1)
+        )
+        feat_row = feat_result.first()
+        if feat_row:
+            provider = _build_provider(feat_row[1], feat_row[0], app_settings, decrypt)
+            if provider:
+                return provider
+
+    feat_result = await db.execute(
+        select(FeatureLLMConfig, ProviderConfig)
+        .join(ProviderConfig, FeatureLLMConfig.provider_config_id == ProviderConfig.id)
+        .limit(1)
+    )
+    feat_row = feat_result.first()
+    if feat_row:
+        provider = _build_provider(feat_row[1], feat_row[0], app_settings, decrypt)
+        if provider:
+            return provider
+
+    return OllamaProvider(host=app_settings.OLLAMA_HOST, model="llama3.2")

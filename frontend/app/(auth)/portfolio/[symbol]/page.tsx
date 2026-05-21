@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { PrivacyValue } from "@/components/ui/PrivacyValue";
 import { api } from "@/lib/api";
 import { VerdictCard } from "@/components/analysis/VerdictCard";
+import Link from "next/link";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { TickerLogo } from "@/components/ui/TickerLogo";
 import { useDualCurrency } from "@/hooks/useDualCurrency";
@@ -132,6 +133,15 @@ export default function AssetDetailPage() {
       </div>
 
       <VerdictCard symbol={symbol} />
+
+      <div className="flex justify-end">
+        <Link
+          href={`/analysis/${symbol.toUpperCase()}`}
+          className="inline-flex items-center gap-2 rounded-lg bg-[var(--color-brand)] px-4 py-2 text-sm font-medium text-white hover:opacity-90 transition-opacity"
+        >
+          Top-Down Analysis →
+        </Link>
+      </div>
 
       <div>
         <h2 className="text-sm font-medium text-muted-foreground mb-2">

@@ -11,14 +11,13 @@ import {
   TrendingUp,
   CalendarDays,
   Receipt,
-  FileText,
   Activity,
   Bot,
   MessageSquare,
-  Newspaper,
   Settings,
   Upload,
   HardDrive,
+  BarChart2,
 } from "lucide-react";
 
 const navItems = [
@@ -29,10 +28,9 @@ const navItems = [
   { href: "/net-worth", label: "Net Worth", icon: TrendingUp },
   { href: "/events", label: "Events", icon: CalendarDays },
   { href: "/transactions", label: "Transactions", icon: Receipt },
-  { href: "/documents", label: "Documents", icon: FileText },
   { href: "/pipeline", label: "Pipeline", icon: Activity },
   { href: "/import", label: "Import", icon: Upload },
-  { href: "/research", label: "Research", icon: Newspaper },
+  { href: "/analysis", label: "Analysis", icon: BarChart2 },
   { href: "/ai-usage", label: "AI Usage", icon: Bot },
   { href: "/settings", label: "Settings", icon: Settings },
   { href: "/settings/backup", label: "Backup", icon: HardDrive },

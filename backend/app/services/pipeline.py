@@ -80,13 +80,17 @@ async def finish_step(
     return step
 
 
-async def list_logs(db: AsyncSession, limit: int = 50) -> list[PipelineLog]:
-    result = await db.execute(
+async def list_logs(
+    db: AsyncSession, limit: int = 50, job_type: str | None = None
+) -> list[PipelineLog]:
+    q = (
         select(PipelineLog)
         .options(selectinload(PipelineLog.steps))
         .order_by(desc(PipelineLog.started_at))
-        .limit(limit)
     )
+    if job_type:
+        q = q.where(PipelineLog.job_type == job_type)
+    result = await db.execute(q.limit(limit))
     return list(result.scalars().all())
 
 

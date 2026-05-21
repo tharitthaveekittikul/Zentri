@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { api } from "@/lib/api";
 import { usePrivacyStore } from "@/store/privacy";
 import { useDualCurrency } from "@/hooks/useDualCurrency";
 
@@ -55,39 +57,32 @@ export function VerdictCard({ symbol }: VerdictCardProps) {
   const displayed = history.find((a) => a.id === selectedId) ?? latest;
 
   async function fetchLatest() {
-    const res = await fetch(`/api/v1/analysis/${symbol}/latest`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
-      },
-    });
-    if (res.ok) {
+    try {
+      const res = await api.get(`/api/v1/analysis/${symbol}/latest`);
       const data = await res.json();
       setLatest(data);
       setSelectedId(data.id);
-    }
+    } catch {}
   }
 
   async function fetchHistory() {
-    const res = await fetch(`/api/v1/analysis/${symbol}/history`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
-      },
-    });
-    if (res.ok) setHistory(await res.json());
+    try {
+      const res = await api.get(`/api/v1/analysis/${symbol}/history`);
+      setHistory(await res.json());
+    } catch {}
   }
 
   async function runAnalysis() {
     setLoading(true);
-    const token = localStorage.getItem("token") ?? "";
-    const res = await fetch(`/api/v1/analysis/${symbol}`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!res.ok) {
+    try {
+      await api.post(`/api/v1/analysis/${symbol}`, null);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to trigger analysis");
       setLoading(false);
       return;
     }
 
+    const token = localStorage.getItem("access_token") ?? "";
     const source = new EventSource(`/api/v1/pipeline/stream?token=${token}`);
     source.onmessage = (e) => {
       const jobs = JSON.parse(e.data) as { job_type: string; status: string }[];
@@ -98,6 +93,7 @@ export function VerdictCard({ symbol }: VerdictCardProps) {
         source.close();
         fetchLatest().then(fetchHistory);
         setLoading(false);
+        toast.success("Analysis complete");
       }
       const failed = jobs.find(
         (j) => j.job_type === "run_analysis" && j.status === "failed",
@@ -105,21 +101,21 @@ export function VerdictCard({ symbol }: VerdictCardProps) {
       if (failed) {
         source.close();
         setLoading(false);
+        toast.error("Analysis failed — check your LLM provider settings");
       }
     };
     source.onerror = () => {
       source.close();
       setLoading(false);
+      toast.error("Lost connection to pipeline stream");
     };
   }
 
   async function loadConversation(id: string) {
-    const res = await fetch(`/api/v1/analysis/conversation/${id}`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
-      },
-    });
-    if (res.ok) setConversation(await res.json());
+    try {
+      const res = await api.get(`/api/v1/analysis/conversation/${id}`);
+      setConversation(await res.json());
+    } catch {}
   }
 
   // Load latest on first render

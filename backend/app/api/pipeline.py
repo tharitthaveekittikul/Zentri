@@ -45,11 +45,12 @@ async def _get_user_for_sse(
 @router.get("/jobs", response_model=list[PipelineLogResponse])
 async def list_pipeline_jobs(
     limit: int = 50,
+    job_type: str | None = Query(None),
     db: AsyncSession = Depends(get_db),
     _: User = Depends(get_current_user),
 ):
-    """Return recent pipeline job logs, newest first."""
-    return await list_logs(db, limit=limit)
+    """Return recent pipeline job logs, newest first. Optionally filter by job_type."""
+    return await list_logs(db, limit=limit, job_type=job_type)
 
 
 @router.get("/jobs/{log_id}", response_model=PipelineLogResponse)

@@ -101,6 +101,40 @@ export const MODEL_RECOMMENDATIONS: Record<string, ModelRecommendation> = {
     ],
     cost_tier: "medium",
   },
+  top_down_analysis: {
+    recommended: "claude-sonnet-4-6",
+    why: "Top-down analysis requires multi-step reasoning: synthesizing SEC filings, earnings trends, and macro context into a structured SWOT. Sonnet delivers the best balance of reasoning depth and JSON reliability for this complexity.",
+    alternatives: [
+      {
+        model: "claude-opus-4-7",
+        note: "Best qualitative SWOT depth — use when accuracy matters more than cost",
+      },
+      {
+        model: "gpt-5",
+        note: "Strong on financial document synthesis from SEC filings",
+      },
+      {
+        model: "gemini-2.5-flash",
+        note: "Budget option — fast and cheap, but SWOT quality is shallower",
+      },
+    ],
+    cost_tier: "medium",
+  },
+  top_down_discovery: {
+    recommended: "gemini-2.5-flash-lite",
+    why: "Discovery is a screening task, not a reasoning task — it scans price data for ATH pullbacks and queues candidates. A fast, cheap model is ideal here since the real analysis happens in top_down_analysis.",
+    alternatives: [
+      {
+        model: "claude-haiku-4-5-20251001",
+        note: "Slightly higher quality filtering with minimal cost increase",
+      },
+      {
+        model: "gpt-4o-mini",
+        note: "Good alternative if you prefer OpenAI for screening tasks",
+      },
+    ],
+    cost_tier: "low",
+  },
 };
 
 export const COST_TIER_LABELS: Record<string, string> = {

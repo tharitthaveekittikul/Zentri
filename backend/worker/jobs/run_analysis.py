@@ -64,7 +64,7 @@ async def job_run_analysis(ctx: dict, symbol: str) -> dict:
             await finish_step(db, current_step, success=True, metadata={"chunks_found": len(rag_chunks)})
 
             holdings_txt = "\n".join(
-                f"- {h.quantity} units @ avg cost {h.avg_cost}" for h in holdings
+                f"- {h.quantity} units @ avg cost {h.avg_cost_price}" for h in holdings
             ) or "No current holdings."
             prices_txt = "\n".join(
                 f"{p.timestamp.date()}: close={p.close}" for p in prices[:10]

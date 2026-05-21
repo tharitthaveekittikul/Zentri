@@ -12,6 +12,7 @@ JobType = Literal[
     "watchlist_discovery", "watchlist_scan", "watchlist_alert",
     "run_analysis", "ingest_document",
     "dividend_fetch", "dividend_alert", "ipo_fetch",
+    "run_top_down_analysis", "top_down_discovery",
 ]
 JobStatus = Literal["queued", "running", "done", "failed"]
 StepStatus = Literal["running", "done", "failed"]
