@@ -42,10 +42,10 @@ interface Document {
 }
 
 const STATUS_BADGE: Record<Document["status"], string> = {
-  pending: "bg-gray-400 text-white",
-  processing: "bg-blue-500 text-white animate-pulse",
-  done: "bg-green-500 text-white",
-  failed: "bg-red-500 text-white",
+  pending: "bg-muted text-muted-foreground",
+  processing: "bg-primary text-primary-foreground animate-pulse",
+  done: "bg-brand-accent text-white",
+  failed: "bg-destructive text-white",
 };
 
 /** For multipart/FormData uploads we cannot use api (it forces JSON content-type). */
@@ -262,7 +262,7 @@ export default function DocumentsPage() {
                 <TableCell>
                   <Badge className={STATUS_BADGE[doc.status]}>{doc.status}</Badge>
                   {doc.error_msg && (
-                    <p className="text-xs text-red-500 mt-1">{doc.error_msg}</p>
+                    <p className="text-xs text-destructive mt-1">{doc.error_msg}</p>
                   )}
                 </TableCell>
                 <TableCell>{doc.chunk_count ?? "—"}</TableCell>

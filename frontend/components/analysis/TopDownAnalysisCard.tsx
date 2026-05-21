@@ -2,6 +2,7 @@
 
 import { SwotGrid } from './SwotGrid'
 import { DocumentsList } from './DocumentsList'
+import { Button } from '@/components/ui/button'
 
 type TopDownAnalysisData = {
   id: string
@@ -91,13 +92,13 @@ export function TopDownAnalysisCard({ data, ticker, onRefresh, loading }: Props)
           <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">
             Documents used ({data.documents.length})
           </p>
-          <button
+          <Button
             onClick={onRefresh}
             disabled={loading}
-            className="rounded-md bg-[var(--color-brand)] px-3 py-1 text-xs font-medium text-white disabled:opacity-50"
+            className="px-3 py-1 text-xs font-medium"
           >
             {loading ? 'Running…' : 'Fetch & Analyze'}
-          </button>
+          </Button>
         </div>
         <DocumentsList documents={data.documents} ticker={ticker} />
       </div>

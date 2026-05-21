@@ -117,7 +117,7 @@ export default function SetupPage() {
                   <input
                     type="file"
                     accept=".json"
-                    className="hidden"
+                    className="sr-only"
                     disabled={loading}
                     onChange={async (e) => {
                       const file = e.target.files?.[0];

@@ -43,12 +43,12 @@ import type { PaginatedResponse } from "@/lib/types";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
 
 const TYPE_COLORS: Record<string, string> = {
-  buy: "bg-green-100 text-green-800",
-  sell: "bg-red-100 text-red-800",
-  dividend: "bg-blue-100 text-blue-800",
-  reward: "bg-purple-100 text-purple-800",
-  fee: "bg-yellow-100 text-yellow-800",
-  transfer: "bg-gray-100 text-gray-800",
+  buy: "[background:var(--signal-gain-bg)] [color:var(--signal-gain-text)]",
+  sell: "bg-destructive/10 text-destructive",
+  dividend: "bg-muted text-muted-foreground",
+  reward: "bg-muted text-muted-foreground",
+  fee: "bg-muted text-muted-foreground",
+  transfer: "bg-muted text-muted-foreground",
 };
 
 export default function TransactionsPage() {

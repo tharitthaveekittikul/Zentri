@@ -3,6 +3,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { PlusIcon, XIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { renameChatSession, deleteChatSession } from "@/lib/services/chat";
 import type { ChatSessionSummary } from "@/lib/services/chat";
@@ -58,7 +60,7 @@ function SessionChip({
 
   if (editing) {
     return (
-      <input
+      <Input
         ref={inputRef}
         value={draft}
         onChange={(e) => setDraft(e.target.value)}
@@ -75,7 +77,8 @@ function SessionChip({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <button
+      <Button
+        variant="ghost"
         onClick={onSelect}
         onDoubleClick={handleDoubleClick}
         title="Double-click to rename"
@@ -89,15 +92,16 @@ function SessionChip({
         style={{ maxWidth: 160 }}
       >
         {session.title}
-      </button>
+      </Button>
       {hovered && (
-        <button
+        <Button
+          variant="ghost"
           onClick={(e) => { e.stopPropagation(); onDelete(); }}
-          className="absolute right-1.5 top-1/2 -translate-y-1/2 flex size-4 items-center justify-center rounded-full text-muted-foreground hover:text-destructive transition-colors"
+          className="absolute right-1.5 top-1/2 -translate-y-1/2 flex size-4 items-center justify-center rounded-full text-muted-foreground hover:text-destructive transition-colors p-0 h-auto"
           title="Delete conversation"
         >
           <XIcon className="size-3" />
-        </button>
+        </Button>
       )}
     </div>
   );
@@ -123,13 +127,14 @@ export function SessionStrip({
 
   return (
     <div className="flex items-center gap-2 overflow-x-auto py-2 px-1 scrollbar-none border-b">
-      <button
+      <Button
+        variant="ghost"
         onClick={onNewChat}
         className="flex h-7 shrink-0 items-center gap-1 rounded-full border border-border bg-muted/40 px-3 text-xs text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
       >
         <PlusIcon className="size-3" />
         New
-      </button>
+      </Button>
       {sessions.map((s) => (
         <SessionChip
           key={s.id}

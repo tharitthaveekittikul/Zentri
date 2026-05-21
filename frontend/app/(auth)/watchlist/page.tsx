@@ -134,7 +134,7 @@ function AddDialog({
           <DialogTitle>Add to Watchlist</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          <input
+          <Input
             className="w-full border rounded px-3 py-2 text-sm"
             placeholder="Search ticker or name…"
             value={query}
@@ -146,9 +146,10 @@ function AddDialog({
           {results.length > 0 && !selected && (
             <div className="border rounded divide-y max-h-48 overflow-y-auto">
               {results.map((a) => (
-                <button
+                <Button
                   key={a.id}
-                  className="w-full text-left px-3 py-2 text-sm hover:bg-accent"
+                  variant="ghost"
+                  className="w-full text-left px-3 py-2 text-sm hover:bg-accent h-auto justify-start rounded-none"
                   onClick={() => {
                     setSelected(a);
                     setQuery(a.symbol);
@@ -157,7 +158,7 @@ function AddDialog({
                 >
                   <span className="font-medium">{a.symbol}</span>{" "}
                   <span className="text-muted-foreground">{a.name}</span>
-                </button>
+                </Button>
               ))}
             </div>
           )}
@@ -166,7 +167,7 @@ function AddDialog({
               <label className="text-xs text-muted-foreground block mb-1">
                 Target price (optional)
               </label>
-              <input
+              <Input
                 type="number"
                 className="w-full border rounded px-3 py-2 text-sm"
                 placeholder="e.g. 150.00"

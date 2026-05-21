@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -40,17 +41,17 @@ const MONTH_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct"
 type FilterType = "all" | "dividend" | "ipo" | "watchlist";
 
 const VERDICT_STYLE: Record<string, string> = {
-  BUY: "bg-green-100 text-green-800",
-  WATCH: "bg-yellow-100 text-yellow-800",
-  SKIP: "bg-red-100 text-red-800",
+  BUY: "[background:var(--signal-gain-bg)] [color:var(--signal-gain-text)]",
+  WATCH: "bg-muted text-muted-foreground",
+  SKIP: "bg-destructive/10 text-destructive",
 };
 
 const STATUS_BADGE: Record<string, string> = {
-  upcoming: "bg-blue-100 text-blue-800",
-  payable: "bg-yellow-100 text-yellow-800",
-  paid: "bg-green-100 text-green-800",
-  priced: "bg-purple-100 text-purple-800",
-  listed: "bg-gray-100 text-gray-800",
+  upcoming: "bg-muted text-muted-foreground",
+  payable: "bg-muted text-muted-foreground",
+  paid: "[background:var(--signal-gain-bg)] [color:var(--signal-gain-text)]",
+  priced: "bg-muted text-muted-foreground",
+  listed: "bg-muted text-muted-foreground",
 };
 
 function filterEvents(events: CalendarEvent[], filter: FilterType): CalendarEvent[] {
@@ -126,7 +127,7 @@ function CalendarGrid({
           <div
             key={i}
             className={`min-h-[72px] border-b border-r p-1 text-xs ${!day ? "bg-muted/10" : ""} ${
-              day === today.getDate() && isCurrentMonth ? "bg-blue-100 dark:bg-blue-950/40 ring-1 ring-inset ring-blue-300 dark:ring-blue-800" : ""
+              day === today.getDate() && isCurrentMonth ? "bg-brand-accent/10 ring-1 ring-inset ring-brand-accent/30" : ""
             }`}
           >
             {day && (
@@ -142,8 +143,8 @@ function CalendarGrid({
                     }
                     className={`truncate rounded px-1 py-0.5 mb-0.5 cursor-pointer text-[10px] font-medium flex items-center gap-0.5 ${
                       ev.event_type === "dividend"
-                        ? "bg-blue-100 text-blue-800 dark:bg-blue-900/70 dark:text-blue-200"
-                        : "bg-orange-100 text-orange-800 dark:bg-orange-900/70 dark:text-orange-200"
+                        ? "[background:var(--signal-gain-bg)] [color:var(--signal-gain-text)]"
+                        : "bg-muted text-muted-foreground"
                     }`}
                   >
                     {ev.is_in_watchlist && <span>★</span>}
@@ -229,7 +230,7 @@ function IpoPanel({
             </span>
           </div>
           {event.is_in_watchlist && (
-            <div className="text-xs text-yellow-700 bg-yellow-50 border border-yellow-200 rounded px-2 py-1">
+            <div className="text-xs text-muted-foreground bg-muted border border-border rounded px-2 py-1">
               ★ In your watchlist
             </div>
           )}
@@ -245,7 +246,7 @@ function IpoPanel({
             <div className="text-center text-sm text-muted-foreground">Analyzing…</div>
           )}
           {analyzeError && (
-            <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">
+            <div className="text-sm text-destructive bg-destructive/5 border border-destructive/20 rounded px-3 py-2">
               {analyzeError.includes("Settings") ? (
                 <>LLM not configured. <a href="/settings" className="underline">Set up in Settings →</a></>
               ) : analyzeError}
@@ -381,27 +382,28 @@ export default function EventsPage() {
 
       <div className="flex gap-2 flex-wrap">
         {FILTERS.map(({ key, label }) => (
-          <button
+          <Button
             key={key}
+            variant="outline"
             onClick={() => setFilter(key)}
-            className={`px-3 py-1 rounded-full text-sm font-medium border transition-colors ${
+            className={`px-3 py-1 rounded-full text-sm font-medium h-auto border transition-colors ${
               filter === key
                 ? "bg-primary text-primary-foreground border-primary"
                 : "bg-background border-border text-muted-foreground hover:border-primary"
             }`}
           >
             {label}
-          </button>
+          </Button>
         ))}
         <div className="flex items-center gap-3 ml-auto text-xs text-muted-foreground">
-          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-blue-200 inline-block" /> Dividend</span>
-          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-orange-200 inline-block" /> IPO</span>
+          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded [background:var(--signal-gain-bg)] inline-block" /> Dividend</span>
+          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-muted inline-block" /> IPO</span>
           <span>★ Watchlist</span>
         </div>
       </div>
 
       {fetchError && (
-        <div className="rounded-md border border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/30 px-4 py-3 text-sm text-red-700 dark:text-red-400">
+        <div className="rounded-md border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive">
           {fetchError}
         </div>
       )}
@@ -468,14 +470,14 @@ export default function EventsPage() {
                 <TableRow key={ev.id}>
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-2">
-                      {ev.is_in_watchlist && <span className="text-yellow-500">★</span>}
+                      {ev.is_in_watchlist && <span className="text-brand-accent">★</span>}
                       <TickerLogo symbol={ev.symbol} logoUrl={ev.metadata_?.logo_url as string | undefined} />
                       <span>{ev.symbol}</span>
                     </div>
                   </TableCell>
                   <TableCell>
                     <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                      ev.event_type === "dividend" ? "bg-blue-100 text-blue-800" : "bg-orange-100 text-orange-800"
+                      ev.event_type === "dividend" ? "[background:var(--signal-gain-bg)] [color:var(--signal-gain-text)]" : "bg-muted text-muted-foreground"
                     }`}>
                       {ev.event_type === "dividend" ? "Dividend" : "IPO"}
                     </span>
@@ -540,7 +542,7 @@ export default function EventsPage() {
             </div>
             <div className="space-y-1">
               <label className="text-sm font-medium">Quantity received</label>
-              <input className="w-full border rounded px-3 py-2 text-sm" value={confirmQty} onChange={(e) => setConfirmQty(e.target.value)} />
+              <Input className="w-full" value={confirmQty} onChange={(e) => setConfirmQty(e.target.value)} />
             </div>
             <div className="space-y-1">
               <label className="text-sm font-medium">Date received</label>

@@ -137,7 +137,7 @@ export default function BackupPage() {
             ref={fileInputRef}
             type="file"
             accept=".json"
-            className="hidden"
+            className="sr-only"
             disabled={importing}
             aria-label="Upload backup file"
             onChange={handleFileChange}

@@ -23,10 +23,9 @@ export interface VisDot extends PortfolioViewItem {
 }
 
 export function getHoldingColor(pnlPct: number): { bg: string; accent: string } {
-  // matches project brand tokens: --brand-mid / --brand-sage for gain, --brand-danger for loss
-  if (pnlPct > 0) return { bg: "#227d53", accent: "#5fbd92" };
-  if (pnlPct < 0) return { bg: "#9b2335", accent: "#F43F5E" };
-  return { bg: "#4b5563", accent: "#6b7280" };
+  if (pnlPct > 0) return { bg: "var(--color-brand-mid)", accent: "var(--color-brand-sage)" };
+  if (pnlPct < 0) return { bg: "var(--color-brand-danger)", accent: "var(--color-brand-danger)" };
+  return { bg: "var(--color-muted)", accent: "var(--color-muted-foreground)" };
 }
 
 export interface CurrencyOptions {

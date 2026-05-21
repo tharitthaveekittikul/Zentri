@@ -242,13 +242,14 @@ export default function ChatPage() {
                 "How much cash do I have?",
                 "What's on my watchlist?",
               ].map((suggestion) => (
-                <button
+                <Button
                   key={suggestion}
+                  variant="outline"
                   onClick={() => setInput(suggestion)}
-                  className="rounded-xl border border-border px-3 py-2 text-left text-sm hover:bg-muted transition-colors"
+                  className="rounded-xl px-3 py-2 text-left text-sm h-auto justify-start"
                 >
                   {suggestion}
-                </button>
+                </Button>
               ))}
             </div>
           </div>

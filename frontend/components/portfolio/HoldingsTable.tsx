@@ -153,12 +153,13 @@ export function HoldingsTable({
     {
       accessorKey: "symbol",
       header: ({ column }) => (
-        <button
-          className="flex items-center text-xs font-medium text-muted-foreground uppercase tracking-wide"
+        <Button
+          variant="ghost"
+          className="flex items-center text-xs font-medium text-muted-foreground uppercase tracking-wide p-0 h-auto"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Symbol <SortIcon isSorted={column.getIsSorted()} />
-        </button>
+        </Button>
       ),
       cell: ({ row }) => {
         const platform = row.original.platform;
@@ -207,12 +208,13 @@ export function HoldingsTable({
       accessorKey: "outstanding_shares",
       sortingFn: "alphanumeric",
       header: ({ column }) => (
-        <button
-          className="flex items-center text-xs font-medium text-muted-foreground uppercase tracking-wide"
+        <Button
+          variant="ghost"
+          className="flex items-center text-xs font-medium text-muted-foreground uppercase tracking-wide p-0 h-auto"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Shares <SortIcon isSorted={column.getIsSorted()} />
-        </button>
+        </Button>
       ),
       cell: ({ row }) => (
         <span className="font-mono tabular-nums">
@@ -224,12 +226,13 @@ export function HoldingsTable({
       accessorKey: "cost_per_share",
       sortingFn: "alphanumeric",
       header: ({ column }) => (
-        <button
-          className="flex items-center text-xs font-medium text-muted-foreground uppercase tracking-wide"
+        <Button
+          variant="ghost"
+          className="flex items-center text-xs font-medium text-muted-foreground uppercase tracking-wide p-0 h-auto"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Cost/Share <SortIcon isSorted={column.getIsSorted()} />
-        </button>
+        </Button>
       ),
       cell: ({ row }) =>
         row.original.cost_per_share == null ? (
@@ -248,12 +251,13 @@ export function HoldingsTable({
       accessorKey: "total_cost",
       sortingFn: "alphanumeric",
       header: ({ column }) => (
-        <button
-          className="flex items-center text-xs font-medium text-muted-foreground uppercase tracking-wide"
+        <Button
+          variant="ghost"
+          className="flex items-center text-xs font-medium text-muted-foreground uppercase tracking-wide p-0 h-auto"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Total Cost <SortIcon isSorted={column.getIsSorted()} />
-        </button>
+        </Button>
       ),
       cell: ({ row }) =>
         row.original.total_cost == null ? (
@@ -269,12 +273,13 @@ export function HoldingsTable({
       accessorKey: "current_price",
       sortingFn: "alphanumeric",
       header: ({ column }) => (
-        <button
-          className="flex items-center text-xs font-medium text-muted-foreground uppercase tracking-wide"
+        <Button
+          variant="ghost"
+          className="flex items-center text-xs font-medium text-muted-foreground uppercase tracking-wide p-0 h-auto"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Price <SortIcon isSorted={column.getIsSorted()} />
-        </button>
+        </Button>
       ),
       cell: ({ row }) =>
         row.original.current_price == null ? (
@@ -327,12 +332,13 @@ export function HoldingsTable({
       accessorKey: "holding_value",
       sortingFn: "alphanumeric",
       header: ({ column }) => (
-        <button
-          className="flex items-center text-xs font-medium text-muted-foreground uppercase tracking-wide"
+        <Button
+          variant="ghost"
+          className="flex items-center text-xs font-medium text-muted-foreground uppercase tracking-wide p-0 h-auto"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Value <SortIcon isSorted={column.getIsSorted()} />
-        </button>
+        </Button>
       ),
       cell: ({ row }) =>
         row.original.holding_value == null ? (
@@ -351,12 +357,13 @@ export function HoldingsTable({
       accessorKey: "unrealized_pnl",
       sortingFn: "alphanumeric",
       header: ({ column }) => (
-        <button
-          className="flex items-center text-xs font-medium text-muted-foreground uppercase tracking-wide"
+        <Button
+          variant="ghost"
+          className="flex items-center text-xs font-medium text-muted-foreground uppercase tracking-wide p-0 h-auto"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           P/L <SortIcon isSorted={column.getIsSorted()} />
-        </button>
+        </Button>
       ),
       cell: ({ row }) => {
         const val = row.original.unrealized_pnl;

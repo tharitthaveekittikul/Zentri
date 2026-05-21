@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { type PipelineStep } from "@/lib/services/pipeline";
+import { Button } from "@/components/ui/button";
 
 const STEP_LABELS: Record<string, string> = {
   fetch_and_store: "Fetch & Store",
@@ -25,9 +26,9 @@ function stepDuration(step: PipelineStep): string {
 }
 
 function StepIcon({ status }: { status: string }) {
-  if (status === "done") return <span className="text-green-600 text-xs">✓</span>;
+  if (status === "done") return <span className="text-brand-accent text-xs">✓</span>;
   if (status === "failed") return <span className="text-destructive text-xs">✗</span>;
-  return <span className="text-blue-500 text-xs animate-pulse">●</span>;
+  return <span className="text-muted-foreground text-xs animate-pulse">●</span>;
 }
 
 function LLMMetadata({ m }: { m: Record<string, unknown> }) {
@@ -45,18 +46,20 @@ function LLMMetadata({ m }: { m: Record<string, unknown> }) {
         </span>
       </div>
       <div className="flex gap-3">
-        <button
-          className="text-xs text-blue-500 underline underline-offset-2"
+        <Button
+          variant="link"
+          className="text-xs h-auto p-0"
           onClick={() => setShowPrompt((v) => !v)}
         >
           Prompt {showPrompt ? "▴" : "▾"}
-        </button>
-        <button
-          className="text-xs text-blue-500 underline underline-offset-2"
+        </Button>
+        <Button
+          variant="link"
+          className="text-xs h-auto p-0"
           onClick={() => setShowResponse((v) => !v)}
         >
           Response {showResponse ? "▴" : "▾"}
-        </button>
+        </Button>
       </div>
       {showPrompt && (
         <pre className="text-xs bg-muted p-2 rounded overflow-auto max-h-48 whitespace-pre-wrap font-mono">

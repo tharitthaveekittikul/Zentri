@@ -180,7 +180,7 @@ function AIUsageContent() {
                     <Tooltip
                       formatter={(v) => [formatNative(Number(v), "USD", 6).primary, "Cost"]}
                     />
-                    <Bar dataKey="cost_usd" fill="#6366f1" />
+                    <Bar dataKey="cost_usd" fill="var(--color-brand-accent)" />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -225,12 +225,13 @@ function AIUsageContent() {
                     {new Date(log.created_at).toLocaleString()}
                   </TableCell>
                   <TableCell>
-                    <button
-                      className="text-xs text-muted-foreground underline"
+                    <Button
+                      variant="link"
+                      className="text-xs h-auto p-0 text-muted-foreground"
                       onClick={() => viewPayload(log.id)}
                     >
                       View log
-                    </button>
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}

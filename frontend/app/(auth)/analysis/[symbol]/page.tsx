@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'next/navigation'
+import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { TopDownAnalysisCard } from '@/components/analysis/TopDownAnalysisCard'
 import { PipelineFlow, PipelineJob } from '@/components/analysis/PipelineFlow'
@@ -134,13 +135,13 @@ export default function AnalysisPage() {
           <p className="text-sm text-[var(--color-text-muted)]">
             {error ?? `No analysis found for`} <strong>{symbol}</strong>
           </p>
-          <button
+          <Button
             onClick={trigger}
             disabled={loading}
-            className="rounded-md bg-[var(--color-brand)] px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+            className="px-4 py-2 text-sm font-medium"
           >
             {loading ? 'Running…' : 'Fetch & Analyze'}
-          </button>
+          </Button>
         </div>
       ) : (
         <TopDownAnalysisCard

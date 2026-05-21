@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { api } from '@/lib/api'
 import { PipelineFlow, PipelineJob } from '@/components/analysis/PipelineFlow'
@@ -100,13 +101,13 @@ export default function AnalysisIndexPage() {
         <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">
           Top-Down Analysis
         </h1>
-        <button
+        <Button
           onClick={discover}
           disabled={discovering}
-          className="rounded-lg bg-[var(--color-brand)] px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+          className="px-4 py-2 text-sm font-medium"
         >
           {discovering ? 'Scanning…' : '⟳ Discover Candidates'}
-        </button>
+        </Button>
       </div>
 
       {(discovering || discoveryJob) && discoveryJob && (

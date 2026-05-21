@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AISettings } from "@/components/settings/AISettings";
 import { ScheduleTab } from "@/components/settings/ScheduleTab";
 import { getProfile, saveProfile, type ProfileSettings } from "@/lib/services/auth";
@@ -286,27 +287,29 @@ function SettingsContent() {
               <div className="flex flex-col sm:flex-row gap-4 sm:items-end">
                 <div className="flex-1">
                   <label className="text-sm font-medium mb-1 block">Primary Currency</label>
-                  <select
-                    className="w-full border rounded px-3 py-2 text-sm bg-background"
-                    value={currencyPrimary}
-                    onChange={(e) => setCurrencyPrimary(e.target.value)}
-                  >
-                    {CURRENCIES.map((c) => (
-                      <option key={c} value={c}>{c}</option>
-                    ))}
-                  </select>
+                  <Select value={currencyPrimary} onValueChange={(v) => { if (v) setCurrencyPrimary(v); }}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CURRENCIES.map((c) => (
+                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="flex-1">
                   <label className="text-sm font-medium mb-1 block">Secondary Currency</label>
-                  <select
-                    className="w-full border rounded px-3 py-2 text-sm bg-background"
-                    value={currencySecondary}
-                    onChange={(e) => setCurrencySecondary(e.target.value)}
-                  >
-                    {CURRENCIES.map((c) => (
-                      <option key={c} value={c}>{c}</option>
-                    ))}
-                  </select>
+                  <Select value={currencySecondary} onValueChange={(v) => { if (v) setCurrencySecondary(v); }}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CURRENCIES.map((c) => (
+                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <Button
                   onClick={async () => {

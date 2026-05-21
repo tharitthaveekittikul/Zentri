@@ -51,7 +51,8 @@ export function TopNav() {
       {/* Card wrapper — mirrors the sidebar card */}
       <div className="bg-shell dark:bg-shell rounded-[24px] flex items-center px-5 h-16 gap-3">
         {/* Search pill — tinted so it reads against the white card */}
-        <button
+        <Button
+          variant="ghost"
           onClick={() => setOpen(true)}
           className="flex flex-1 items-center gap-3 h-10 px-4 rounded-full bg-page dark:bg-slate-800 hover:bg-page/80 dark:hover:bg-slate-700 transition-colors text-left min-w-0"
           title="Search (⌘K)"
@@ -66,7 +67,7 @@ export function TopNav() {
           <kbd className="hidden sm:flex items-center text-[11px] text-slate-400/60 font-mono bg-slate-100 dark:bg-slate-700 px-1.5 py-0.5 rounded-md shrink-0">
             ⌘K
           </kbd>
-        </button>
+        </Button>
 
         {/* Action buttons */}
         <Button

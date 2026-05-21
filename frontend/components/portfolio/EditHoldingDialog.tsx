@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { updateHolding, fetchAsset, updateAsset, lookupThFund, searchCoinGecko, CoinGeckoResult, ThFundMatch, HoldingRow } from "@/lib/services/portfolio";
@@ -154,16 +155,16 @@ export function EditHoldingDialog({
           <DialogTitle>Edit {holding.symbol}</DialogTitle>
         </DialogHeader>
         <div className="mb-2">
-          <select
-            className="text-sm border rounded px-2 py-1 bg-background text-muted-foreground"
-            value={assetType}
-            onChange={(e) => setAssetType(e.target.value)}
-            disabled={assetLoading}
-          >
-            {["us_stock","thai_stock","thai_dr","th_fund","etf","crypto","gold","cash"].map((t) => (
-              <option key={t} value={t}>{t}</option>
-            ))}
-          </select>
+          <Select value={assetType} onValueChange={(v) => { if (v) setAssetType(v); }} disabled={assetLoading}>
+            <SelectTrigger className="text-sm h-8 w-auto">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {["us_stock","thai_stock","thai_dr","th_fund","etf","crypto","gold","cash"].map((t) => (
+                <SelectItem key={t} value={t}>{t}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <form onSubmit={handleSubmit} className="space-y-3">
           {/* Asset section */}
@@ -201,14 +202,15 @@ export function EditHoldingDialog({
                     disabled={assetLoading}
                     className="text-sm h-8"
                   />
-                  <button
+                  <Button
                     type="button"
+                    variant="link"
                     onClick={() => triggerLookup(lookupQuery)}
                     disabled={lookupLoading || assetLoading || !lookupQuery}
-                    className="text-xs text-primary hover:underline disabled:opacity-40 whitespace-nowrap"
+                    className="text-xs h-auto p-0 whitespace-nowrap"
                   >
                     {lookupLoading ? "Searching…" : "Lookup"}
-                  </button>
+                  </Button>
                 </div>
                 <Input
                   value={projId}
@@ -219,22 +221,23 @@ export function EditHoldingDialog({
                 {lookupResults.length > 0 && (
                   <div className="border rounded-md divide-y text-xs max-h-40 overflow-y-auto">
                     {lookupResults.map((r) => (
-                      <button
+                      <Button
                         key={r.proj_id}
                         type="button"
+                        variant="ghost"
                         onClick={() => {
                           setProjId(r.proj_id);
                           if (!assetName) setAssetName(r.proj_name_en || r.proj_abbr_name);
                           setLookupResults([]);
                         }}
-                        className="w-full text-left px-3 py-2 hover:bg-muted"
+                        className="w-full text-left px-3 py-2 hover:bg-muted h-auto justify-start rounded-none"
                       >
                         <span className="font-medium">{r.proj_abbr_name}</span>
                         <span className="text-muted-foreground ml-2">{r.proj_id}</span>
                         {r.proj_name_en && (
                           <div className="text-muted-foreground truncate">{r.proj_name_en}</div>
                         )}
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 )}
@@ -254,10 +257,11 @@ export function EditHoldingDialog({
                 {coinResults.length > 0 && (
                   <div className="absolute z-10 w-full bg-background border rounded shadow-md top-full mt-1">
                     {coinResults.map((coin) => (
-                      <button
+                      <Button
                         key={coin.id}
                         type="button"
-                        className="w-full text-left px-3 py-2 hover:bg-muted text-sm flex items-center gap-2"
+                        variant="ghost"
+                        className="w-full text-left px-3 py-2 hover:bg-muted text-sm flex items-center gap-2 h-auto justify-start rounded-none"
                         onClick={() => {
                           setSymbol(coin.symbol);
                           setCoingeckoId(coin.id);
@@ -266,7 +270,7 @@ export function EditHoldingDialog({
                       >
                         {coin.thumb && <img src={coin.thumb} alt="" className="w-4 h-4 shrink-0" />}
                         {coin.name} <span className="text-muted-foreground">({coin.symbol})</span>
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 )}

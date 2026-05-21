@@ -18,6 +18,18 @@ import { useDualCurrency } from "@/hooks/useDualCurrency";
 const RANGES = ["1M", "3M", "6M", "1Y", "ALL"] as const;
 type Range = (typeof RANGES)[number];
 
+function cssVar(name: string): string {
+  const dark = document.documentElement.classList.contains("dark");
+  const map: Record<string, string> = {
+    "--color-brand-accent":     "#10b981",
+    "--color-brand-danger":     "#f43f5e",
+    "--color-brand-sage":       "#5fbd92",
+    "--color-brand-mid":        "#227d53",
+    "--color-muted-foreground": dark ? "#919191" : "#707070",
+  };
+  return map[name] ?? "#94a3b8";
+}
+
 export function NetWorthChart({ privacyMode }: { privacyMode: boolean }) {
   const { primaryCurrency } = useDualCurrency();
 
@@ -44,20 +56,20 @@ export function NetWorthChart({ privacyMode }: { privacyMode: boolean }) {
     const chart = createChart(containerRef.current, {
       width: containerRef.current.clientWidth,
       height: 280,
-      layout: { background: { color: "transparent" }, textColor: "#94a3b8" },
+      layout: { background: { color: "transparent" }, textColor: cssVar("--color-muted-foreground") },
       grid: { vertLines: { visible: false }, horzLines: { visible: false } },
       rightPriceScale: { borderColor: "transparent" },
       timeScale: { borderColor: "transparent", timeVisible: false },
     });
 
     valueSeriesRef.current = chart.addSeries(AreaSeries, {
-      lineColor: "#10B981",
+      lineColor: cssVar("--color-brand-accent"),
       topColor: "rgba(16,185,129,0.20)",
       bottomColor: "rgba(16,185,129,0)",
       lineWidth: 2,
     });
     costSeriesRef.current = chart.addSeries(LineSeries, {
-      color: "#5fbd92",
+      color: cssVar("--color-brand-sage"),
       lineWidth: 1,
       lineStyle: 1,
     });

@@ -61,7 +61,7 @@ export const PerformanceChart = memo(function PerformanceChart() {
             <Line
               type="monotone"
               dataKey="portfolio"
-              stroke="#6366f1"
+              stroke="var(--color-brand-accent)"
               dot={false}
               strokeWidth={2}
               name="Portfolio"
@@ -69,7 +69,7 @@ export const PerformanceChart = memo(function PerformanceChart() {
             <Line
               type="monotone"
               dataKey="benchmark"
-              stroke="#94a3b8"
+              stroke="var(--color-muted-foreground)"
               dot={false}
               strokeWidth={1.5}
               name="S&P500"

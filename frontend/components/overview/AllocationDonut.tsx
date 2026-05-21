@@ -7,7 +7,14 @@ import { AllocationItem } from "@/lib/services/overview";
 import { useDualCurrency } from "@/hooks/useDualCurrency";
 import { usePrivacyStore } from "@/store/privacy";
 
-const COLORS = ["#6366f1", "#06b6d4", "#f59e0b", "#10b981", "#f43f5e", "#8b5cf6"];
+const COLORS = [
+  "var(--color-brand-accent)",
+  "var(--color-brand-sage)",
+  "var(--color-brand-mid)",
+  "var(--color-brand-danger)",
+  "var(--color-muted-foreground)",
+  "var(--color-brand-deep)",
+];
 
 function formatCompact(value: number): string {
   if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
