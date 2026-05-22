@@ -56,7 +56,7 @@ export default function OverviewPage() {
           <PerformanceChart />
         </div>
         <div className="lg:col-span-2 bg-card card-surface rounded-2xl border border-border p-5 overflow-hidden">
-          <AllocationDonut allocation={allocation} />
+          <AllocationDonut allocation={allocation} sectorAllocation={[]} />
         </div>
       </div>
 

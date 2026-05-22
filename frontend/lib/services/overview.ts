@@ -15,6 +15,12 @@ export interface AllocationItem {
   pct: string;
 }
 
+export interface SectorAllocationItem {
+  sector: string;
+  value: string;
+  pct: string;
+}
+
 export interface PerformancePoint {
   date: string;
   value: string;
@@ -48,6 +54,18 @@ export async function fetchOverviewSummary(): Promise<OverviewSummary> {
 export async function fetchAllocation(): Promise<AllocationItem[]> {
   const res = await api.get("/api/v1/overview/allocation");
   if (!res.ok) throw new Error("Failed to fetch allocation");
+  return res.json();
+}
+
+export async function fetchSectorAllocation(): Promise<SectorAllocationItem[]> {
+  const res = await api.get("/api/v1/overview/allocation/sector");
+  if (!res.ok) throw new Error("Failed to fetch sector allocation");
+  return res.json();
+}
+
+export async function triggerEnrichMetadata(): Promise<{ enriched: number; total: number }> {
+  const res = await api.post("/api/v1/assets/enrich-metadata", null);
+  if (!res.ok) throw new Error("Failed to enrich metadata");
   return res.json();
 }
 

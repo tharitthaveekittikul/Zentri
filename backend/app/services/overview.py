@@ -147,6 +147,51 @@ async def get_allocation(db: AsyncSession, user_id: uuid.UUID, target_currency: 
     return [{"asset_type": k, "value": v, "pct": v / total * 100} for k, v in by_type.items()]
 
 
+async def get_sector_allocation(db: AsyncSession, user_id: uuid.UUID, target_currency: str = "USD") -> list[dict]:
+    holdings = list((await db.execute(
+        select(Holding).where(Holding.user_id == user_id)
+    )).scalars().all())
+
+    by_sector: dict[str, Decimal] = {}
+
+    for h in holdings:
+        latest = await _latest_price(db, h.asset_id)
+        if not latest:
+            continue
+        asset = (await db.execute(
+            select(Asset).where(Asset.id == h.asset_id)
+        )).scalar_one_or_none()
+        if not asset:
+            continue
+        sector = asset.sector or asset.asset_type.replace("_", " ").title()
+        value_native = h.quantity * latest.close
+        rate = await fx_service.get_rate(db, asset.currency, target_currency)
+        value_converted = value_native * rate if rate else value_native
+        by_sector[sector] = by_sector.get(sector, Decimal("0")) + value_converted
+
+    cash_assets = list((await db.execute(
+        select(Asset).where(Asset.user_id == user_id, Asset.asset_type == "cash")
+    )).scalars().all())
+
+    for ca in cash_assets:
+        snap_result = await db.execute(
+            select(CashBalance)
+            .where(CashBalance.asset_id == ca.id, CashBalance.user_id == user_id)
+            .order_by(CashBalance.snapshot_date.desc())
+            .limit(1)
+        )
+        snap = snap_result.scalar_one_or_none()
+        if snap:
+            balance = Decimal(str(snap.balance))
+            rate = await fx_service.get_rate(db, ca.currency, target_currency)
+            balance_converted = balance * rate if rate else balance
+            by_sector["Cash"] = by_sector.get("Cash", Decimal("0")) + balance_converted
+
+    total = sum(by_sector.values()) or Decimal("1")
+    logger.info("SectorAllocation: user=%s sectors=%s", user_id, list(by_sector.keys()))
+    return [{"sector": k, "value": v, "pct": v / total * 100} for k, v in by_sector.items()]
+
+
 async def get_performance(db: AsyncSession, user_id: uuid.UUID, range_: str) -> dict:
     from datetime import date as date_type
     from app.models.transaction import Transaction

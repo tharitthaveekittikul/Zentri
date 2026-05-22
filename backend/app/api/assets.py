@@ -15,6 +15,7 @@ from app.models.user import User
 from app.schemas.asset import AssetCreate, AssetResponse, AssetUpdate, CoinGeckoMatch
 from app.schemas.price import PriceBar, PriceHistoryResponse
 from app.services import asset as asset_service
+from app.services.asset_enrichment import enrich_assets
 from app.services.th_fund import search_th_funds
 
 router = APIRouter(prefix="/assets", tags=["assets"])
@@ -228,6 +229,14 @@ async def search_coingecko(
         )
         for c in coins
     ]
+
+
+@router.post("/enrich-metadata")
+async def enrich_asset_metadata(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    return await enrich_assets(db, current_user.id)
 
 
 @router.get("/{asset_id}", response_model=AssetResponse)

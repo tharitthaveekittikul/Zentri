@@ -1,7 +1,7 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { fetchOverviewSummary, fetchAllocation } from "@/lib/services/overview";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchOverviewSummary, fetchAllocation, fetchSectorAllocation, triggerEnrichMetadata } from "@/lib/services/overview";
 import { KpiCards } from "@/components/overview/KpiCards";
 import { PerformanceChart } from "@/components/overview/PerformanceChart";
 import { AllocationDonut } from "@/components/overview/AllocationDonut";
@@ -25,6 +25,20 @@ export default function OverviewPage() {
     refetchInterval: 60_000,
   });
 
+  const queryClient = useQueryClient();
+
+  const { data: sectorAllocation = [] } = useQuery({
+    queryKey: ["overview", "allocation", "sector"],
+    queryFn: fetchSectorAllocation,
+  });
+
+  const enrichMutation = useMutation({
+    mutationFn: triggerEnrichMetadata,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["overview", "allocation", "sector"] });
+    },
+  });
+
   return (
     <div className="flex flex-col gap-6 max-w-7xl mx-auto">
       <PageHeader title="Overview" />
@@ -44,8 +58,15 @@ export default function OverviewPage() {
         <div className="lg:col-span-3 bg-card card-surface rounded-2xl p-5 overflow-hidden">
           <PerformanceChart />
         </div>
-        <div className="lg:col-span-2 bg-card card-surface rounded-2xl p-5 overflow-hidden">
-          <AllocationDonut allocation={allocation} />
+        <div className="lg:col-span-2 bg-card card-surface rounded-2xl p-5 overflow-hidden flex flex-col">
+          <AllocationDonut allocation={allocation} sectorAllocation={sectorAllocation} />
+          <button
+            onClick={() => enrichMutation.mutate()}
+            disabled={enrichMutation.isPending}
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50 self-end mt-1"
+          >
+            {enrichMutation.isPending ? "Updating..." : "Update Sector Data"}
+          </button>
         </div>
       </div>
 

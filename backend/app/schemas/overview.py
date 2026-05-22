@@ -19,6 +19,12 @@ class AllocationItem(BaseModel):
     pct: Decimal
 
 
+class SectorAllocationItem(BaseModel):
+    sector: str
+    value: Decimal
+    pct: Decimal
+
+
 class PerformancePoint(BaseModel):
     date: date
     value: Decimal
