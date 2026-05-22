@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
 
 import httpx
@@ -61,24 +61,31 @@ async def _fetch_usd_to(db: AsyncSession, rate_date: date, to_currency: str) -> 
     if cached is not None:
         return cached
 
-    date_str = rate_date.strftime("%Y-%m-%d")
-    url = _API_URL.format(date=date_str)
-    try:
-        async with httpx.AsyncClient(timeout=10.0) as client:
-            resp = await client.get(url)
-            resp.raise_for_status()
-            data = resp.json()
-            raw_rate = data.get("usd", {}).get(to_currency.lower())
-            if raw_rate is None:
-                logger.warning("exchange_rate: %s not in API response for %s", to_currency, date_str)
+    candidates = [rate_date, rate_date - timedelta(days=1)]
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        for fetch_date in candidates:
+            date_str = fetch_date.strftime("%Y-%m-%d")
+            url = _API_URL.format(date=date_str)
+            try:
+                resp = await client.get(url)
+                if resp.status_code == 404:
+                    logger.info("exchange_rate: %s not published yet, trying previous day", date_str)
+                    continue
+                resp.raise_for_status()
+                data = resp.json()
+                raw_rate = data.get("usd", {}).get(to_currency.lower())
+                if raw_rate is None:
+                    logger.warning("exchange_rate: %s not in API response for %s", to_currency, date_str)
+                    return None
+                rate = Decimal(str(raw_rate))
+                await _cache_rate(db, rate_date, "USD", to_currency, rate)
+                logger.info("exchange_rate: USD→%s=%.6f for %s", to_currency, float(rate), date_str)
+                return rate
+            except Exception as exc:
+                logger.warning("exchange_rate: fetch failed for %s on %s: %s", to_currency, date_str, exc)
                 return None
-            rate = Decimal(str(raw_rate))
-            await _cache_rate(db, rate_date, "USD", to_currency, rate)
-            logger.info("exchange_rate: USD→%s=%.6f for %s", to_currency, float(rate), date_str)
-            return rate
-    except Exception as exc:
-        logger.warning("exchange_rate: fetch failed for %s on %s: %s", to_currency, date_str, exc)
-        return None
+    logger.warning("exchange_rate: no data available for %s or previous day", to_currency)
+    return None
 
 
 # Backward-compat wrappers

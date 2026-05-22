@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
 import httpx
@@ -350,9 +350,10 @@ async def _fetch_th_fund_for_user(
             skipped.append(asset.symbol)
             continue
 
+        start_date = (datetime.now(timezone.utc) - timedelta(days=14)).strftime("%Y-%m-%d")
         params: dict = {
             "proj_id": proj_id,
-            "start_nav_date": today,
+            "start_nav_date": start_date,
             "end_nav_date": today,
             "page_size": 100,
         }
@@ -367,27 +368,33 @@ async def _fetch_th_fund_for_user(
                 params=params,
             )
             if resp.status_code == 204:
-                logger.debug("fetch_th_fund_prices: no NAV for %s on %s (holiday/weekend)", proj_id, today)
+                logger.info("fetch_th_fund_prices: no NAV for %s in last 14 days", proj_id)
                 continue
             resp.raise_for_status()
             data = resp.json()
 
-            for item in data.get("items", []):
-                nav_val = _to_decimal(item.get("last_val"))
-                nav_date_str = item.get("nav_date")
-                if not nav_val or not nav_date_str:
-                    continue
-                nav_dt = datetime.strptime(nav_date_str, "%Y-%m-%d").replace(tzinfo=timezone.utc)
-                rows.append({
-                    "asset_id": asset.id,
-                    "timestamp": nav_dt,
-                    "open": None,
-                    "high": None,
-                    "low": None,
-                    "close": nav_val,
-                    "volume": None,
-                })
-                fetched.append(asset.symbol)
+            valid_items = [
+                item for item in data.get("items", [])
+                if item.get("last_val") and item.get("nav_date")
+            ]
+            if fund_class:
+                valid_items = [i for i in valid_items if i.get("fund_class_name") == fund_class]
+            if not valid_items:
+                continue
+            latest = max(valid_items, key=lambda x: x["nav_date"])
+            nav_val = _to_decimal(latest["last_val"])
+            nav_dt = datetime.strptime(latest["nav_date"], "%Y-%m-%d").replace(tzinfo=timezone.utc)
+            rows.append({
+                "asset_id": asset.id,
+                "timestamp": nav_dt,
+                "open": None,
+                "high": None,
+                "low": None,
+                "close": nav_val,
+                "volume": None,
+            })
+            fetched.append(asset.symbol)
+            logger.debug("fetch_th_fund_prices: %s nav_date=%s last_val=%s", asset.symbol, latest["nav_date"], nav_val)
 
             await asyncio.sleep(0.01)  # 10ms between calls per SEC rate limit guidance
         except Exception as e:
