@@ -64,6 +64,12 @@ async def _fetch_usd_to(db: AsyncSession, rate_date: date, to_currency: str) -> 
     candidates = [rate_date, rate_date - timedelta(days=1)]
     async with httpx.AsyncClient(timeout=10.0) as client:
         for fetch_date in candidates:
+            if fetch_date != rate_date:
+                cached_prev = await _get_cached_rate(db, fetch_date, "USD", to_currency)
+                if cached_prev is not None:
+                    await _cache_rate(db, rate_date, "USD", to_currency, cached_prev)
+                    return cached_prev
+
             date_str = fetch_date.strftime("%Y-%m-%d")
             url = _API_URL.format(date=date_str)
             try:
@@ -76,14 +82,14 @@ async def _fetch_usd_to(db: AsyncSession, rate_date: date, to_currency: str) -> 
                 raw_rate = data.get("usd", {}).get(to_currency.lower())
                 if raw_rate is None:
                     logger.warning("exchange_rate: %s not in API response for %s", to_currency, date_str)
-                    return None
+                    continue
                 rate = Decimal(str(raw_rate))
                 await _cache_rate(db, rate_date, "USD", to_currency, rate)
                 logger.info("exchange_rate: USD→%s=%.6f for %s", to_currency, float(rate), date_str)
                 return rate
             except Exception as exc:
                 logger.warning("exchange_rate: fetch failed for %s on %s: %s", to_currency, date_str, exc)
-                return None
+                continue
     logger.warning("exchange_rate: no data available for %s or previous day", to_currency)
     return None
 
