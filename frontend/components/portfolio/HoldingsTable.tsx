@@ -143,10 +143,13 @@ export function HoldingsTable({
   }
 
   function SortIcon({ isSorted }: { isSorted: false | "asc" | "desc" }) {
-    if (!isSorted)
-      return <ArrowUpDown className="ml-1 h-3 w-3 inline opacity-40" />;
-    if (isSorted === "asc") return <ArrowUp className="ml-1 h-3 w-3 inline" />;
-    return <ArrowDown className="ml-1 h-3 w-3 inline" />;
+    return !isSorted ? (
+      <ArrowUpDown className="ml-1 h-3 w-3 inline opacity-40" />
+    ) : isSorted === "asc" ? (
+      <ArrowUp className="ml-1 h-3 w-3 inline" />
+    ) : (
+      <ArrowDown className="ml-1 h-3 w-3 inline" />
+    );
   }
 
   const columns: ColumnDef<HoldingRow>[] = [
@@ -207,6 +210,7 @@ export function HoldingsTable({
     {
       accessorKey: "outstanding_shares",
       sortingFn: "alphanumeric",
+      meta: { className: "hidden md:table-cell" },
       header: ({ column }) => (
         <Button
           variant="ghost"
@@ -225,6 +229,7 @@ export function HoldingsTable({
     {
       accessorKey: "cost_per_share",
       sortingFn: "alphanumeric",
+      meta: { className: "hidden md:table-cell" },
       header: ({ column }) => (
         <Button
           variant="ghost"
@@ -250,6 +255,7 @@ export function HoldingsTable({
     {
       accessorKey: "total_cost",
       sortingFn: "alphanumeric",
+      meta: { className: "hidden md:table-cell" },
       header: ({ column }) => (
         <Button
           variant="ghost"
@@ -296,6 +302,7 @@ export function HoldingsTable({
     },
     {
       accessorKey: "price_1d_change",
+      meta: { className: "hidden md:table-cell" },
       header: () => (
         <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
           1D Change
@@ -520,11 +527,20 @@ export function HoldingsTable({
           className={`overflow-x-auto transition-opacity ${isFetching ? "opacity-60" : ""}`}
         >
           <Table>
-            <TableHeader>
+            <TableHeader
+              className="sticky top-0 z-10"
+              style={{
+                background: 'var(--card)',
+                borderBottom: '1px solid var(--border)',
+              }}
+            >
               {table.getHeaderGroups().map((hg) => (
                 <TableRow key={hg.id}>
                   {hg.headers.map((h) => (
-                    <TableHead key={h.id}>
+                    <TableHead
+                      key={h.id}
+                      className={(h.column.columnDef.meta as { className?: string } | undefined)?.className}
+                    >
                       {flexRender(h.column.columnDef.header, h.getContext())}
                     </TableHead>
                   ))}
@@ -533,13 +549,16 @@ export function HoldingsTable({
             </TableHeader>
             <TableBody>
               {table.getRowModel().rows.length > 0 ? (
-                table.getRowModel().rows.map((row) => (
+                table.getRowModel().rows.map((row, index) => (
                   <TableRow
                     key={row.id}
-                    className="hover:bg-muted/40 transition-colors duration-150"
+                    className="hover:bg-muted/50 transition-colors"
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
+                      <TableCell
+                        key={cell.id}
+                        className={(cell.column.columnDef.meta as { className?: string } | undefined)?.className}
+                      >
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext(),

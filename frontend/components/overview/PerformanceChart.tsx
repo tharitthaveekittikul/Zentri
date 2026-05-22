@@ -18,6 +18,33 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 const RANGES = ["1W", "1M", "3M", "1Y"] as const;
 type Range = (typeof RANGES)[number];
 
+function CustomTooltip({ active, payload, label }: {
+  active?: boolean;
+  payload?: Array<{ value: string; name: string; color: string }>;
+  label?: string;
+}) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div
+      className="rounded-xl px-3 py-2 text-xs"
+      style={{
+        background: 'var(--glass-bg)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        border: '1px solid var(--glass-border)',
+        boxShadow: '0 4px 16px oklch(0 0 0 / 20%)',
+      }}
+    >
+      <p className="font-medium text-foreground mb-1">{label}</p>
+      {payload.map((p) => (
+        <p key={p.name} style={{ color: p.color }}>
+          {p.name}: {p.value}
+        </p>
+      ))}
+    </div>
+  );
+}
+
 export const PerformanceChart = memo(function PerformanceChart() {
   const [range, setRange] = useState<Range>("1M");
 
@@ -52,31 +79,39 @@ export const PerformanceChart = memo(function PerformanceChart() {
           <span className="text-xs">No performance data yet</span>
         </div>
       ) : (
-        <ResponsiveContainer width="100%" height={208}>
-          <LineChart data={combined}>
-            <XAxis dataKey="date" tick={{ fontSize: 10 }} tickLine={false} />
-            <YAxis tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
-            <Tooltip formatter={(v) => `${Number(v).toFixed(1)}`} />
-            <Legend wrapperStyle={{ fontSize: 11 }} />
-            <Line
-              type="monotone"
-              dataKey="portfolio"
-              stroke="var(--color-brand-accent)"
-              dot={false}
-              strokeWidth={2}
-              name="Portfolio"
-            />
-            <Line
-              type="monotone"
-              dataKey="benchmark"
-              stroke="var(--color-muted-foreground)"
-              dot={false}
-              strokeWidth={1.5}
-              name="S&P500"
-              strokeDasharray="4 2"
-            />
-          </LineChart>
-        </ResponsiveContainer>
+        <div style={{ animation: 'card-in 500ms var(--motion-smooth) 200ms both' }}>
+          <ResponsiveContainer width="100%" height={208}>
+            <LineChart data={combined}>
+              <XAxis dataKey="date" tick={{ fontSize: 10 }} tickLine={false} />
+              <YAxis tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
+              <Line
+                type="monotone"
+                dataKey="portfolio"
+                stroke="var(--color-brand-accent)"
+                dot={false}
+                strokeWidth={2}
+                name="Portfolio"
+                isAnimationActive={true}
+                animationDuration={1000}
+                animationEasing="ease-out"
+              />
+              <Line
+                type="monotone"
+                dataKey="benchmark"
+                stroke="var(--color-muted-foreground)"
+                dot={false}
+                strokeWidth={1.5}
+                name="S&P500"
+                strokeDasharray="4 2"
+                isAnimationActive={true}
+                animationDuration={1200}
+                animationEasing="ease-out"
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
       )}
     </div>
   );

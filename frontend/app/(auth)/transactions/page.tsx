@@ -51,10 +51,12 @@ const TYPE_COLORS: Record<string, string> = {
   transfer: "bg-muted text-muted-foreground",
 };
 
+const DEBIT_TYPES = new Set(["sell", "fee"]);
+const NEUTRAL_TYPES = new Set(["transfer"]);
+
 export default function TransactionsPage() {
   const { formatNative } = useDualCurrency();
   const { get, getInt, setParam } = useTableParams();
-
   const [data, setData] = useState<PaginatedResponse<TransactionRow>>({
     items: [],
     total: 0,
@@ -256,15 +258,21 @@ export default function TransactionsPage() {
             }`}
           >
             <Table>
-              <TableHeader>
+              <TableHeader
+                className="sticky top-0 z-10"
+                style={{
+                  background: 'var(--card)',
+                  borderBottom: '1px solid var(--border)',
+                }}
+              >
                 <TableRow>
                   <TableHead>Date</TableHead>
                   <TableHead>Asset</TableHead>
                   <TableHead>Type</TableHead>
-                  <TableHead className="text-right">Quantity</TableHead>
+                  <TableHead className="hidden md:table-cell text-right">Quantity</TableHead>
                   <TableHead className="text-right">Price</TableHead>
-                  <TableHead className="text-right">Fee</TableHead>
-                  <TableHead>Platform</TableHead>
+                  <TableHead className="hidden md:table-cell text-right">Fee</TableHead>
+                  <TableHead className="hidden md:table-cell">Platform</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -279,62 +287,80 @@ export default function TransactionsPage() {
                     </TableCell>
                   </TableRow>
                 )}
-                {data.items.map((tx) => (
-                  <TableRow key={tx.id}>
-                    <TableCell className="text-sm">
-                      {new Date(tx.executed_at).toLocaleDateString("en-GB")}
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      <div className="flex items-center gap-2">
-                        <TickerLogo symbol={tx.symbol} logoUrl={tx.metadata_?.logo_url as string | undefined} />
-                        <span>{tx.symbol}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                          TYPE_COLORS[tx.type] ?? "bg-gray-100 text-gray-800"
-                        }`}
-                      >
-                        {tx.type}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {parseFloat(tx.quantity).toLocaleString()}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DualCurrencyAmount
-                        value={formatNative(tx.price, tx.currency ?? "USD")}
-                      />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DualCurrencyAmount
-                        value={formatNative(tx.fee, tx.currency ?? "USD")}
-                      />
-                    </TableCell>
-                    <TableCell className="text-muted-foreground text-sm">
-                      {tx.platform ?? "—"}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => openEdit(tx)}
+                {data.items.map((tx) => {
+                  const isDebit = DEBIT_TYPES.has(tx.type);
+                  const isNeutral = NEUTRAL_TYPES.has(tx.type);
+                  const priceColor = isNeutral
+                    ? 'var(--muted-foreground)'
+                    : isDebit
+                    ? 'var(--brand-danger)'
+                    : 'var(--brand-sage)';
+                  return (
+                    <TableRow
+                      key={tx.id}
+                      className="hover:bg-muted/50 transition-colors"
+                    >
+                      <TableCell className="text-sm">
+                        {new Date(tx.executed_at).toLocaleDateString("en-GB")}
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          <TickerLogo symbol={tx.symbol} logoUrl={tx.metadata_?.logo_url as string | undefined} />
+                          <span>{tx.symbol}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <span
+                          className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                            TYPE_COLORS[tx.type] ?? "bg-gray-100 text-gray-800"
+                          }`}
                         >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setDeleteTarget(tx)}
+                          {tx.type}
+                        </span>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell text-right">
+                        {parseFloat(tx.quantity).toLocaleString()}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <span
+                          className="font-mono tabular-nums text-sm"
+                          style={{ color: priceColor, opacity: 0.7 }}
                         >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                          {isNeutral ? '' : isDebit ? '−' : '+'}
+                          <DualCurrencyAmount
+                            value={formatNative(tx.price, tx.currency ?? "USD")}
+                          />
+                        </span>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell text-right">
+                        <DualCurrencyAmount
+                          value={formatNative(tx.fee, tx.currency ?? "USD")}
+                        />
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell text-muted-foreground text-sm">
+                        {tx.platform ?? "—"}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => openEdit(tx)}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setDeleteTarget(tx)}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </div>

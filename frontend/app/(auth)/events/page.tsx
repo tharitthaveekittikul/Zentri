@@ -108,54 +108,56 @@ function CalendarGrid({
   }, [firstDay, daysInMonth]);
 
   return (
-    <div className="overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-2 border-b bg-muted/30">
-        <Button variant="ghost" size="icon" onClick={prev}><ChevronLeft className="h-4 w-4" /></Button>
-        <span className="font-semibold text-sm">
-          {MONTH_NAMES[viewMonth]} {viewYear}
-          {isCurrentMonth && <span className="ml-2 text-xs text-muted-foreground">(current)</span>}
-        </span>
-        <Button variant="ghost" size="icon" onClick={next}><ChevronRight className="h-4 w-4" /></Button>
-      </div>
-      <div className="grid grid-cols-7 text-xs text-center text-muted-foreground border-b">
-        {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map((d) => (
-          <div key={d} className="py-1">{d}</div>
-        ))}
-      </div>
-      <div className="grid grid-cols-7">
-        {cells.map((day, i) => (
-          <div
-            key={i}
-            className={`min-h-[72px] border-b border-r p-1 text-xs ${!day ? "bg-muted/10" : ""} ${
-              day === today.getDate() && isCurrentMonth ? "bg-brand-accent/10 ring-1 ring-inset ring-brand-accent/30" : ""
-            }`}
-          >
-            {day && (
-              <>
-                <div className="text-muted-foreground mb-1">{day}</div>
-                {(byDay[day] || []).map((ev) => (
-                  <div
-                    key={ev.id}
-                    onClick={() =>
-                      ev.event_type === "dividend"
-                        ? onSelectDividend(ev as DividendCalendarEvent)
-                        : onSelectIpo(ev as IpoCalendarEvent)
-                    }
-                    className={`truncate rounded px-1 py-0.5 mb-0.5 cursor-pointer text-[10px] font-medium flex items-center gap-0.5 ${
-                      ev.event_type === "dividend"
-                        ? "[background:var(--signal-gain-bg)] [color:var(--signal-gain-text)]"
-                        : "bg-muted text-muted-foreground"
-                    }`}
-                  >
-                    {ev.is_in_watchlist && <span>★</span>}
-                    <TickerLogo symbol={ev.symbol} logoUrl={ev.metadata_?.logo_url as string | undefined} size={16} />
-                    {ev.symbol}
-                  </div>
-                ))}
-              </>
-            )}
-          </div>
-        ))}
+    <div className="overflow-x-auto">
+      <div className="min-w-[476px]">
+        <div className="flex items-center justify-between px-4 py-2 border-b bg-muted/30">
+          <Button variant="ghost" size="icon" onClick={prev}><ChevronLeft className="h-4 w-4" /></Button>
+          <span className="font-semibold text-sm">
+            {MONTH_NAMES[viewMonth]} {viewYear}
+            {isCurrentMonth && <span className="ml-2 text-xs text-muted-foreground">(current)</span>}
+          </span>
+          <Button variant="ghost" size="icon" onClick={next}><ChevronRight className="h-4 w-4" /></Button>
+        </div>
+        <div className="grid grid-cols-7 text-xs text-center text-muted-foreground border-b">
+          {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map((d) => (
+            <div key={d} className="py-1">{d}</div>
+          ))}
+        </div>
+        <div className="grid grid-cols-7">
+          {cells.map((day, i) => (
+            <div
+              key={i}
+              className={`min-h-[72px] border-b border-r p-1 text-xs ${!day ? "bg-muted/10" : ""} ${
+                day === today.getDate() && isCurrentMonth ? "bg-brand-accent/10 ring-1 ring-inset ring-brand-accent/30" : ""
+              }`}
+            >
+              {day && (
+                <>
+                  <div className="text-muted-foreground mb-1">{day}</div>
+                  {(byDay[day] || []).map((ev) => (
+                    <div
+                      key={ev.id}
+                      onClick={() =>
+                        ev.event_type === "dividend"
+                          ? onSelectDividend(ev as DividendCalendarEvent)
+                          : onSelectIpo(ev as IpoCalendarEvent)
+                      }
+                      className={`truncate rounded px-1 py-0.5 mb-0.5 cursor-pointer text-[10px] font-medium flex items-center gap-0.5 ${
+                        ev.event_type === "dividend"
+                          ? "[background:var(--signal-gain-bg)] [color:var(--signal-gain-text)]"
+                          : "bg-muted text-muted-foreground"
+                      }`}
+                    >
+                      {ev.is_in_watchlist && <span>★</span>}
+                      <TickerLogo symbol={ev.symbol} logoUrl={ev.metadata_?.logo_url as string | undefined} size={16} />
+                      {ev.symbol}
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -415,19 +417,23 @@ export default function EventsPage() {
             <Skeleton className="h-4 w-32" />
             <Skeleton className="h-8 w-8 rounded-full" />
           </div>
-          <div className="grid grid-cols-7 text-xs border-b">
-            {Array.from({ length: 7 }).map((_, i) => (
-              <div key={i} className="py-1 flex justify-center">
-                <Skeleton className="h-3 w-6" />
+          <div className="overflow-x-auto">
+            <div className="min-w-[476px]">
+              <div className="grid grid-cols-7 text-xs border-b">
+                {Array.from({ length: 7 }).map((_, i) => (
+                  <div key={i} className="py-1 flex justify-center">
+                    <Skeleton className="h-3 w-6" />
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-          <div className="grid grid-cols-7">
-            {Array.from({ length: 35 }).map((_, i) => (
-              <div key={i} className="min-h-[72px] border-b border-r p-1">
-                <Skeleton className="h-3 w-4 mb-1" />
+              <div className="grid grid-cols-7">
+                {Array.from({ length: 35 }).map((_, i) => (
+                  <div key={i} className="min-h-[72px] border-b border-r p-1">
+                    <Skeleton className="h-3 w-4 mb-1" />
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
         </div>
       ) : (

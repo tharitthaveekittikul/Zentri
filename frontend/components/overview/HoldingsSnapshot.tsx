@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { DualCurrencyAmount } from "@/components/ui/DualCurrencyAmount";
@@ -21,6 +22,11 @@ interface Props {
 export function HoldingsSnapshot({ holdings }: Props) {
   const router = useRouter();
   const { format } = useDualCurrency();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 50);
+    return () => clearTimeout(t);
+  }, []);
 
   return (
     <div className="bg-card card-surface rounded-2xl border border-border overflow-hidden">
@@ -37,13 +43,19 @@ export function HoldingsSnapshot({ holdings }: Props) {
           </tr>
         </thead>
         <tbody>
-          {holdings.map((h) => {
+          {holdings.map((h, index) => {
             const value = format(h.current_value);
             const cost = format(h.cost_basis);
             return (
               <tr
                 key={h.symbol}
                 className="border-t border-border hover:bg-muted/40 cursor-pointer transition-colors duration-150"
+                style={{
+                  animation: mounted
+                    ? `card-in 300ms var(--motion-smooth) ${index * 40}ms both`
+                    : undefined,
+                  opacity: mounted ? undefined : 0,
+                }}
                 onClick={() => router.push(`/portfolio/${h.symbol}`)}
               >
                 <td className="px-4 py-2.5 font-mono font-semibold">{h.symbol}</td>

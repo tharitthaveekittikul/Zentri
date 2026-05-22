@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Bell,
@@ -58,7 +58,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { TickerLogo } from "@/components/ui/TickerLogo";
-import { useDualCurrency } from "@/hooks/useDualCurrency";
+import { useDualCurrency, type DualValue } from "@/hooks/useDualCurrency";
 import { DualCurrencyAmount } from "@/components/ui/DualCurrencyAmount";
 import { useTableParams } from "@/hooks/useTableParams";
 import type { PaginatedResponse } from "@/lib/types";
@@ -187,6 +187,162 @@ function AddDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function WatchlistRow({
+  item,
+  formatNative,
+  scanningId,
+  onScan,
+  onApplyPrice,
+  onToggleAlert,
+  onDelete,
+}: {
+  item: WatchlistItem;
+  formatNative: (value: string | number, nativeCurrency: string) => DualValue;
+  scanningId: string | null;
+  onScan: (id: string) => void;
+  onApplyPrice: (item: WatchlistItem) => void;
+  onToggleAlert: (item: WatchlistItem) => void;
+  onDelete: (id: string) => void;
+}) {
+  const prevPriceRef = useRef(item.current_price);
+  const [pulsing, setPulsing] = useState(false);
+
+  useEffect(() => {
+    if (prevPriceRef.current !== item.current_price) {
+      prevPriceRef.current = item.current_price;
+      setPulsing(true);
+      const t = setTimeout(() => setPulsing(false), 400);
+      return () => clearTimeout(t);
+    }
+  }, [item.current_price]);
+
+  return (
+    <TableRow
+      key={item.id}
+      className="hover:bg-muted/50 transition-colors"
+    >
+      <TableCell>
+        <div className="flex items-center gap-2">
+          <TickerLogo symbol={item.asset.symbol} logoUrl={item.asset.metadata_?.logo_url as string | undefined} />
+          <span className="font-medium">{item.asset.symbol}</span>
+        </div>
+        <div className="text-xs text-muted-foreground">
+          {item.asset.name}
+        </div>
+      </TableCell>
+      <TableCell className="text-right">
+        <span
+          style={{
+            display: 'inline-block',
+            transition: 'transform 300ms var(--motion-spring)',
+            transform: pulsing ? 'scale(1.15)' : 'scale(1)',
+          }}
+        >
+          {item.current_price
+            ? <DualCurrencyAmount
+                value={formatNative(item.current_price, item.currency)}
+              />
+            : "—"}
+        </span>
+      </TableCell>
+      <TableCell className="hidden md:table-cell text-right">
+        {item.target_price
+          ? <DualCurrencyAmount
+              value={formatNative(item.target_price, item.currency)}
+            />
+          : "—"}
+      </TableCell>
+      <TableCell className="hidden md:table-cell text-right">
+        {item.pct_from_target !== null ? (
+          <span
+            className={
+              item.pct_from_target <= 0
+                ? "text-green-600"
+                : "text-muted-foreground"
+            }
+          >
+            {item.pct_from_target > 0 ? "+" : ""}
+            {item.pct_from_target.toFixed(1)}%
+          </span>
+        ) : (
+          "—"
+        )}
+      </TableCell>
+      <TableCell>
+        {item.last_verdict ? (
+          <span
+            className={`text-xs font-medium px-2 py-1 rounded-full ${VERDICT_STYLE[item.last_verdict]}`}
+          >
+            {item.last_verdict}
+          </span>
+        ) : (
+          <span className="text-muted-foreground text-xs">—</span>
+        )}
+      </TableCell>
+      <TableCell className="hidden md:table-cell text-right">
+        {item.ai_suggested_price
+          ? <DualCurrencyAmount
+              value={formatNative(item.ai_suggested_price, item.currency ?? "USD")}
+            />
+          : "—"}
+      </TableCell>
+      <TableCell className="hidden md:table-cell text-xs text-muted-foreground">
+        {item.last_scanned_at
+          ? new Date(item.last_scanned_at).toLocaleDateString("en-GB")
+          : "Never"}
+      </TableCell>
+      <TableCell>
+        <div className="flex justify-end gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            title="Scan"
+            disabled={scanningId === item.id}
+            onClick={() => onScan(item.id)}
+          >
+            <Scan
+              className={`h-4 w-4 ${scanningId === item.id ? "animate-pulse" : ""}`}
+            />
+          </Button>
+          {item.ai_suggested_price && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs h-8 px-2"
+              title="Apply AI price as target alert"
+              onClick={() => onApplyPrice(item)}
+            >
+              Apply
+            </Button>
+          )}
+          <Button
+            variant="ghost"
+            size="icon"
+            title={
+              item.alert_enabled ? "Disable alert" : "Enable alert"
+            }
+            onClick={() => onToggleAlert(item)}
+          >
+            {item.alert_enabled ? (
+              <Bell className="h-4 w-4 text-blue-500" />
+            ) : (
+              <BellOff className="h-4 w-4 text-muted-foreground" />
+            )}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            title="Remove"
+            onClick={() => onDelete(item.id)}
+          >
+            <Trash2 className="h-4 w-4 text-destructive" />
+          </Button>
+        </div>
+      </TableCell>
+    </TableRow>
   );
 }
 
@@ -392,7 +548,7 @@ export default function WatchlistPage() {
             </Select>
           </div>
           {/* Right: Scan All, Discover New, Add buttons */}
-          <div className="flex flex-wrap gap-2 shrink-0">
+          <div className="flex flex-wrap gap-2">
             <Button
               variant="outline"
               size="sm"
@@ -446,132 +602,36 @@ export default function WatchlistPage() {
         ) : (
           <div className="overflow-x-auto">
             <Table>
-              <TableHeader>
+              <TableHeader
+                className="sticky top-0 z-10"
+                style={{
+                  background: 'var(--card)',
+                  borderBottom: '1px solid var(--border)',
+                }}
+              >
                 <TableRow>
                   <TableHead>Ticker</TableHead>
                   <TableHead className="text-right">Price</TableHead>
-                  <TableHead className="text-right">Target</TableHead>
-                  <TableHead className="text-right">% to Target</TableHead>
+                  <TableHead className="hidden md:table-cell text-right">Target</TableHead>
+                  <TableHead className="hidden md:table-cell text-right">% to Target</TableHead>
                   <TableHead>AI Verdict</TableHead>
-                  <TableHead className="text-right">AI Price</TableHead>
-                  <TableHead>Last Scanned</TableHead>
+                  <TableHead className="hidden md:table-cell text-right">AI Price</TableHead>
+                  <TableHead className="hidden md:table-cell">Last Scanned</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {itemsPage.items.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <TickerLogo symbol={item.asset.symbol} logoUrl={item.asset.metadata_?.logo_url as string | undefined} />
-                        <span className="font-medium">{item.asset.symbol}</span>
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {item.asset.name}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {item.current_price
-                        ? <DualCurrencyAmount
-                            value={formatNative(item.current_price, item.currency)}
-                          />
-                        : "—"}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {item.target_price
-                        ? <DualCurrencyAmount
-                            value={formatNative(item.target_price, item.currency)}
-                          />
-                        : "—"}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {item.pct_from_target !== null ? (
-                        <span
-                          className={
-                            item.pct_from_target <= 0
-                              ? "text-green-600"
-                              : "text-muted-foreground"
-                          }
-                        >
-                          {item.pct_from_target > 0 ? "+" : ""}
-                          {item.pct_from_target.toFixed(1)}%
-                        </span>
-                      ) : (
-                        "—"
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {item.last_verdict ? (
-                        <span
-                          className={`text-xs font-medium px-2 py-1 rounded-full ${VERDICT_STYLE[item.last_verdict]}`}
-                        >
-                          {item.last_verdict}
-                        </span>
-                      ) : (
-                        <span className="text-muted-foreground text-xs">—</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {item.ai_suggested_price
-                        ? <DualCurrencyAmount
-                            value={formatNative(item.ai_suggested_price, item.currency ?? "USD")}
-                          />
-                        : "—"}
-                    </TableCell>
-                    <TableCell className="text-xs text-muted-foreground">
-                      {item.last_scanned_at
-                        ? new Date(item.last_scanned_at).toLocaleDateString("en-GB")
-                        : "Never"}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex justify-end gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          title="Scan"
-                          disabled={scanningId === item.id}
-                          onClick={() => handleScanItem(item.id)}
-                        >
-                          <Scan
-                            className={`h-4 w-4 ${scanningId === item.id ? "animate-pulse" : ""}`}
-                          />
-                        </Button>
-                        {item.ai_suggested_price && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-xs h-8 px-2"
-                            title="Apply AI price as target alert"
-                            onClick={() => handleApplyPrice(item)}
-                          >
-                            Apply
-                          </Button>
-                        )}
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          title={
-                            item.alert_enabled ? "Disable alert" : "Enable alert"
-                          }
-                          onClick={() => handleToggleAlert(item)}
-                        >
-                          {item.alert_enabled ? (
-                            <Bell className="h-4 w-4 text-blue-500" />
-                          ) : (
-                            <BellOff className="h-4 w-4 text-muted-foreground" />
-                          )}
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          title="Remove"
-                          onClick={() => handleDelete(item.id)}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
+                  <WatchlistRow
+                    key={item.id}
+                    item={item}
+                    formatNative={formatNative}
+                    scanningId={scanningId}
+                    onScan={handleScanItem}
+                    onApplyPrice={handleApplyPrice}
+                    onToggleAlert={handleToggleAlert}
+                    onDelete={handleDelete}
+                  />
                 ))}
               </TableBody>
             </Table>

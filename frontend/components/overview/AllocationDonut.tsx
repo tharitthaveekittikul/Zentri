@@ -31,6 +31,7 @@ export const AllocationDonut = memo(function AllocationDonut({ allocation, secto
   const { primaryCurrency } = useDualCurrency();
   const { isPrivate } = usePrivacyStore();
   const [tab, setTab] = useState<"type" | "sector">("type");
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const typeData = useMemo(
     () => allocation.map((a) => ({
@@ -99,9 +100,20 @@ export const AllocationDonut = memo(function AllocationDonut({ allocation, secto
                   paddingAngle={2}
                   startAngle={90}
                   endAngle={-270}
+                  isAnimationActive={true}
+                  animationBegin={0}
+                  animationDuration={800}
+                  animationEasing="ease-out"
                 >
                   {data.map((_, i) => (
-                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                    <Cell
+                      key={i}
+                      fill={COLORS[i % COLORS.length]}
+                      opacity={hoveredIndex === null || hoveredIndex === i ? 1 : 0.6}
+                      onMouseEnter={() => setHoveredIndex(i)}
+                      onMouseLeave={() => setHoveredIndex(null)}
+                      style={{ transition: 'opacity 150ms ease', cursor: 'pointer' }}
+                    />
                   ))}
                 </Pie>
                 <Tooltip

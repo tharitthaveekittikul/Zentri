@@ -59,6 +59,11 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* ── Motion tokens ── */
+  --motion-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --motion-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+  --elevation-hover: 0 4px 16px oklch(0 0 0 / 12%), 0 1px 4px oklch(0 0 0 / 8%);
 }
 
 /* Higher specificity (0,1,1) to win over shadcn's :root (0,1,0) */
@@ -260,7 +265,18 @@ html:root.dark {
       background-color 250ms cubic-bezier(0.16, 1, 0.3, 1),
       border-color 200ms cubic-bezier(0.16, 1, 0.3, 1),
       color 200ms cubic-bezier(0.16, 1, 0.3, 1),
-      box-shadow 250ms cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow 250ms cubic-bezier(0.16, 1, 0.3, 1),
+      transform 200ms var(--motion-spring);
+  }
+
+  .card-surface:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--elevation-hover);
+  }
+
+  [data-slot="card"]:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--elevation-hover);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -363,3 +379,25 @@ html:root.dark {
     touch-action: manipulation;
   }
 }
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pnl-pulse-gain {
+  0%, 100% { box-shadow: 0 0 0 1px var(--signal-gain-bg), var(--card-shadow); }
+  50%       { box-shadow: 0 0 0 4px transparent, var(--card-shadow); }
+}
+
+@keyframes pnl-pulse-loss {
+  0%, 100% { box-shadow: 0 0 0 1px var(--signal-loss-bg), var(--card-shadow); }
+  50%       { box-shadow: 0 0 0 4px transparent, var(--card-shadow); }
+}
+

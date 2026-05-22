@@ -55,9 +55,15 @@ function NavItem({
   const isActive = pathname === href;
   return (
     <div className="relative">
-      {isActive && (
-        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-full" style={{ background: 'var(--gradient-brand)' }} />
-      )}
+      <span
+        className="absolute left-0 top-1/2 w-[3px] h-5 rounded-full"
+        style={{
+          background: 'var(--gradient-brand)',
+          transform: `translateY(-50%) scaleY(${isActive ? 1 : 0})`,
+          transformOrigin: 'center',
+          transition: 'transform 200ms var(--motion-spring)',
+        }}
+      />
       <Link
         href={href}
         className={cn(
@@ -66,8 +72,17 @@ function NavItem({
             ? "bg-brand-accent/10 dark:bg-brand-accent/15 text-brand-deep dark:text-brand-sage font-semibold"
             : "text-ink-muted/60 dark:text-ink-muted/60 font-normal hover:text-ink dark:hover:text-ink",
         )}
+        style={{ transition: 'color 150ms ease, background-color 150ms ease' }}
       >
-        <Icon className="h-[18px] w-[18px] shrink-0" strokeWidth={1.2} />
+        <Icon
+          className="h-[18px] w-[18px] shrink-0"
+          strokeWidth={1.2}
+          style={{
+            transition: 'transform 120ms var(--motion-spring)',
+          }}
+          onMouseEnter={(e: React.MouseEvent<SVGElement>) => { (e.currentTarget as SVGElement).style.transform = 'scale(1.08)'; }}
+          onMouseLeave={(e: React.MouseEvent<SVGElement>) => { (e.currentTarget as SVGElement).style.transform = 'scale(1)'; }}
+        />
         {label}
       </Link>
     </div>
@@ -79,8 +94,25 @@ export function Sidebar() {
   return (
     <aside className="hidden md:flex w-72 flex-col h-full py-4 pl-4">
       {/* Single card wrapping logo + nav */}
-      <div className="flex-1 bg-shell dark:bg-shell rounded-[24px] flex flex-col overflow-hidden">
-        <div className="flex items-center gap-4 px-5 h-20 shrink-0">
+      <div
+        className="flex-1 rounded-[24px] flex flex-col overflow-hidden"
+        style={{
+          background: 'var(--glass-bg)',
+          backdropFilter: `blur(var(--glass-blur)) saturate(var(--glass-saturate))`,
+          WebkitBackdropFilter: `blur(var(--glass-blur)) saturate(var(--glass-saturate))`,
+          boxShadow: 'inset 0 1px 0 var(--glass-specular)',
+          border: '1px solid var(--glass-border)',
+        }}
+      >
+        <div className="flex items-center gap-3 px-5 h-20 shrink-0">
+          <div
+            className="shrink-0 rounded-[6px]"
+            style={{
+              width: 24,
+              height: 24,
+              background: 'var(--gradient-brand)',
+            }}
+          />
           <span className="text-base font-semibold tracking-[0.06em] uppercase text-brand-deep dark:text-brand-sage leading-none">
             Zentri
           </span>
@@ -89,7 +121,7 @@ export function Sidebar() {
         <div className="mx-4 h-px bg-slate-200/70 dark:bg-slate-800 shrink-0" />
 
         <nav className="flex-1 flex flex-col py-4 overflow-y-auto">
-          <p className="px-5 mb-2 text-[10px] font-semibold tracking-[0.12em] uppercase text-slate-400/70 dark:text-slate-500">
+          <p className="px-5 mb-2 text-[10px] font-semibold tracking-[0.12em] uppercase text-slate-400/80 dark:text-slate-400">
             Portfolio
           </p>
           <div className="flex flex-col gap-1.5">
@@ -100,7 +132,7 @@ export function Sidebar() {
 
           <div className="my-4 mx-4 h-px bg-slate-100 dark:bg-slate-800" />
 
-          <p className="px-5 mb-2 text-[10px] font-semibold tracking-[0.12em] uppercase text-slate-400/70 dark:text-slate-500">
+          <p className="px-5 mb-2 text-[10px] font-semibold tracking-[0.12em] uppercase text-slate-400/80 dark:text-slate-400">
             Tools
           </p>
           <div className="flex flex-col gap-1.5">
