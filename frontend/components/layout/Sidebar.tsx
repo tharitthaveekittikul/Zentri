@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
   Briefcase,
+  PieChart,
   Star,
   TrendingUp,
   CalendarDays,
@@ -23,6 +24,7 @@ import {
 const navItems = [
   { href: "/overview", label: "Overview", icon: LayoutDashboard },
   { href: "/portfolio", label: "Portfolio", icon: Briefcase },
+  { href: "/allocation", label: "Allocation", icon: PieChart },
   { href: "/watchlist", label: "Watchlist", icon: Star },
   { href: "/chat", label: "Chat", icon: MessageSquare },
   { href: "/net-worth", label: "Net Worth", icon: TrendingUp },
@@ -36,8 +38,8 @@ const navItems = [
   { href: "/settings/backup", label: "Backup", icon: HardDrive },
 ];
 
-const mainNavItems = navItems.slice(0, 5);
-const toolNavItems = navItems.slice(5);
+const mainNavItems = navItems.slice(0, 6);
+const toolNavItems = navItems.slice(6);
 
 function NavItem({
   href,

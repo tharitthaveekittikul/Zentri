@@ -79,3 +79,25 @@ async def test_allocation_includes_cash(auth_client):
     assert resp.status_code == 200
     types = [row["asset_type"] for row in resp.json()]
     assert "cash" in types
+
+
+@pytest.mark.asyncio
+async def test_allocation_holdings_empty(auth_client):
+    res = await auth_client.get("/api/v1/overview/allocation/holdings")
+    assert res.status_code == 200
+    assert res.json() == []
+
+
+@pytest.mark.asyncio
+async def test_allocation_holdings_no_prices(auth_client, asset_with_holding):
+    res = await auth_client.get("/api/v1/overview/allocation/holdings")
+    assert res.status_code == 200
+    assert res.json() == []
+
+
+@pytest.mark.asyncio
+async def test_allocation_holdings_schema_fields(auth_client, asset_with_holding):
+    res = await auth_client.get("/api/v1/overview/allocation/holdings")
+    assert res.status_code == 200
+    data = res.json()
+    assert isinstance(data, list)

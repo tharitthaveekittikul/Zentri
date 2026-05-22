@@ -25,6 +25,15 @@ class SectorAllocationItem(BaseModel):
     pct: Decimal
 
 
+class HoldingAllocationItem(BaseModel):
+    symbol: str
+    name: str
+    sector: str
+    asset_type: str
+    value: Decimal
+    pct_of_total: Decimal
+
+
 class PerformancePoint(BaseModel):
     date: date
     value: Decimal

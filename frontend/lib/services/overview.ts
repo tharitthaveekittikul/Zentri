@@ -21,6 +21,15 @@ export interface SectorAllocationItem {
   pct: string;
 }
 
+export interface HoldingAllocationItem {
+  symbol: string;
+  name: string;
+  sector: string;
+  asset_type: string;
+  value: string;
+  pct_of_total: string;
+}
+
 export interface PerformancePoint {
   date: string;
   value: string;
@@ -60,6 +69,12 @@ export async function fetchAllocation(): Promise<AllocationItem[]> {
 export async function fetchSectorAllocation(): Promise<SectorAllocationItem[]> {
   const res = await api.get("/api/v1/overview/allocation/sector");
   if (!res.ok) throw new Error("Failed to fetch sector allocation");
+  return res.json();
+}
+
+export async function fetchAllocationHoldings(): Promise<HoldingAllocationItem[]> {
+  const res = await api.get("/api/v1/overview/allocation/holdings");
+  if (!res.ok) throw new Error("Failed to fetch allocation holdings");
   return res.json();
 }
 
