@@ -112,7 +112,7 @@ Provide your BUY/SELL/HOLD verdict as JSON."""
                 "cost_thb": cost_thb,
                 "exchange_rate": float(usd_thb) if usd_thb else 0.0,
                 "model": getattr(llm, "model", "unknown"),
-                "provider": type(llm).__name__.replace("Provider", "").lower(),
+                "provider": llm.provider_name,
                 "prompt": user_prompt,
                 "response": resp.content,
             })
@@ -125,7 +125,7 @@ Provide your BUY/SELL/HOLD verdict as JSON."""
                 verdict=parsed["verdict"],
                 target_price=parsed.get("target_price"),
                 reasoning=parsed["reasoning"],
-                provider=type(llm).__name__.replace("Provider", "").lower(),
+                provider=llm.provider_name,
                 model=getattr(llm, "model", "unknown"),
                 tokens_in=resp.tokens_in,
                 tokens_out=resp.tokens_out,

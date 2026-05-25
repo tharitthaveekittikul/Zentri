@@ -28,6 +28,8 @@ class LLMProvider(ABC):
 
 
 class OllamaProvider(LLMProvider):
+    provider_name = "ollama"
+
     def __init__(self, host: str, model: str):
         self.host = host
         self.model = model
@@ -50,6 +52,8 @@ class OllamaProvider(LLMProvider):
 
 
 class OpenAIProvider(LLMProvider):
+    provider_name = "openai"
+
     def __init__(self, api_key: str, model: str):
         self.api_key = api_key
         self.model = model
@@ -67,6 +71,8 @@ class OpenAIProvider(LLMProvider):
 
 
 class ClaudeProvider(LLMProvider):
+    provider_name = "anthropic"
+
     def __init__(self, api_key: str, model: str):
         self.api_key = api_key
         self.model = model
@@ -92,6 +98,8 @@ class ClaudeProvider(LLMProvider):
 
 
 class GeminiProvider(LLMProvider):
+    provider_name = "gemini"
+
     def __init__(self, api_key: str, model: str):
         self.api_key = api_key
         self.model = model

@@ -135,7 +135,7 @@ Provide your top-down analysis as JSON."""
                     db.add(LLMCallLog(
                         user_id=uuid.UUID(user_id),
                         feature_key="top_down_analysis",
-                        provider=type(llm).__name__.replace("Provider", "").lower(),
+                        provider=llm.provider_name,
                         model=getattr(llm, "model", "unknown"),
                         prompt_in=user_prompt,
                         response_out=resp.content,
@@ -162,7 +162,7 @@ Provide your top-down analysis as JSON."""
                 swot_threats=swot["threats"],
                 verdict=parsed["verdict"],
                 target_price=parsed.get("target_price"),
-                provider=type(llm).__name__.replace("Provider", "").lower(),
+                provider=llm.provider_name,
                 model=getattr(llm, "model", "unknown"),
                 tokens_in=resp.tokens_in,
                 tokens_out=resp.tokens_out,
