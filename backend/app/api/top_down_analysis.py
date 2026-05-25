@@ -90,26 +90,89 @@ async def trigger_discover_top_down(
 async def trigger_top_down_analysis(
     symbol: str,
     db: AsyncSession = Depends(get_db),
-    _: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ):
-    result = await db.execute(select(Asset).where(Asset.symbol == symbol.upper()))
+    import asyncio
+    import yfinance as yf
+
+    sym = symbol.upper()
+    is_thai = sym.endswith(".BK")
+    if is_thai:
+        sym = sym[:-3]
+    result = await db.execute(select(Asset).where(Asset.symbol == sym))
     asset = result.scalar_one_or_none()
+
     if not asset:
-        raise HTTPException(status_code=404, detail=f"Asset {symbol} not found")
+        original_sym = symbol.upper()
+
+        def _fetch_quote(s: str, bare: str):
+            try:
+                quotes = yf.Search(s, max_results=10).quotes
+                return next(
+                    (q for q in quotes if (q.get("symbol") or "").upper() in (s, bare)),
+                    None,
+                )
+            except Exception:
+                return None
+
+        match = await asyncio.get_running_loop().run_in_executor(None, _fetch_quote, original_sym, sym)
+        if not match:
+            raise HTTPException(status_code=404, detail=f"Ticker {sym} not found in market data")
+
+        quote_type = (match.get("quoteType") or "").upper()
+        if is_thai:
+            asset_type, currency = "thai_stock", "THB"
+        elif quote_type == "ETF":
+            asset_type, currency = "etf", "USD"
+        else:
+            asset_type, currency = "us_stock", "USD"
+
+        name = match.get("shortname") or match.get("longname") or sym
+        from app.services.asset import create_asset
+        asset = await create_asset(db, current_user.id, sym, asset_type, name, currency)
+        logger.info("auto-created asset for analysis symbol=%s user=%s", sym, current_user.id)
+
+    # Seed current price if no price records exist for this asset
+    from decimal import Decimal
+    from datetime import datetime, timezone
+    from app.models.price import Price
+    from sqlalchemy import func
+
+    price_count = await db.scalar(select(func.count()).select_from(Price).where(Price.asset_id == asset.id))
+    if not price_count:
+        yf_sym = f"{sym}.BK" if is_thai else sym
+
+        def _fetch_price(s: str):
+            try:
+                info = yf.Ticker(s).fast_info
+                price = getattr(info, "last_price", None) or getattr(info, "regular_market_price", None)
+                return float(price) if price else None
+            except Exception:
+                return None
+
+        current_price = await asyncio.get_running_loop().run_in_executor(None, _fetch_price, yf_sym)
+        if current_price:
+            db.add(Price(
+                asset_id=asset.id,
+                timestamp=datetime.now(timezone.utc),
+                close=Decimal(str(current_price)),
+            ))
+            await db.commit()
+            logger.info("seeded price for analysis symbol=%s price=%s", sym, current_price)
 
     job_id = None
     try:
         from arq.connections import RedisSettings, create_pool
         from app.core.config import settings
         redis = await create_pool(RedisSettings.from_dsn(settings.REDIS_URL))
-        job = await redis.enqueue_job("job_run_top_down_analysis", symbol.upper())
+        job = await redis.enqueue_job("job_run_top_down_analysis", sym, user_id=str(current_user.id))
         await redis.aclose()
         job_id = job.job_id if job else None
     except Exception:
         pass
 
-    logger.info("top_down_analysis triggered symbol=%s job_id=%s", symbol, job_id)
-    return {"symbol": symbol.upper(), "job_id": job_id}
+    logger.info("top_down_analysis triggered symbol=%s job_id=%s", sym, job_id)
+    return {"symbol": sym, "job_id": job_id}
 
 
 @router.get("/{symbol}/latest")

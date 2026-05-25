@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { api } from '@/lib/api'
 import { PipelineFlow, PipelineJob } from '@/components/analysis/PipelineFlow'
+import { TickerSearchInput } from '@/components/analysis/TickerSearchInput'
 
 type AnalysisSummary = {
   symbol: string
@@ -36,6 +37,7 @@ export default function AnalysisIndexPage() {
   const [rows, setRows] = useState<AnalysisSummary[]>([])
   const [loading, setLoading] = useState(true)
   const [discovering, setDiscovering] = useState(false)
+  const [showTickerSearch, setShowTickerSearch] = useState(false)
   const [discoveryJob, setDiscoveryJob] = useState<PipelineJob | null>(null)
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
@@ -101,14 +103,27 @@ export default function AnalysisIndexPage() {
         <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">
           Top-Down Analysis
         </h1>
-        <Button
-          onClick={discover}
-          disabled={discovering}
-          className="px-4 py-2 text-sm font-medium"
-        >
-          {discovering ? 'Scanning…' : '⟳ Discover Candidates'}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={() => setShowTickerSearch(v => !v)}
+            variant="outline"
+            className="px-4 py-2 text-sm font-medium"
+          >
+            Analyze Ticker
+          </Button>
+          <Button
+            onClick={discover}
+            disabled={discovering}
+            className="px-4 py-2 text-sm font-medium"
+          >
+            {discovering ? 'Scanning…' : '⟳ Discover Candidates'}
+          </Button>
+        </div>
       </div>
+
+      {showTickerSearch && (
+        <TickerSearchInput onClose={() => setShowTickerSearch(false)} />
+      )}
 
       {(discovering || discoveryJob) && discoveryJob && (
         <PipelineFlow job={discoveryJob} title="Discovery Pipeline" />

@@ -59,6 +59,35 @@ async def search_assets(
     return await asset_service.search_assets(db, current_user.id, q)
 
 
+@router.get("/market-search")
+async def market_search_tickers(
+    q: str = Query(min_length=1),
+    _: User = Depends(get_current_user),
+):
+    import asyncio
+    import yfinance as yf
+
+    def _search(query: str) -> list[dict]:
+        try:
+            results = yf.Search(query, max_results=8).quotes
+            out = []
+            for r in results:
+                symbol = r.get("symbol") or ""
+                if not symbol:
+                    continue
+                out.append({
+                    "symbol": symbol,
+                    "name": r.get("shortname") or r.get("longname") or symbol,
+                    "exchange": r.get("exchange") or "",
+                    "type_display": r.get("quoteType") or "",
+                })
+            return out[:8]
+        except Exception:
+            return []
+
+    return await asyncio.get_running_loop().run_in_executor(None, _search, q)
+
+
 @router.get("/symbol/{symbol}/history", response_model=PriceHistoryResponse)
 async def get_asset_history_by_symbol(
     symbol: str,
