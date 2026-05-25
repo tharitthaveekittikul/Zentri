@@ -338,3 +338,119 @@ async def test_primary_currency_formatted_in_system(mock_gateway_deps_with_user)
     system_arg = mock_adapter.complete.call_args[0][0]
     assert "THB" in system_arg
     assert "{primary_currency}" not in system_arg
+
+
+@pytest.mark.asyncio
+async def test_complete_chat_collects_tool_calls():
+    """complete_chat should populate tool_calls on the result when tools are used."""
+    from unittest.mock import patch, AsyncMock, MagicMock
+    from app.services.llm_gateway import LLMGateway, ToolCall
+    from app.services.llm_service import LLMResponse
+
+    user_id = uuid.uuid4()
+    provider_cfg_id = uuid.uuid4()
+
+    feature_config = _make_feature_config("chat", provider_cfg_id)
+    provider = _make_provider(provider_cfg_id)
+
+    fake_user = FakeUser(currency_primary="USD")
+
+    call_count = [0]
+    async def execute_side_effect(stmt):
+        call_count[0] += 1
+        result = AsyncMock()
+        n = call_count[0]
+        if n == 1:
+            result.scalar_one_or_none = MagicMock(return_value=feature_config)
+        elif n == 2:
+            result.scalar_one_or_none = MagicMock(return_value=provider)
+        elif n == 3:
+            result.scalar_one_or_none = MagicMock(return_value=fake_user)
+        else:
+            result.scalar_one_or_none = MagicMock(return_value=None)
+        return result
+
+    mock_db = AsyncMock()
+    mock_db.execute = AsyncMock(side_effect=execute_side_effect)
+    mock_db.add = MagicMock()
+    mock_db.flush = AsyncMock()
+
+    tool_resp = MagicMock()
+    tool_resp.content = None
+    tool_resp.tool_calls = [ToolCall(id="tc1", name="get_portfolio_summary", arguments={})]
+    tool_resp.tokens_in = 100
+    tool_resp.tokens_out = 50
+    tool_resp.cost_usd = 0.001
+    tool_resp.stop_reason = "tool_use"
+
+    final_resp = MagicMock()
+    final_resp.content = "Your portfolio is worth 500k."
+    final_resp.tool_calls = []
+    final_resp.tokens_in = 120
+    final_resp.tokens_out = 60
+    final_resp.cost_usd = 0.002
+    final_resp.stop_reason = "end_turn"
+
+    mock_adapter = AsyncMock()
+    mock_adapter.complete_with_tools = AsyncMock(side_effect=[tool_resp, final_resp])
+
+    with patch("app.services.llm_gateway._build_adapter", return_value=mock_adapter), \
+         patch("app.services.chat_tools.execute_tool", new=AsyncMock(return_value="Total value: 500000 USD")):
+        gateway = LLMGateway(mock_db)
+        result = await gateway.complete_chat(user_id, [{"role": "user", "content": "What's my portfolio worth?"}])
+
+    assert result.tool_calls == [
+        {"name": "get_portfolio_summary", "args": {}, "result": "Total value: 500000 USD"}
+    ]
+    assert result.content == "Your portfolio is worth 500k."
+
+
+@pytest.mark.asyncio
+async def test_complete_chat_empty_tool_calls_when_no_tools_used():
+    """complete_chat should return empty tool_calls list when LLM answers directly."""
+    from unittest.mock import patch, AsyncMock, MagicMock
+    from app.services.llm_gateway import LLMGateway
+
+    user_id = uuid.uuid4()
+    provider_cfg_id = uuid.uuid4()
+
+    feature_config = _make_feature_config("chat", provider_cfg_id)
+    provider = _make_provider(provider_cfg_id)
+    fake_user = FakeUser(currency_primary="USD")
+
+    call_count = [0]
+    async def execute_side_effect(stmt):
+        call_count[0] += 1
+        result = AsyncMock()
+        n = call_count[0]
+        if n == 1:
+            result.scalar_one_or_none = MagicMock(return_value=feature_config)
+        elif n == 2:
+            result.scalar_one_or_none = MagicMock(return_value=provider)
+        elif n == 3:
+            result.scalar_one_or_none = MagicMock(return_value=fake_user)
+        else:
+            result.scalar_one_or_none = MagicMock(return_value=None)
+        return result
+
+    mock_db = AsyncMock()
+    mock_db.execute = AsyncMock(side_effect=execute_side_effect)
+    mock_db.add = MagicMock()
+    mock_db.flush = AsyncMock()
+
+    final_resp = MagicMock()
+    final_resp.content = "Hello! How can I help?"
+    final_resp.tool_calls = []
+    final_resp.tokens_in = 50
+    final_resp.tokens_out = 20
+    final_resp.cost_usd = 0.0005
+    final_resp.stop_reason = "end_turn"
+
+    mock_adapter = AsyncMock()
+    mock_adapter.complete_with_tools = AsyncMock(return_value=final_resp)
+
+    with patch("app.services.llm_gateway._build_adapter", return_value=mock_adapter):
+        gateway = LLMGateway(mock_db)
+        result = await gateway.complete_chat(user_id, [{"role": "user", "content": "Hi"}])
+
+    assert result.tool_calls == []

@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 import uuid
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 
 import httpx
@@ -42,6 +42,7 @@ class LLMGatewayResult:
     exchange_rate: float
     model: str
     provider: str
+    tool_calls: list[dict] = field(default_factory=list)
 
 
 @dataclass
@@ -867,6 +868,7 @@ class LLMGateway:
         total_cost_usd = 0.0
         final_content = ""
         MAX_TOOL_ROUNDS = 5
+        collected_tool_calls: list[dict] = []
 
         for _ in range(MAX_TOOL_ROUNDS):
             resp = await adapter.complete_with_tools(system, chat_messages, config.model, TOOL_DEFINITIONS)
@@ -890,6 +892,7 @@ class LLMGateway:
             for tc in resp.tool_calls:
                 logger.info("Chat tool call: %s args=%s", tc.name, tc.arguments)
                 tool_result = await execute_tool(tc.name, tc.arguments, self._db, user_id, currency)
+                collected_tool_calls.append({"name": tc.name, "args": tc.arguments, "result": tool_result})
                 chat_messages.append({"role": "tool", "tool_call_id": tc.id, "content": tool_result})
         else:
             final_content = resp.content or "I ran into a loop — please rephrase your question."
@@ -917,6 +920,7 @@ class LLMGateway:
             cost_usd=total_cost_usd, cost_thb=cost_thb,
             exchange_rate=float(usd_thb) if usd_thb else 0.0,
             model=config.model, provider=provider.provider,
+            tool_calls=collected_tool_calls,
         )
 
     async def _get_feature_config(self, feature_key: str, user_id: uuid.UUID) -> FeatureLLMConfig:

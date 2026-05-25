@@ -12,6 +12,8 @@ from app.models.cash_balance import CashBalance
 from app.models.holding import Holding
 from app.models.price import Price
 from app.models.watchlist_item import WatchlistItem
+from app.models.ai_analysis import AIAnalysis
+from app.models.combined_verdict import CombinedVerdict
 from app.services import exchange_rate as fx_service
 
 logger = get_logger(__name__)
@@ -85,6 +87,25 @@ TOOL_DEFINITIONS: list[dict] = [
             "required": ["query"],
         },
     },
+    {
+        "name": "get_symbol_analysis",
+        "description": (
+            "Get the stored AI analysis for a specific ticker symbol, including verdict "
+            "(BUY/SELL/HOLD), conviction score, price targets, bull and bear thesis, and "
+            "key risks. Call this when the user asks about a specific stock or whether to "
+            "buy or sell it."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "symbol": {
+                    "type": "string",
+                    "description": "The ticker symbol, e.g. AAPL, SCB, BTC.",
+                }
+            },
+            "required": ["symbol"],
+        },
+    },
 ]
 
 
@@ -115,6 +136,8 @@ async def execute_tool(
             return await _get_asset_price(db, arguments.get("symbol", ""), currency)
         if name == "search_news":
             return await _search_news(db, arguments.get("query", ""), arguments.get("symbol"))
+        if name == "get_symbol_analysis":
+            return await _get_symbol_analysis(db, arguments.get("symbol", ""), user_id)
         return f"Unknown tool: {name}"
     except Exception as exc:
         logger.warning("Tool %s failed: %s", name, exc)
@@ -263,3 +286,74 @@ async def _get_asset_price(db: AsyncSession, symbol: str, currency: str) -> str:
         + (f" (≈ {price_converted:.2f} {currency})" if asset.currency != currency else "")
         + f"\nAs of: {latest.timestamp.strftime('%Y-%m-%d %H:%M UTC')}"
     )
+
+
+async def _get_symbol_analysis(db: AsyncSession, symbol: str, user_id: uuid.UUID) -> str:
+    if not symbol:
+        return "Symbol is required."
+    sym = symbol.upper()
+    asset = (await db.execute(
+        select(Asset).where(Asset.symbol == sym, Asset.user_id == user_id)
+    )).scalar_one_or_none()
+    if not asset:
+        return f"No analysis found for {sym}."
+
+    verdict = (await db.execute(
+        select(CombinedVerdict)
+        .where(CombinedVerdict.asset_id == asset.id)
+        .order_by(desc(CombinedVerdict.created_at))
+        .limit(1)
+    )).scalar_one_or_none()
+
+    if verdict:
+        lines = [
+            f"{sym} — {verdict.verdict.upper()} (conviction: {verdict.conviction}/10)",
+            f"As of: {verdict.created_at.strftime('%Y-%m-%d')}",
+            "",
+        ]
+        ccy = asset.currency
+        price_parts = []
+        if verdict.entry_price:
+            price_parts.append(f"Entry: {float(verdict.entry_price):.2f} {ccy}")
+        if verdict.target_price:
+            price_parts.append(f"Target: {float(verdict.target_price):.2f} {ccy}")
+        if verdict.stop_loss:
+            price_parts.append(f"Stop: {float(verdict.stop_loss):.2f} {ccy}")
+        if verdict.risk_reward:
+            price_parts.append(f"R/R: {float(verdict.risk_reward):.1f}x")
+        if price_parts:
+            lines.append(" | ".join(price_parts))
+            lines.append("")
+        lines += [
+            "Bull thesis:",
+            verdict.bull_thesis,
+            "",
+            "Bear thesis:",
+            verdict.bear_thesis,
+            "",
+        ]
+        if verdict.key_risks:
+            lines.append("Key risks:")
+            for risk in verdict.key_risks:
+                lines.append(f"- {risk}")
+            lines.append("")
+        lines += ["Reasoning:", verdict.reasoning]
+        if verdict.based_on:
+            lines += ["", f"Based on: {', '.join(verdict.based_on)}"]
+        return "\n".join(lines)
+
+    analysis = (await db.execute(
+        select(AIAnalysis)
+        .where(AIAnalysis.asset_id == asset.id)
+        .order_by(desc(AIAnalysis.created_at))
+        .limit(1)
+    )).scalar_one_or_none()
+
+    if analysis:
+        lines = [f"{sym} — {analysis.verdict.upper()} (AI analysis, no combined verdict)"]
+        if analysis.target_price:
+            lines.append(f"Target price: {float(analysis.target_price):.2f} {asset.currency}")
+        lines += ["Reasoning:", analysis.reasoning, f"As of: {analysis.created_at.strftime('%Y-%m-%d')}"]
+        return "\n".join(lines)
+
+    return f"No analysis found for {sym}."

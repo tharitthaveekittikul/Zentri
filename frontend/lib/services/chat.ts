@@ -1,6 +1,12 @@
 // frontend/lib/services/chat.ts
 import { api } from "@/lib/api";
 
+export interface ToolCallRecord {
+  name: string;
+  args: Record<string, unknown>;
+  result: string;
+}
+
 export interface ChatMessage {
   role: "user" | "assistant";
   content: string;
@@ -14,6 +20,7 @@ export interface ChatMessageWithMeta extends ChatMessage {
   cost_thb?: number;
   model?: string;
   provider?: string;
+  tool_calls?: ToolCallRecord[];
 }
 
 export interface ChatResponse {
@@ -24,6 +31,7 @@ export interface ChatResponse {
   cost_thb: number;
   model: string;
   provider: string;
+  tool_calls: ToolCallRecord[];
 }
 
 export interface ChatSessionSummary {

@@ -39,6 +39,7 @@ class ChatResponse(BaseModel):
     cost_thb: float
     model: str
     provider: str
+    tool_calls: list[dict]
 
 
 class CreateSessionRequest(BaseModel):
@@ -66,6 +67,7 @@ class MessageResponse(BaseModel):
     cost_thb: Optional[float] = None
     model: Optional[str] = None
     provider: Optional[str] = None
+    tool_calls: Optional[list[dict]] = None
     created_at: datetime
 
 
@@ -192,6 +194,7 @@ async def get_session_messages(
             cost_thb=float(m.cost_thb) if m.cost_thb is not None else None,
             model=m.model,
             provider=m.provider,
+            tool_calls=m.tool_calls,
             created_at=m.created_at,
         )
         for m in msgs
@@ -237,6 +240,7 @@ async def chat(
         cost_thb=result.cost_thb,
         model=result.model,
         provider=result.provider,
+        tool_calls=result.tool_calls or None,
     )
     db.add(assistant_msg)
     session.updated_at = datetime.now(timezone.utc)
@@ -250,4 +254,5 @@ async def chat(
         cost_thb=result.cost_thb,
         model=result.model,
         provider=result.provider,
+        tool_calls=result.tool_calls,
     )

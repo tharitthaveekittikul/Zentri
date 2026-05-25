@@ -4,10 +4,11 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
-import { SendIcon, BotIcon, UserIcon, AlertCircleIcon } from "lucide-react";
+import { SendIcon, BotIcon, UserIcon, AlertCircleIcon, ChevronDownIcon, ChevronRightIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   ChatMessageWithMeta,
+  ToolCallRecord,
   sendChatMessage,
   listChatSessions,
   createChatSession,
@@ -57,6 +58,58 @@ function MessageMetaRow({ msg }: { msg: ChatMessageWithMeta }) {
   );
 }
 
+function ToolCallsPanel({ toolCalls }: { toolCalls: ToolCallRecord[] }) {
+  const [open, setOpen] = useState(false);
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+
+  if (!toolCalls || toolCalls.length === 0) return null;
+
+  function formatArgs(args: Record<string, unknown>): string {
+    return Object.entries(args)
+      .map(([k, v]) => `${k}=${JSON.stringify(v)}`)
+      .join(", ");
+  }
+
+  return (
+    <div className="mt-2 border border-border rounded-lg text-xs">
+      <button
+        className="w-full flex items-center gap-1 px-3 py-2 text-muted-foreground hover:text-foreground transition-colors"
+        onClick={() => setOpen((v) => !v)}
+      >
+        {open ? <ChevronDownIcon className="w-3 h-3" /> : <ChevronRightIcon className="w-3 h-3" />}
+        <span>Tools used ({toolCalls.length})</span>
+      </button>
+      {open && (
+        <div className="border-t border-border divide-y divide-border">
+          {toolCalls.map((tc, i) => (
+            <div key={i}>
+              <button
+                className="w-full flex items-center gap-1 px-3 py-2 text-left text-muted-foreground hover:text-foreground transition-colors font-mono"
+                onClick={() => setExpandedIndex(expandedIndex === i ? null : i)}
+              >
+                {expandedIndex === i ? (
+                  <ChevronDownIcon className="w-3 h-3 shrink-0" />
+                ) : (
+                  <ChevronRightIcon className="w-3 h-3 shrink-0" />
+                )}
+                <span>
+                  {tc.name}
+                  {Object.keys(tc.args).length > 0 ? `(${formatArgs(tc.args)})` : "()"}
+                </span>
+              </button>
+              {expandedIndex === i && (
+                <pre className="px-4 py-2 text-xs text-foreground bg-muted whitespace-pre-wrap break-words font-mono">
+                  {tc.result}
+                </pre>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function MessageBubble({ message }: { message: ChatMessageWithMeta }) {
   const isUser = message.role === "user";
   const outOfScope = !isUser && isOutOfScope(message.content);
@@ -74,17 +127,22 @@ function MessageBubble({ message }: { message: ChatMessageWithMeta }) {
       >
         {isUser ? <UserIcon className="size-3.5" /> : <BotIcon className="size-3.5" />}
       </div>
-      <div
-        className={cn(
-          "max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
-          isUser
-            ? "bg-primary text-primary-foreground rounded-tr-sm"
-            : outOfScope
-              ? "bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 rounded-tl-sm"
-              : "bg-muted text-foreground rounded-tl-sm",
+      <div className="flex flex-col max-w-[80%]">
+        <div
+          className={cn(
+            "rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
+            isUser
+              ? "bg-primary text-primary-foreground rounded-tr-sm"
+              : outOfScope
+                ? "bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 rounded-tl-sm"
+                : "bg-muted text-foreground rounded-tl-sm",
+          )}
+        >
+          {displayContent}
+        </div>
+        {!isUser && !outOfScope && message.tool_calls && message.tool_calls.length > 0 && (
+          <ToolCallsPanel toolCalls={message.tool_calls} />
         )}
-      >
-        {displayContent}
       </div>
     </div>
   );
@@ -190,6 +248,7 @@ export default function ChatPage() {
         cost_thb: result.cost_thb,
         model: result.model,
         provider: result.provider,
+        tool_calls: result.tool_calls,
       };
       setMessages((prev) => [...prev, assistantMessage]);
       setSessions((prev) =>
