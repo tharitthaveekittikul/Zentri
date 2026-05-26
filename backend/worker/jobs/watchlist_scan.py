@@ -1,8 +1,6 @@
 import json
 import uuid
 from datetime import datetime, timedelta, timezone
-from decimal import Decimal
-
 from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
@@ -107,8 +105,6 @@ async def job_scan_watchlist_item(ctx: dict, item_id: str, user_id: str) -> dict
             # Step 4: save_suggestion
             step_save = await create_step(db, log.id, "save_suggestion")
             suggested_price = parsed.get("suggested_price")
-            if suggested_price is None and prices:
-                suggested_price = float(prices[0].close)
             analysis = AIAnalysis(
                 asset_id=asset.id,
                 job_id=str(log.id),
@@ -122,8 +118,6 @@ async def job_scan_watchlist_item(ctx: dict, item_id: str, user_id: str) -> dict
                 cost_usd=0,
             )
             db.add(analysis)
-            if suggested_price is not None:
-                item.target_price = Decimal(str(suggested_price))
             await db.commit()
             await finish_step(db, step_save, success=True, metadata={"symbol": asset.symbol, "verdict": parsed["verdict"]})
             await finish_log(db, log, success=True)
