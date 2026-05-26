@@ -26,6 +26,7 @@ class WatchlistItemUpdate(BaseModel):
     target_price: Decimal | None = None
     notes: str | None = None
     alert_enabled: bool | None = None
+    ath_alert_threshold: Decimal | None = None
 
 
 class WatchlistItemOut(BaseModel):
@@ -36,10 +37,13 @@ class WatchlistItemOut(BaseModel):
     notes: str | None
     alert_enabled: bool
     alerted_at: datetime | None
+    ath_alert_threshold: Decimal | None
+    ath_alerted_at: datetime | None
     created_at: datetime
     asset: AssetSummary
     current_price: Decimal | None
     pct_from_target: float | None
+    ath_drop_pct: float | None
     last_verdict: str | None = None
     ai_suggested_price: Decimal | None = None
     last_scanned_at: datetime | None = None

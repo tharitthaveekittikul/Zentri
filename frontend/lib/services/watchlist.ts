@@ -25,6 +25,9 @@ export interface WatchlistItem {
   last_verdict: "BUY" | "SELL" | "HOLD" | null;
   ai_suggested_price: string | null;
   last_scanned_at: string | null;
+  ath_drop_pct: number | null;
+  ath_alert_threshold: string | null;
+  ath_alerted_at: string | null;
 }
 
 export interface WatchlistSuggestion {
@@ -80,6 +83,7 @@ export async function updateWatchlistItem(
     target_price?: string | null;
     notes?: string | null;
     alert_enabled?: boolean;
+    ath_alert_threshold?: string | null;
   },
 ): Promise<WatchlistItem> {
   const r = await api.patch(`/api/v1/watchlist/${id}`, patch);

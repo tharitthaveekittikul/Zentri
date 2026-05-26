@@ -6,6 +6,7 @@ import {
   Bell,
   BellOff,
   Check,
+  Pencil,
   Plus,
   Scan,
   Search,
@@ -69,6 +70,14 @@ const VERDICT_STYLE: Record<string, string> = {
   SELL: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
   HOLD: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
 };
+
+function athDropColor(pct: number | null, threshold: string | null): string {
+  if (pct === null) return "text-muted-foreground";
+  if (threshold !== null && pct >= parseFloat(threshold)) return "text-[var(--signal-gain-text)]";
+  if (pct >= 20) return "text-[var(--color-warning)]";
+  if (pct >= 10) return "text-muted-foreground";
+  return "text-muted-foreground";
+}
 
 type AssetResult = {
   id: string;
@@ -190,6 +199,89 @@ function AddDialog({
   );
 }
 
+function EditItemDialog({
+  item,
+  open,
+  onClose,
+  onSaved,
+}: {
+  item: WatchlistItem | null;
+  open: boolean;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const [targetPrice, setTargetPrice] = useState("");
+  const [athThreshold, setAthThreshold] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (item) {
+      setTargetPrice(item.target_price ?? "");
+      setAthThreshold(item.ath_alert_threshold ?? "");
+    }
+  }, [item]);
+
+  const handleSave = async () => {
+    if (!item) return;
+    setSaving(true);
+    try {
+      await updateWatchlistItem(item.id, {
+        target_price: targetPrice || null,
+        ath_alert_threshold: athThreshold || null,
+      });
+      toast.success("Saved");
+      onSaved();
+      onClose();
+    } catch {
+      toast.error("Failed to save");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Edit {item?.asset.symbol}</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div>
+            <label className="text-xs text-muted-foreground block mb-1">
+              Target price (optional)
+            </label>
+            <Input
+              type="number"
+              placeholder="e.g. 150.00"
+              value={targetPrice}
+              onChange={(e) => setTargetPrice(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground block mb-1">
+              ATH drop alert threshold % (optional, e.g. 20 = alert when down 20% from ATH)
+            </label>
+            <Input
+              type="number"
+              placeholder="e.g. 20"
+              value={athThreshold}
+              onChange={(e) => setAthThreshold(e.target.value)}
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button onClick={handleSave} disabled={saving}>
+            {saving ? "Saving…" : "Save"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 function WatchlistRow({
   item,
   formatNative,
@@ -197,6 +289,7 @@ function WatchlistRow({
   onScan,
   onApplyPrice,
   onToggleAlert,
+  onEdit,
   onDelete,
 }: {
   item: WatchlistItem;
@@ -205,6 +298,7 @@ function WatchlistRow({
   onScan: (id: string) => void;
   onApplyPrice: (item: WatchlistItem) => void;
   onToggleAlert: (item: WatchlistItem) => void;
+  onEdit: (item: WatchlistItem) => void;
   onDelete: (id: string) => void;
 }) {
   const prevPriceRef = useRef(item.current_price);
@@ -271,6 +365,18 @@ function WatchlistRow({
           "—"
         )}
       </TableCell>
+      <TableCell className="hidden md:table-cell text-right">
+        {item.ath_drop_pct !== null ? (
+          <span className={athDropColor(item.ath_drop_pct, item.ath_alert_threshold)}>
+            -{item.ath_drop_pct.toFixed(1)}%
+            {item.ath_alerted_at && (
+              <Bell className="inline ml-1 h-3 w-3" />
+            )}
+          </span>
+        ) : (
+          "—"
+        )}
+      </TableCell>
       <TableCell>
         {item.last_verdict ? (
           <span
@@ -321,6 +427,14 @@ function WatchlistRow({
           <Button
             variant="ghost"
             size="icon"
+            title="Edit"
+            onClick={() => onEdit(item)}
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
             title={
               item.alert_enabled ? "Disable alert" : "Enable alert"
             }
@@ -363,6 +477,7 @@ export default function WatchlistPage() {
   const [discovering, setDiscovering] = useState(false);
   const [scanningId, setScanningId] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
+  const [editItem, setEditItem] = useState<WatchlistItem | null>(null);
   const [llmConfirm, setLlmConfirm] = useState<{ action: "scan" | "discover"; open: boolean }>({ action: "scan", open: false });
 
   const fetchAll = useCallback(async () => {
@@ -476,6 +591,10 @@ export default function WatchlistPage() {
       });
     }
     fetchAll();
+  };
+
+  const handleEdit = (item: WatchlistItem) => {
+    setEditItem(item);
   };
 
   const handleDelete = async (id: string) => {
@@ -614,6 +733,7 @@ export default function WatchlistPage() {
                   <TableHead className="text-right">Price</TableHead>
                   <TableHead className="hidden md:table-cell text-right">Target</TableHead>
                   <TableHead className="hidden md:table-cell text-right">% to Target</TableHead>
+                  <TableHead className="hidden md:table-cell text-right">ATH Drop</TableHead>
                   <TableHead>AI Verdict</TableHead>
                   <TableHead className="hidden md:table-cell text-right">AI Price</TableHead>
                   <TableHead className="hidden md:table-cell">Last Scanned</TableHead>
@@ -630,6 +750,7 @@ export default function WatchlistPage() {
                     onScan={handleScanItem}
                     onApplyPrice={handleApplyPrice}
                     onToggleAlert={handleToggleAlert}
+                    onEdit={handleEdit}
                     onDelete={handleDelete}
                   />
                 ))}
@@ -730,6 +851,13 @@ export default function WatchlistPage() {
         open={addOpen}
         onClose={() => setAddOpen(false)}
         onAdded={fetchAll}
+      />
+
+      <EditItemDialog
+        item={editItem}
+        open={editItem !== null}
+        onClose={() => setEditItem(null)}
+        onSaved={fetchAll}
       />
 
       <ConfirmLLMDialog

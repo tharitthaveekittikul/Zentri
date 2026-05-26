@@ -1,5 +1,6 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
+from decimal import Decimal
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import and_, func, or_, select
@@ -9,6 +10,7 @@ from arq.connections import RedisSettings, create_pool
 
 from app.api.deps import get_current_user
 from app.core.config import settings
+from app.core.constants import ATH_WINDOW_DAYS
 from app.core.database import get_db
 from app.core.logging import get_logger
 from app.models.ai_analysis import AIAnalysis
@@ -74,6 +76,18 @@ async def _item_to_out(db: AsyncSession, item: WatchlistItem) -> WatchlistItemOu
     if current_price is not None and item.target_price:
         pct = float((current_price - item.target_price) / item.target_price * 100)
 
+    since_ath = datetime.now(timezone.utc) - timedelta(days=ATH_WINDOW_DAYS)
+    ath_result = await db.execute(
+        select(func.max(Price.close))
+        .where(Price.asset_id == item.asset_id, Price.timestamp >= since_ath)
+    )
+    ath = ath_result.scalar()
+    ath_drop_pct = None
+    if ath and current_price:
+        ath_drop_pct = float(
+            (Decimal(str(ath)) - Decimal(str(current_price))) / Decimal(str(ath)) * 100
+        )
+
     analysis = (
         await db.execute(
             select(AIAnalysis)
@@ -98,6 +112,9 @@ async def _item_to_out(db: AsyncSession, item: WatchlistItem) -> WatchlistItemOu
         last_verdict=analysis.verdict if analysis else None,
         ai_suggested_price=analysis.target_price if analysis else None,
         last_scanned_at=analysis.created_at if analysis else None,
+        ath_alert_threshold=item.ath_alert_threshold,
+        ath_alerted_at=item.ath_alerted_at,
+        ath_drop_pct=ath_drop_pct,
     )
 
 
@@ -209,6 +226,8 @@ async def update_watchlist_item(
         item.notes = body.notes
     if "alert_enabled" in body.model_fields_set:
         item.alert_enabled = body.alert_enabled
+    if "ath_alert_threshold" in body.model_fields_set:
+        item.ath_alert_threshold = body.ath_alert_threshold
     await db.commit()
     await db.refresh(item)
     return await _item_to_out(db, item)
@@ -233,6 +252,7 @@ async def rearm_watchlist_item(
 ):
     item = await _get_owned_item(db, item_id, current_user.id)
     item.alerted_at = None
+    item.ath_alerted_at = None
     item.alert_enabled = True
     await db.commit()
     await db.refresh(item)

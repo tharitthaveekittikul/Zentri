@@ -20,6 +20,8 @@ class WatchlistItem(Base):
     notes: Mapped[str | None] = mapped_column(Text(), nullable=True)
     alert_enabled: Mapped[bool] = mapped_column(Boolean(), nullable=False, default=True)
     alerted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    ath_alert_threshold: Mapped[Decimal | None] = mapped_column(Numeric(5, 2), nullable=True)
+    ath_alerted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )

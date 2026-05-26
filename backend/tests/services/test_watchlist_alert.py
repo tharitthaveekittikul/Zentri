@@ -49,8 +49,9 @@ async def test_alert_sent_when_price_hits_target():
     mock_db = AsyncMock()
 
     with patch("app.services.watchlist_alert._fetch_pending_rows", return_value=rows):
-        with patch("app.services.watchlist_alert.send_message", new_callable=AsyncMock) as mock_send:
-            count = await check_and_notify(mock_db)
+        with patch("app.services.watchlist_alert._fetch_ath_alert_rows", return_value=[]):
+            with patch("app.services.watchlist_alert.send_message", new_callable=AsyncMock) as mock_send:
+                count = await check_and_notify(mock_db)
 
     assert count == 1
     assert item.alerted_at is not None
@@ -65,8 +66,9 @@ async def test_no_alert_when_price_above_target():
     mock_db = AsyncMock()
 
     with patch("app.services.watchlist_alert._fetch_pending_rows", return_value=rows):
-        with patch("app.services.watchlist_alert.send_message", new_callable=AsyncMock) as mock_send:
-            count = await check_and_notify(mock_db)
+        with patch("app.services.watchlist_alert._fetch_ath_alert_rows", return_value=[]):
+            with patch("app.services.watchlist_alert.send_message", new_callable=AsyncMock) as mock_send:
+                count = await check_and_notify(mock_db)
 
     assert count == 0
     assert item.alerted_at is None
@@ -80,8 +82,9 @@ async def test_no_alert_when_no_telegram_config():
     mock_db = AsyncMock()
 
     with patch("app.services.watchlist_alert._fetch_pending_rows", return_value=rows):
-        with patch("app.services.watchlist_alert.send_message", new_callable=AsyncMock) as mock_send:
-            count = await check_and_notify(mock_db)
+        with patch("app.services.watchlist_alert._fetch_ath_alert_rows", return_value=[]):
+            with patch("app.services.watchlist_alert.send_message", new_callable=AsyncMock) as mock_send:
+                count = await check_and_notify(mock_db)
 
     assert count == 0
     mock_send.assert_not_called()
@@ -94,8 +97,9 @@ async def test_no_alert_when_price_is_none():
     mock_db = AsyncMock()
 
     with patch("app.services.watchlist_alert._fetch_pending_rows", return_value=rows):
-        with patch("app.services.watchlist_alert.send_message", new_callable=AsyncMock) as mock_send:
-            count = await check_and_notify(mock_db)
+        with patch("app.services.watchlist_alert._fetch_ath_alert_rows", return_value=[]):
+            with patch("app.services.watchlist_alert.send_message", new_callable=AsyncMock) as mock_send:
+                count = await check_and_notify(mock_db)
 
     assert count == 0
     mock_send.assert_not_called()
@@ -112,13 +116,112 @@ async def test_continues_after_send_failure():
     mock_db = AsyncMock()
 
     with patch("app.services.watchlist_alert._fetch_pending_rows", return_value=rows):
-        with patch(
-            "app.services.watchlist_alert.send_message",
-            new_callable=AsyncMock,
-            side_effect=[RuntimeError("network error"), None],
-        ):
-            count = await check_and_notify(mock_db)
+        with patch("app.services.watchlist_alert._fetch_ath_alert_rows", return_value=[]):
+            with patch(
+                "app.services.watchlist_alert.send_message",
+                new_callable=AsyncMock,
+                side_effect=[RuntimeError("network error"), None],
+            ):
+                count = await check_and_notify(mock_db)
 
     assert count == 1
     assert item1.alerted_at is None
     assert item2.alerted_at is not None
+
+
+def _ath_item(ath_alert_threshold=Decimal("20"), ath_alerted_at=None):
+    m = MagicMock()
+    m.id = uuid.uuid4()
+    m.ath_alert_threshold = ath_alert_threshold
+    m.ath_alerted_at = ath_alerted_at
+    m.asset_id = uuid.uuid4()
+    return m
+
+
+@pytest.mark.asyncio
+async def test_ath_alert_sent_when_drop_exceeds_threshold():
+    """ATH drop >= threshold → alert fires, ath_alerted_at set."""
+    item = _ath_item(ath_alert_threshold=Decimal("20"))
+    mock_db = AsyncMock()
+    # max(Price.close) = 100, current close = 75 → drop = 25%
+    mock_db.execute.return_value.scalar = MagicMock(return_value=Decimal("100"))
+
+    with patch("app.services.watchlist_alert._fetch_pending_rows", return_value=[]):
+        with patch("app.services.watchlist_alert._fetch_ath_alert_rows",
+                   return_value=[(item, _asset(), _price(close=Decimal("75")), _user())]):
+            with patch("app.services.watchlist_alert.send_message", new_callable=AsyncMock) as mock_send:
+                count = await check_and_notify(mock_db)
+
+    assert count == 1
+    assert item.ath_alerted_at is not None
+    mock_send.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_ath_alert_not_sent_when_drop_below_threshold():
+    """ATH drop < threshold → no alert."""
+    item = _ath_item(ath_alert_threshold=Decimal("20"))
+    mock_db = AsyncMock()
+    # max(Price.close) = 100, current close = 90 → drop = 10%
+    mock_db.execute.return_value.scalar = MagicMock(return_value=Decimal("100"))
+
+    with patch("app.services.watchlist_alert._fetch_pending_rows", return_value=[]):
+        with patch("app.services.watchlist_alert._fetch_ath_alert_rows",
+                   return_value=[(item, _asset(), _price(close=Decimal("90")), _user())]):
+            with patch("app.services.watchlist_alert.send_message", new_callable=AsyncMock) as mock_send:
+                count = await check_and_notify(mock_db)
+
+    assert count == 0
+    assert item.ath_alerted_at is None
+    mock_send.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_ath_alert_not_sent_when_no_price_history():
+    """No ATH data (no prices in window) → skip."""
+    item = _ath_item(ath_alert_threshold=Decimal("20"))
+    mock_db = AsyncMock()
+    mock_db.execute.return_value.scalar = MagicMock(return_value=None)  # no ATH
+
+    with patch("app.services.watchlist_alert._fetch_pending_rows", return_value=[]):
+        with patch("app.services.watchlist_alert._fetch_ath_alert_rows",
+                   return_value=[(item, _asset(), _price(close=Decimal("80")), _user())]):
+            with patch("app.services.watchlist_alert.send_message", new_callable=AsyncMock) as mock_send:
+                count = await check_and_notify(mock_db)
+
+    assert count == 0
+    mock_send.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_ath_alert_not_sent_when_no_telegram():
+    """No Telegram config → skip ATH alert."""
+    item = _ath_item(ath_alert_threshold=Decimal("20"))
+    mock_db = AsyncMock()
+    mock_db.execute.return_value.scalar = MagicMock(return_value=Decimal("100"))
+
+    with patch("app.services.watchlist_alert._fetch_pending_rows", return_value=[]):
+        with patch("app.services.watchlist_alert._fetch_ath_alert_rows",
+                   return_value=[(item, _asset(), _price(close=Decimal("75")), _user(has_telegram=False))]):
+            with patch("app.services.watchlist_alert.send_message", new_callable=AsyncMock) as mock_send:
+                count = await check_and_notify(mock_db)
+
+    assert count == 0
+    mock_send.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_ath_alert_not_sent_when_alert_disabled():
+    """alert_enabled=False → no ATH alert even if threshold is set."""
+    item = _ath_item(ath_alert_threshold=Decimal("20"))
+    item.alert_enabled = False
+    mock_db = AsyncMock()
+    mock_db.execute.return_value.scalar = MagicMock(return_value=Decimal("100"))
+
+    with patch("app.services.watchlist_alert._fetch_pending_rows", return_value=[]):
+        with patch("app.services.watchlist_alert._fetch_ath_alert_rows", return_value=[]):
+            with patch("app.services.watchlist_alert.send_message", new_callable=AsyncMock) as mock_send:
+                count = await check_and_notify(mock_db)
+
+    assert count == 0
+    mock_send.assert_not_called()
