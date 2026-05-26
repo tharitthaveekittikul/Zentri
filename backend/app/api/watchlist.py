@@ -20,6 +20,7 @@ from app.models.price import Price
 from app.models.user import User
 from app.models.watchlist_item import WatchlistItem
 from app.models.watchlist_suggestion import WatchlistSuggestion
+from app.services.price_feed import fetch_price_for_asset
 from app.schemas.common import PaginatedResponse
 from app.schemas.watchlist import (
     AssetSummary,
@@ -274,6 +275,19 @@ async def trigger_item_scan(
     except Exception:
         logger.exception("Failed to enqueue scan for item %s", item_id)
     return {"queued": True, "item_id": str(item_id)}
+
+
+@router.post("/{item_id}/fetch-prices")
+async def fetch_item_prices(
+    item_id: uuid.UUID,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    item = await _get_owned_item(db, item_id, current_user.id)
+    asset = (await db.execute(select(Asset).where(Asset.id == item.asset_id))).scalar_one()
+    rows = await fetch_price_for_asset(db, asset)
+    logger.info("fetch-prices: %d rows for item=%s symbol=%s", len(rows), item_id, asset.symbol)
+    return {"fetched": len(rows), "symbol": asset.symbol}
 
 
 @router.post("/scan-all")

@@ -8,6 +8,7 @@ import {
   Check,
   Pencil,
   Plus,
+  RefreshCw,
   Scan,
   Search,
   Sparkles,
@@ -40,9 +41,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { createAsset, searchAssets, searchMarketAssets, type MarketResult } from "@/lib/services/assets";
 import {
   acceptSuggestion,
   addToWatchlist,
+  fetchItemPrices,
   deleteWatchlistItem,
   discoverWatchlist,
   dismissSuggestion,
@@ -79,12 +82,16 @@ function athDropColor(pct: number | null, threshold: string | null): string {
   return "text-muted-foreground";
 }
 
-type AssetResult = {
-  id: string;
-  symbol: string;
-  name: string;
-  currency: string;
-};
+function marketTypeToAssetType(typeDisplay: string, exchange: string): string {
+  if (typeDisplay === "ETF") return "etf";
+  if (typeDisplay === "CRYPTOCURRENCY") return "crypto";
+  return "us_stock";
+}
+
+function marketCurrency(exchange: string): string {
+  if (exchange === "BKK") return "THB";
+  return "USD";
+}
 
 function AddDialog({
   open,
@@ -96,8 +103,8 @@ function AddDialog({
   onAdded: () => void;
 }) {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<AssetResult[]>([]);
-  const [selected, setSelected] = useState<AssetResult | null>(null);
+  const [results, setResults] = useState<MarketResult[]>([]);
+  const [selected, setSelected] = useState<MarketResult | null>(null);
   const [targetPrice, setTargetPrice] = useState("");
   const [adding, setAdding] = useState(false);
 
@@ -107,10 +114,8 @@ function AddDialog({
       return;
     }
     const t = setTimeout(async () => {
-      const r = await api.get(
-        `/api/v1/assets/search?q=${encodeURIComponent(query)}`,
-      );
-      if (r.ok) setResults(await r.json());
+      const data = await searchMarketAssets(query);
+      setResults(data);
     }, 300);
     return () => clearTimeout(t);
   }, [query]);
@@ -119,10 +124,19 @@ function AddDialog({
     if (!selected) return;
     setAdding(true);
     try {
-      await addToWatchlist({
-        asset_id: selected.id,
-        target_price: targetPrice || null,
-      });
+      const locals = await searchAssets(selected.symbol);
+      const exact = locals.find((a) => a.symbol.toUpperCase() === selected.symbol.toUpperCase());
+      let assetId: string | null = exact?.id ?? null;
+      if (!assetId) {
+        const created = await createAsset({
+          symbol: selected.symbol,
+          name: selected.name,
+          asset_type: marketTypeToAssetType(selected.type_display, selected.exchange),
+          currency: marketCurrency(selected.exchange),
+        });
+        assetId = created.id;
+      }
+      await addToWatchlist({ asset_id: assetId, target_price: targetPrice || null });
       toast.success(`${selected.symbol} added to watchlist`);
       onAdded();
       onClose();
@@ -156,7 +170,7 @@ function AddDialog({
             <div className="border rounded divide-y max-h-48 overflow-y-auto">
               {results.map((a) => (
                 <Button
-                  key={a.id}
+                  key={a.symbol}
                   variant="ghost"
                   className="w-full text-left px-3 py-2 text-sm hover:bg-accent h-auto justify-start rounded-none"
                   onClick={() => {
@@ -167,6 +181,9 @@ function AddDialog({
                 >
                   <span className="font-medium">{a.symbol}</span>{" "}
                   <span className="text-muted-foreground">{a.name}</span>
+                  {a.exchange && (
+                    <span className="ml-auto text-xs text-muted-foreground">{a.exchange}</span>
+                  )}
                 </Button>
               ))}
             </div>
@@ -286,7 +303,9 @@ function WatchlistRow({
   item,
   formatNative,
   scanningId,
+  fetchingPricesId,
   onScan,
+  onFetchPrices,
   onApplyPrice,
   onToggleAlert,
   onEdit,
@@ -295,7 +314,9 @@ function WatchlistRow({
   item: WatchlistItem;
   formatNative: (value: string | number, nativeCurrency: string) => DualValue;
   scanningId: string | null;
+  fetchingPricesId: string | null;
   onScan: (id: string) => void;
+  onFetchPrices: (id: string) => void;
   onApplyPrice: (item: WatchlistItem) => void;
   onToggleAlert: (item: WatchlistItem) => void;
   onEdit: (item: WatchlistItem) => void;
@@ -388,13 +409,6 @@ function WatchlistRow({
           <span className="text-muted-foreground text-xs">—</span>
         )}
       </TableCell>
-      <TableCell className="hidden md:table-cell text-right">
-        {item.ai_suggested_price
-          ? <DualCurrencyAmount
-              value={formatNative(item.ai_suggested_price, item.currency ?? "USD")}
-            />
-          : "—"}
-      </TableCell>
       <TableCell className="hidden md:table-cell text-xs text-muted-foreground">
         {item.last_scanned_at
           ? new Date(item.last_scanned_at).toLocaleDateString("en-GB")
@@ -413,17 +427,17 @@ function WatchlistRow({
               className={`h-4 w-4 ${scanningId === item.id ? "animate-pulse" : ""}`}
             />
           </Button>
-          {item.ai_suggested_price && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-xs h-8 px-2"
-              title="Apply AI price as target alert"
-              onClick={() => onApplyPrice(item)}
-            >
-              Apply
-            </Button>
-          )}
+          <Button
+            variant="ghost"
+            size="icon"
+            title="Fetch prices"
+            disabled={fetchingPricesId === item.id}
+            onClick={() => onFetchPrices(item.id)}
+          >
+            <RefreshCw
+              className={`h-4 w-4 ${fetchingPricesId === item.id ? "animate-spin" : ""}`}
+            />
+          </Button>
           <Button
             variant="ghost"
             size="icon"
@@ -476,6 +490,7 @@ export default function WatchlistPage() {
   const [scanningAll, setScanningAll] = useState(false);
   const [discovering, setDiscovering] = useState(false);
   const [scanningId, setScanningId] = useState<string | null>(null);
+  const [fetchingPricesId, setFetchingPricesId] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
   const [editItem, setEditItem] = useState<WatchlistItem | null>(null);
   const [llmConfirm, setLlmConfirm] = useState<{ action: "scan" | "discover"; open: boolean }>({ action: "scan", open: false });
@@ -570,6 +585,19 @@ export default function WatchlistPage() {
     toast.success("Scan queued");
     setScanningId(null);
     setTimeout(fetchAll, 5000);
+  };
+
+  const handleFetchPrices = async (id: string) => {
+    setFetchingPricesId(id);
+    try {
+      await fetchItemPrices(id);
+      toast.success("Prices updated");
+      fetchAll();
+    } catch {
+      toast.error("Failed to fetch prices");
+    } finally {
+      setFetchingPricesId(null);
+    }
   };
 
   const handleApplyPrice = async (item: WatchlistItem) => {
@@ -735,7 +763,6 @@ export default function WatchlistPage() {
                   <TableHead className="hidden md:table-cell text-right">% to Target</TableHead>
                   <TableHead className="hidden md:table-cell text-right">ATH Drop</TableHead>
                   <TableHead>AI Verdict</TableHead>
-                  <TableHead className="hidden md:table-cell text-right">AI Price</TableHead>
                   <TableHead className="hidden md:table-cell">Last Scanned</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -747,7 +774,9 @@ export default function WatchlistPage() {
                     item={item}
                     formatNative={formatNative}
                     scanningId={scanningId}
+                    fetchingPricesId={fetchingPricesId}
                     onScan={handleScanItem}
+                    onFetchPrices={handleFetchPrices}
                     onApplyPrice={handleApplyPrice}
                     onToggleAlert={handleToggleAlert}
                     onEdit={handleEdit}

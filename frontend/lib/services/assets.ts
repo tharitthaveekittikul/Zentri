@@ -10,8 +10,21 @@ export interface Asset {
   metadata_: Record<string, unknown>;
 }
 
+export interface MarketResult {
+  symbol: string;
+  name: string;
+  exchange: string;
+  type_display: string;
+}
+
 export async function searchAssets(q: string): Promise<Asset[]> {
   const res = await api.get(`/api/v1/assets/search?q=${encodeURIComponent(q)}`);
+  if (!res.ok) return [];
+  return res.json();
+}
+
+export async function searchMarketAssets(q: string): Promise<MarketResult[]> {
+  const res = await api.get(`/api/v1/assets/market-search?q=${encodeURIComponent(q)}`);
   if (!res.ok) return [];
   return res.json();
 }

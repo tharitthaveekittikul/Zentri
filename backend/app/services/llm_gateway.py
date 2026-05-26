@@ -172,8 +172,15 @@ DEFAULT_SYSTEM_PROMPTS: dict[str, str] = {
         "The user does not currently hold this asset. Analyze the recent price history and research context. "
         "Respond ONLY with valid JSON in this exact format — no text outside the object:\n"
         "{\"verdict\": \"BUY\" | \"HOLD\" | \"AVOID\", "
-        "\"suggested_price\": <number or null>, "
-        "\"reasoning\": \"<2-3 sentence explanation>\"}"
+        "\"suggested_price\": <number>, "
+        "\"reasoning\": \"<2-3 sentence explanation>\"}\n\n"
+        "Rules for suggested_price — you MUST always return a number, never null:\n"
+        "- BUY: the specific entry price you recommend buying at.\n"
+        "- HOLD: a fair-value or support price to watch (e.g. the most recent close, or a round-number support).\n"
+        "- AVOID: the price at which the thesis would become attractive.\n"
+        "If you are uncertain, use the most recent closing price from the price history as your suggested_price.\n"
+        "Example for HOLD when last close was 136.50: "
+        "{\"verdict\": \"HOLD\", \"suggested_price\": 136.50, \"reasoning\": \"...\"}"
     ),
     "watchlist_discovery": (
         "You are a portfolio advisor. Based on the investor's current holdings, suggest assets worth watching. "

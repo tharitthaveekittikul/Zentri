@@ -1,6 +1,7 @@
 import json
 import uuid
 from datetime import datetime, timedelta, timezone
+from decimal import Decimal
 
 from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import async_sessionmaker
@@ -12,19 +13,27 @@ from app.models.price import Price
 from app.models.watchlist_item import WatchlistItem
 from app.services.llm_gateway import LLMGateway
 from app.services.pipeline import create_log, finish_log, create_step, finish_step
+from app.services.price_feed import fetch_price_for_asset
 from app.services.rag_service import get_or_create_collection, search
 
 logger = get_logger(__name__)
 
 
 def _parse_scan_response(text: str) -> dict | None:
+    import math
     text = text.strip()
     if text.startswith("```"):
         lines = text.split("\n")
         text = "\n".join(lines[1:-1]) if len(lines) > 2 else text
     try:
         data = json.loads(text)
-        if data.get("verdict") not in ("BUY", "SELL", "HOLD"):
+        if data.get("verdict") not in ("BUY", "SELL", "HOLD", "AVOID"):
+            return None
+        price = data.get("suggested_price")
+        if price is not None:
+            if isinstance(price, bool) or not isinstance(price, (int, float)) or not math.isfinite(price):
+                return None
+        if not isinstance(data.get("reasoning"), str):
             return None
         return data
     except (json.JSONDecodeError, AttributeError):
@@ -56,6 +65,8 @@ async def job_scan_watchlist_item(ctx: dict, item_id: str, user_id: str) -> dict
                 .order_by(desc(Price.timestamp))
                 .limit(10)
             )).scalars().all()
+
+            prices = await fetch_price_for_asset(db, asset) or list(prices)
 
             prices_txt = (
                 "\n".join(f"{p.timestamp.date()}: close={p.close}" for p in prices)
@@ -95,11 +106,14 @@ async def job_scan_watchlist_item(ctx: dict, item_id: str, user_id: str) -> dict
 
             # Step 4: save_suggestion
             step_save = await create_step(db, log.id, "save_suggestion")
+            suggested_price = parsed.get("suggested_price")
+            if suggested_price is None and prices:
+                suggested_price = float(prices[0].close)
             analysis = AIAnalysis(
                 asset_id=asset.id,
                 job_id=str(log.id),
                 verdict=parsed["verdict"],
-                target_price=parsed.get("suggested_price"),
+                target_price=suggested_price,
                 reasoning=parsed["reasoning"],
                 provider="llm_gateway",
                 model="watchlist_scan",
@@ -108,10 +122,12 @@ async def job_scan_watchlist_item(ctx: dict, item_id: str, user_id: str) -> dict
                 cost_usd=0,
             )
             db.add(analysis)
+            if suggested_price is not None:
+                item.target_price = Decimal(str(suggested_price))
             await db.commit()
             await finish_step(db, step_save, success=True, metadata={"symbol": asset.symbol, "verdict": parsed["verdict"]})
             await finish_log(db, log, success=True)
-            logger.info("watchlist_scan done item=%s verdict=%s", item_id, parsed["verdict"])
+            logger.info("watchlist_scan done item=%s verdict=%s target_price=%s", item_id, parsed["verdict"], item.target_price)
             return {"verdict": parsed["verdict"], "analysis_id": str(analysis.id)}
         except Exception as e:
             logger.exception("job_scan_watchlist_item failed item=%s: %s", item_id, e)

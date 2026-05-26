@@ -68,6 +68,52 @@ async def _upsert_benchmark_prices(db: AsyncSession, rows: list[dict]) -> int:
     return len(rows)
 
 
+async def fetch_price_for_asset(db: AsyncSession, asset: Asset) -> list[Price]:
+    """Fetch recent price history for a single asset via yfinance and upsert it.
+
+    Returns the Price rows now in DB for this asset (last 10 days).
+    Only operates on asset types that yfinance supports.
+    """
+    _YF_TYPES = {"us_stock", "etf", "crypto", "thai_stock", "thai_dr", "gold"}
+    if asset.asset_type not in _YF_TYPES:
+        return []
+
+    suffix_map = {"thai_stock": ".BK", "thai_dr": ".BK"}
+    ticker_sym = asset.symbol + suffix_map.get(asset.asset_type, "")
+
+    def _fetch():
+        try:
+            hist = yf.Ticker(ticker_sym).history(period="1y", interval="1d")
+            rows = []
+            for ts, row in hist.iterrows():
+                rows.append({
+                    "asset_id": asset.id,
+                    "timestamp": ts.to_pydatetime().replace(tzinfo=timezone.utc),
+                    "open": _to_decimal(row.get("Open")),
+                    "high": _to_decimal(row.get("High")),
+                    "low": _to_decimal(row.get("Low")),
+                    "close": _to_decimal(row.get("Close")),
+                    "volume": _to_decimal(row.get("Volume")),
+                })
+            return rows
+        except Exception as e:
+            logger.warning("fetch_price_for_asset: failed for %s: %s", ticker_sym, e)
+            return []
+
+    rows = await asyncio.get_event_loop().run_in_executor(None, _fetch)
+    if rows:
+        await _upsert_prices(db, rows)
+        logger.info("fetch_price_for_asset: upserted %d rows for %s", len(rows), asset.symbol)
+
+    result = await db.execute(
+        select(Price)
+        .where(Price.asset_id == asset.id)
+        .order_by(Price.timestamp.desc())
+        .limit(10)
+    )
+    return list(result.scalars().all())
+
+
 # ---------------------------------------------------------------------------
 # US Stocks
 # ---------------------------------------------------------------------------

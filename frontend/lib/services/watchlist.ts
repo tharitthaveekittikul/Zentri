@@ -105,6 +105,10 @@ export async function scanItem(id: string): Promise<void> {
   await api.post(`/api/v1/watchlist/${id}/scan`, {});
 }
 
+export async function fetchItemPrices(id: string): Promise<void> {
+  await api.post(`/api/v1/watchlist/${id}/fetch-prices`, {});
+}
+
 export async function scanAll(): Promise<void> {
   await api.post("/api/v1/watchlist/scan-all", {});
 }
