@@ -25,6 +25,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -51,9 +52,129 @@ interface CallLog {
   created_at: string;
 }
 
+interface ToolCallRecord {
+  name: string;
+  args: Record<string, unknown>;
+  result: string;
+}
+
+interface ToolRound {
+  round: number;
+  tokens_in: number;
+  tokens_out: number;
+  cost_usd: number;
+  tool_calls: ToolCallRecord[];
+}
+
 interface CallLogDetail extends CallLog {
   prompt_in: string;
   response_out: string;
+  tool_rounds?: ToolRound[];
+}
+
+function ToolRoundsPanel({ rounds, formatCost }: { rounds: ToolRound[]; formatCost: (v: number) => string }) {
+  const [openRounds, setOpenRounds] = useState<Set<number>>(new Set());
+  const [openTools, setOpenTools] = useState<Set<string>>(new Set());
+
+  function toggleRound(n: number) {
+    setOpenRounds((prev) => {
+      const next = new Set(prev);
+      if (next.has(n)) next.delete(n);
+      else next.add(n);
+      return next;
+    });
+  }
+
+  function toggleTool(key: string) {
+    setOpenTools((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  }
+
+  return (
+    <div>
+      <p className="font-semibold mb-2">Tool Rounds ({rounds.length})</p>
+      <div className="space-y-1">
+        {rounds.map((r) => {
+          const isOpen = openRounds.has(r.round);
+          const toolNames =
+            r.tool_calls.length > 0
+              ? r.tool_calls.map((tc) => tc.name).join(", ")
+              : null;
+          return (
+            <div
+              key={r.round}
+              className="border border-border rounded overflow-hidden"
+            >
+              <button
+                className="w-full flex items-center gap-2 px-3 py-2 text-xs text-left hover:bg-muted/50 transition-colors"
+                onClick={() => toggleRound(r.round)}
+              >
+                {isOpen ? (
+                  <ChevronDown className="h-3 w-3 shrink-0" />
+                ) : (
+                  <ChevronRight className="h-3 w-3 shrink-0" />
+                )}
+                <span className="font-medium">Round {r.round}</span>
+                <span className="text-muted-foreground">
+                  — {r.tokens_in.toLocaleString()} in /{" "}
+                  {r.tokens_out.toLocaleString()} out —{" "}
+                  {formatCost(r.cost_usd)}
+                </span>
+                {toolNames ? (
+                  <span className="ml-auto text-muted-foreground truncate max-w-[40%]">
+                    {toolNames}
+                  </span>
+                ) : (
+                  <span className="ml-auto text-muted-foreground italic">
+                    final response
+                  </span>
+                )}
+              </button>
+
+              {isOpen && r.tool_calls.length > 0 && (
+                <div className="border-t border-border divide-y divide-border">
+                  {r.tool_calls.map((tc, i) => {
+                    const toolKey = `${r.round}-${i}`;
+                    const isToolOpen = openTools.has(toolKey);
+                    const argsLabel = Object.entries(tc.args)
+                      .map(([k, v]) => `${k}=${JSON.stringify(v)}`)
+                      .join(", ");
+                    return (
+                      <div key={toolKey}>
+                        <button
+                          className="w-full flex items-center gap-2 px-4 py-1.5 text-xs text-left hover:bg-muted/30 transition-colors"
+                          onClick={() => toggleTool(toolKey)}
+                        >
+                          {isToolOpen ? (
+                            <ChevronDown className="h-3 w-3 shrink-0" />
+                          ) : (
+                            <ChevronRight className="h-3 w-3 shrink-0" />
+                          )}
+                          <code className="font-mono">
+                            {tc.name}
+                            {argsLabel ? `(${argsLabel})` : "()"}
+                          </code>
+                        </button>
+                        {isToolOpen && (
+                          <pre className="bg-muted px-4 py-2 text-xs whitespace-pre-wrap overflow-x-auto max-h-[20vh]">
+                            {tc.result}
+                          </pre>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 }
 
 function AIUsageContent() {
@@ -261,6 +382,12 @@ function AIUsageContent() {
             )}
             {callLogDetail && (
               <div className="space-y-4 text-sm">
+                {callLogDetail.tool_rounds && callLogDetail.tool_rounds.length > 0 && (
+                  <ToolRoundsPanel
+                    rounds={callLogDetail.tool_rounds}
+                    formatCost={(v) => formatNative(v, "USD", 6).primary}
+                  />
+                )}
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <p className="font-semibold">Input Prompt</p>

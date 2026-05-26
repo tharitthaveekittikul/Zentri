@@ -105,4 +105,5 @@ async def get_call_log_detail(
         "created_at": log.created_at.isoformat(),
         "prompt_in": log.prompt_in,
         "response_out": log.response_out,
+        "tool_rounds": log.tool_rounds,
     }

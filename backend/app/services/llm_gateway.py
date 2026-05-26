@@ -43,6 +43,7 @@ class LLMGatewayResult:
     model: str
     provider: str
     tool_calls: list[dict] = field(default_factory=list)
+    tool_rounds: list[dict] = field(default_factory=list)
 
 
 @dataclass
@@ -869,8 +870,11 @@ class LLMGateway:
         final_content = ""
         MAX_TOOL_ROUNDS = 5
         collected_tool_calls: list[dict] = []
+        collected_tool_rounds: list[dict] = []
+        round_index = 0
 
         for _ in range(MAX_TOOL_ROUNDS):
+            round_index += 1
             resp = await adapter.complete_with_tools(system, chat_messages, config.model, TOOL_DEFINITIONS)
             total_tokens_in += resp.tokens_in
             total_tokens_out += resp.tokens_out
@@ -878,8 +882,16 @@ class LLMGateway:
 
             if resp.stop_reason == "end_turn" or not resp.tool_calls:
                 final_content = resp.content or ""
+                collected_tool_rounds.append({
+                    "round": round_index,
+                    "tokens_in": resp.tokens_in,
+                    "tokens_out": resp.tokens_out,
+                    "cost_usd": resp.cost_usd,
+                    "tool_calls": [],
+                })
                 break
 
+            round_tool_calls: list[dict] = []
             chat_messages.append({
                 "role": "assistant",
                 "content": resp.content,
@@ -892,8 +904,16 @@ class LLMGateway:
             for tc in resp.tool_calls:
                 logger.info("Chat tool call: %s args=%s", tc.name, tc.arguments)
                 tool_result = await execute_tool(tc.name, tc.arguments, self._db, user_id, currency)
+                round_tool_calls.append({"name": tc.name, "args": tc.arguments, "result": tool_result})
                 collected_tool_calls.append({"name": tc.name, "args": tc.arguments, "result": tool_result})
                 chat_messages.append({"role": "tool", "tool_call_id": tc.id, "content": tool_result})
+            collected_tool_rounds.append({
+                "round": round_index,
+                "tokens_in": resp.tokens_in,
+                "tokens_out": resp.tokens_out,
+                "cost_usd": resp.cost_usd,
+                "tool_calls": round_tool_calls,
+            })
         else:
             final_content = resp.content or "I ran into a loop — please rephrase your question."
 
@@ -908,12 +928,13 @@ class LLMGateway:
             tokens_in=total_tokens_in, tokens_out=total_tokens_out,
             cost_usd=total_cost_usd, cost_thb=cost_thb,
             exchange_rate=float(usd_thb) if usd_thb else 0.0,
+            tool_rounds=collected_tool_rounds or None,
         )
         self._db.add(log)
         await self._db.flush()
 
         logger.info("Chat complete: tokens_in=%d tokens_out=%d cost_usd=%.6f tool_rounds=%d",
-                    total_tokens_in, total_tokens_out, total_cost_usd, len(chat_messages))
+                    total_tokens_in, total_tokens_out, total_cost_usd, len(collected_tool_rounds))
         return LLMGatewayResult(
             content=final_content, prompt="",
             tokens_in=total_tokens_in, tokens_out=total_tokens_out,
@@ -921,6 +942,7 @@ class LLMGateway:
             exchange_rate=float(usd_thb) if usd_thb else 0.0,
             model=config.model, provider=provider.provider,
             tool_calls=collected_tool_calls,
+            tool_rounds=collected_tool_rounds,
         )
 
     async def _get_feature_config(self, feature_key: str, user_id: uuid.UUID) -> FeatureLLMConfig:
