@@ -21,6 +21,16 @@ from sqlalchemy import select
 logger = get_logger(__name__)
 
 _IDENT_PLACEHOLDER = re.compile(r'\{([A-Za-z_][A-Za-z0-9_]*)\}')
+_TOOL_REFUSAL = re.compile(
+    r"(I cannot|I can't|I'm unable to|I do not have|I don't have|I am unable to)"
+    r".{0,80}"
+    r"(access|retrieve|view|see|fetch|get|look up|provide)",
+    re.IGNORECASE,
+)
+
+
+def _looks_like_tool_refusal(text: str) -> bool:
+    return bool(_TOOL_REFUSAL.search(text))
 
 
 def _safe_format(template: str, vars_: dict) -> str:
@@ -157,6 +167,10 @@ DEFAULT_SYSTEM_PROMPTS: dict[str, str] = {
         "- Any question about a specific ticker (buy/sell/hold, price target, DCA) → get_symbol_analysis + get_asset_price\n"
         "- Any mention of 'my watchlist' → get_watchlist\n"
         "- Any question about news or recent events → search_news\n\n"
+        "CRITICAL — NEVER REFUSE TOOLS: Never say 'I cannot access', 'I don't have access', "
+        "'I'm unable to retrieve', or any similar phrase for data that a tool can fetch. "
+        "If the user asks about their portfolio, holdings, prices, watchlist, or any symbol — "
+        "call the tool. Saying you cannot access data when a tool exists for it is an error.\n\n"
         "SCOPE: Answer only finance-related questions — investments, stocks, funds, bonds, "
         "economics, and events that directly impact markets (e.g., interest rates, geopolitics, "
         "trade policy, political events affecting markets).\n\n"
@@ -911,6 +925,19 @@ class LLMGateway:
                     "cost_usd": resp.cost_usd,
                     "tool_calls": [],
                 })
+                if round_index == 1 and final_content and _looks_like_tool_refusal(final_content):
+                    logger.info("Chat: tool refusal detected on round 1, injecting retry prompt")
+                    chat_messages.append({"role": "assistant", "content": final_content})
+                    chat_messages.append({
+                        "role": "user",
+                        "content": (
+                            "You must call the relevant tools before answering — do not say you "
+                            "cannot access data. Use get_portfolio_summary, get_holdings, "
+                            "get_asset_price, get_symbol_analysis, get_watchlist, or search_news "
+                            "to fetch what you need, then answer."
+                        ),
+                    })
+                    continue
                 break
 
             round_tool_calls: list[dict] = []

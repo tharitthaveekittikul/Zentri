@@ -17,6 +17,7 @@ import {
 } from "@/lib/services/chat";
 import { ChatCostBadge } from "@/components/llm/ChatCostBadge";
 import { SessionStrip } from "@/components/chat/SessionStrip";
+import { ChatQuickActions } from "@/components/chat/ChatQuickActions";
 
 const OUT_OF_SCOPE_TYPE = "out_of_scope";
 
@@ -264,6 +265,11 @@ export default function ChatPage() {
     }
   }, [input, loading, messages, activeSessionId]);
 
+  function handleQuickAction(text: string) {
+    setInput((prev) => prev.trim() ? `${prev.trim()} ${text}` : text);
+    textareaRef.current?.focus();
+  }
+
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -349,6 +355,8 @@ export default function ChatPage() {
 
         <div ref={bottomRef} />
       </div>
+
+      <ChatQuickActions messages={messages} onSelect={handleQuickAction} />
 
       <div className="pt-3 pb-4 shrink-0">
         <div className="rounded-2xl border border-input bg-background focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/20 transition-shadow">
