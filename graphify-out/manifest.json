@@ -1,0 +1,3022 @@
+{
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/.opencode.json": {
+    "mtime": 1776891163.3861988,
+    "ast_hash": "ffcb8e1be4385276f25c181817d22a00",
+    "semantic_hash": "ffcb8e1be4385276f25c181817d22a00"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/.mcp.json": {
+    "mtime": 1776891163.3859196,
+    "ast_hash": "5b91a9f2384903f3cdfad8a2276e412f",
+    "semantic_hash": "5b91a9f2384903f3cdfad8a2276e412f"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/DESIGN.json": {
+    "mtime": 1777653195.207754,
+    "ast_hash": "4d209beeb79a353f23af62239779ae33",
+    "semantic_hash": "4d209beeb79a353f23af62239779ae33"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/.cursor/mcp.json": {
+    "mtime": 1776891163.386091,
+    "ast_hash": "5b91a9f2384903f3cdfad8a2276e412f",
+    "semantic_hash": "5b91a9f2384903f3cdfad8a2276e412f"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/postcss.config.mjs": {
+    "mtime": 1776890757.4972,
+    "ast_hash": "239f3ebf717465dc636818a1a619398d",
+    "semantic_hash": "239f3ebf717465dc636818a1a619398d"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/next-env.d.ts": {
+    "mtime": 1778128919.0029974,
+    "ast_hash": "d0f8375ae1199dc7acd3977fc33b78b8",
+    "semantic_hash": "d0f8375ae1199dc7acd3977fc33b78b8"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/package.json": {
+    "mtime": 1777185213.3655293,
+    "ast_hash": "bfb37fead0c2896f948a84a4c462b553",
+    "semantic_hash": "bfb37fead0c2896f948a84a4c462b553"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/proxy.ts": {
+    "mtime": 1778065053.4265594,
+    "ast_hash": "cf400562b015a04a35a440dc492d229b",
+    "semantic_hash": "cf400562b015a04a35a440dc492d229b"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components.json": {
+    "mtime": 1776890846.0088966,
+    "ast_hash": "63b2c4fcf776fec9dbc76e94ea0d70c6",
+    "semantic_hash": "63b2c4fcf776fec9dbc76e94ea0d70c6"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/tsconfig.json": {
+    "mtime": 1776890757.4981387,
+    "ast_hash": "02fc19ad21338c2ab820a70136310db4",
+    "semantic_hash": "02fc19ad21338c2ab820a70136310db4"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/eslint.config.mjs": {
+    "mtime": 1776890757.4969525,
+    "ast_hash": "dfa1f5f6a7037bf39dc510f30b180002",
+    "semantic_hash": "dfa1f5f6a7037bf39dc510f30b180002"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/next.config.ts": {
+    "mtime": 1776930513.4547155,
+    "ast_hash": "2cb08d5f26583791b21364bb4c7fd544",
+    "semantic_hash": "2cb08d5f26583791b21364bb4c7fd544"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/app/layout.tsx": {
+    "mtime": 1778054102.6025193,
+    "ast_hash": "7932119245301666b360e43d9dcb08a3",
+    "semantic_hash": "7932119245301666b360e43d9dcb08a3"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/app/page.tsx": {
+    "mtime": 1778064502.9097526,
+    "ast_hash": "3ab520a0fef5d4963d82796e4d87cd14",
+    "semantic_hash": "3ab520a0fef5d4963d82796e4d87cd14"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/app/setup/page.tsx": {
+    "mtime": 1779349512.4802072,
+    "ast_hash": "c5cfa17fee48f153415a97a74f670f8e",
+    "semantic_hash": "c5cfa17fee48f153415a97a74f670f8e"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/app/(auth)/layout.tsx": {
+    "mtime": 1778236614.2392678,
+    "ast_hash": "d5188db9a41be28015d9df68865b4bf4",
+    "semantic_hash": "d5188db9a41be28015d9df68865b4bf4"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/app/(auth)/page.tsx": {
+    "mtime": 1779436212.3409014,
+    "ast_hash": "998f9e8c362814da5d88902edbe47273",
+    "semantic_hash": "998f9e8c362814da5d88902edbe47273"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/app/(auth)/research/page.tsx": {
+    "mtime": 1778261109.4013379,
+    "ast_hash": "291c955d36ad4ee91d109b9255014a6e",
+    "semantic_hash": "291c955d36ad4ee91d109b9255014a6e"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/app/(auth)/settings/page.tsx": {
+    "mtime": 1779349843.0937476,
+    "ast_hash": "c2702872e8230899a214401cc978fedc",
+    "semantic_hash": "c2702872e8230899a214401cc978fedc"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/app/(auth)/settings/ai/page.tsx": {
+    "mtime": 1778229527.6257083,
+    "ast_hash": "10cd42cadcb5e241956a565e3aedc2c2",
+    "semantic_hash": "10cd42cadcb5e241956a565e3aedc2c2"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/app/(auth)/settings/backup/page.tsx": {
+    "mtime": 1779349509.0410805,
+    "ast_hash": "846343896fc3b8a52f9dbd541f57d57f",
+    "semantic_hash": "846343896fc3b8a52f9dbd541f57d57f"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/app/(auth)/pipeline/page.tsx": {
+    "mtime": 1778241766.6131423,
+    "ast_hash": "cb4eb5b72d4ecc3d0794fca67870aac1",
+    "semantic_hash": "cb4eb5b72d4ecc3d0794fca67870aac1"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/app/(auth)/analysis/page.tsx": {
+    "mtime": 1779697185.0459127,
+    "ast_hash": "39d5633cc8713a7fba36db8dc1449e62",
+    "semantic_hash": "39d5633cc8713a7fba36db8dc1449e62"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/app/(auth)/analysis/[symbol]/page.tsx": {
+    "mtime": 1779362953.8869152,
+    "ast_hash": "1895ff841b98e48f0cc350040443cc54",
+    "semantic_hash": "1895ff841b98e48f0cc350040443cc54"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/app/(auth)/chat/page.tsx": {
+    "mtime": 1780046017.1159348,
+    "ast_hash": "2cb9adbc987f9dc9c94b6ffbd1cfd353",
+    "semantic_hash": "2cb9adbc987f9dc9c94b6ffbd1cfd353"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/app/(auth)/net-worth/page.tsx": {
+    "mtime": 1778241916.2971964,
+    "ast_hash": "730ffb75695143ec0d1eee89352cb032",
+    "semantic_hash": "730ffb75695143ec0d1eee89352cb032"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/app/(auth)/transactions/page.tsx": {
+    "mtime": 1779453819.261406,
+    "ast_hash": "6ce2e2c9c3a36baf77a8f9a4fa61c85d",
+    "semantic_hash": "6ce2e2c9c3a36baf77a8f9a4fa61c85d"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/app/(auth)/portfolio/page.tsx": {
+    "mtime": 1778246412.232629,
+    "ast_hash": "d33f75ba58d52f361810eddac7789d17",
+    "semantic_hash": "d33f75ba58d52f361810eddac7789d17"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/app/(auth)/portfolio/[symbol]/page.tsx": {
+    "mtime": 1779183386.394781,
+    "ast_hash": "f75586f944d41663b21004883eef40cf",
+    "semantic_hash": "f75586f944d41663b21004883eef40cf"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/app/(auth)/documents/page.tsx": {
+    "mtime": 1779349695.3699005,
+    "ast_hash": "7691fd9b0e96f01b9497a4a1b73b4738",
+    "semantic_hash": "7691fd9b0e96f01b9497a4a1b73b4738"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/app/(auth)/dividends/page.tsx": {
+    "mtime": 1778063433.326689,
+    "ast_hash": "9c7626835df7ea0fa41e1c6de4e3854d",
+    "semantic_hash": "9c7626835df7ea0fa41e1c6de4e3854d"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/app/(auth)/events/page.tsx": {
+    "mtime": 1779449558.7590573,
+    "ast_hash": "7ecace18676484dfc7bd3183b6bf29ec",
+    "semantic_hash": "7ecace18676484dfc7bd3183b6bf29ec"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/app/(auth)/overview/page.tsx": {
+    "mtime": 1779436183.6462371,
+    "ast_hash": "9b933c39d7b2eff04321640d5d75c7ae",
+    "semantic_hash": "9b933c39d7b2eff04321640d5d75c7ae"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/app/(auth)/import/page.tsx": {
+    "mtime": 1778241923.5627158,
+    "ast_hash": "e0d2989a177fccff8f8cc17c768df034",
+    "semantic_hash": "e0d2989a177fccff8f8cc17c768df034"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/app/(auth)/ai-usage/page.tsx": {
+    "mtime": 1779781210.452602,
+    "ast_hash": "285687a779c27e49acb06f81dd09bc67",
+    "semantic_hash": "285687a779c27e49acb06f81dd09bc67"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/app/(auth)/watchlist/page.tsx": {
+    "mtime": 1779790604.1471133,
+    "ast_hash": "da87af6c06fe10bd3f4d9d046f3e2867",
+    "semantic_hash": "da87af6c06fe10bd3f4d9d046f3e2867"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/app/(auth)/allocation/page.tsx": {
+    "mtime": 1779440630.379424,
+    "ast_hash": "9b533815f2cdad60809dba9175a6a6b1",
+    "semantic_hash": "9b533815f2cdad60809dba9175a6a6b1"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/app/login/page.tsx": {
+    "mtime": 1778064526.8424044,
+    "ast_hash": "b1adc065e451b5aae2e88357f5080eb7",
+    "semantic_hash": "b1adc065e451b5aae2e88357f5080eb7"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/net-worth-chart.tsx": {
+    "mtime": 1779350152.0280833,
+    "ast_hash": "e0413ffe92f4c779f8603f57b3d93f89",
+    "semantic_hash": "e0413ffe92f4c779f8603f57b3d93f89"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/providers.tsx": {
+    "mtime": 1778311049.2224395,
+    "ast_hash": "d1ae6927f20e5ec8a75c4c495d6457fd",
+    "semantic_hash": "d1ae6927f20e5ec8a75c4c495d6457fd"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/ui/alert-dialog.tsx": {
+    "mtime": 1778082795.029431,
+    "ast_hash": "91872f60426bb8b08cb60065fa9f1d3e",
+    "semantic_hash": "91872f60426bb8b08cb60065fa9f1d3e"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/ui/date-range-picker.tsx": {
+    "mtime": 1778227217.0756705,
+    "ast_hash": "fe9529d11d4f139198587373d1d43acc",
+    "semantic_hash": "fe9529d11d4f139198587373d1d43acc"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/ui/tabs.tsx": {
+    "mtime": 1776890887.5608993,
+    "ast_hash": "429035bc858475cd3bcedbb08a5ba8da",
+    "semantic_hash": "429035bc858475cd3bcedbb08a5ba8da"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/ui/card.tsx": {
+    "mtime": 1778236679.3384564,
+    "ast_hash": "26450479efb734b921399f667206f51b",
+    "semantic_hash": "26450479efb734b921399f667206f51b"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/ui/input-group.tsx": {
+    "mtime": 1776890887.8130674,
+    "ast_hash": "e416a1443c87bacbba5ac124ee292dd5",
+    "semantic_hash": "e416a1443c87bacbba5ac124ee292dd5"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/ui/popover.tsx": {
+    "mtime": 1778226169.308535,
+    "ast_hash": "b62d75855c01400695cd9b7c8711e92f",
+    "semantic_hash": "b62d75855c01400695cd9b7c8711e92f"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/ui/progress.tsx": {
+    "mtime": 1776890887.4249375,
+    "ast_hash": "aa71e8ceb68b33af5ed5799f42cd873e",
+    "semantic_hash": "aa71e8ceb68b33af5ed5799f42cd873e"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/ui/date-picker.tsx": {
+    "mtime": 1778226179.1817343,
+    "ast_hash": "0f80ccabba8fbc44cb06b7aa61282f12",
+    "semantic_hash": "0f80ccabba8fbc44cb06b7aa61282f12"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/ui/BentoCard.tsx": {
+    "mtime": 1778236672.2464511,
+    "ast_hash": "9fcb5b99af041e9bfd1b352ffe310334",
+    "semantic_hash": "9fcb5b99af041e9bfd1b352ffe310334"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/ui/PrivacyValue.tsx": {
+    "mtime": 1778089435.5455046,
+    "ast_hash": "e068d3de3a85c0a739987bbc1c37671f",
+    "semantic_hash": "e068d3de3a85c0a739987bbc1c37671f"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/ui/sheet.tsx": {
+    "mtime": 1776890887.7039924,
+    "ast_hash": "43ad8bec991f7a28d2aa22d4f374e6b7",
+    "semantic_hash": "43ad8bec991f7a28d2aa22d4f374e6b7"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/ui/scroll-area.tsx": {
+    "mtime": 1776890887.472955,
+    "ast_hash": "ac8fc719d0fd13c77c933474827337da",
+    "semantic_hash": "ac8fc719d0fd13c77c933474827337da"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/ui/label.tsx": {
+    "mtime": 1776890887.2732043,
+    "ast_hash": "a70440da86bfc6a07f15197cca48cb08",
+    "semantic_hash": "a70440da86bfc6a07f15197cca48cb08"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/ui/sonner.tsx": {
+    "mtime": 1776890887.3738306,
+    "ast_hash": "f46214bc2a6a5153a6e04fad523d5587",
+    "semantic_hash": "f46214bc2a6a5153a6e04fad523d5587"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/ui/TickerLogo.tsx": {
+    "mtime": 1778179697.4211986,
+    "ast_hash": "5f26ebfe57523ff028b30c77ab534732",
+    "semantic_hash": "5f26ebfe57523ff028b30c77ab534732"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/ui/switch.tsx": {
+    "mtime": 1776890887.3266816,
+    "ast_hash": "049ff4b9c939a42157e99d6bbdeaaaec",
+    "semantic_hash": "049ff4b9c939a42157e99d6bbdeaaaec"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/ui/calendar.tsx": {
+    "mtime": 1776890887.7523894,
+    "ast_hash": "b2ebfd1248458219a4fa6b7628f124de",
+    "semantic_hash": "b2ebfd1248458219a4fa6b7628f124de"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/ui/command.tsx": {
+    "mtime": 1777297751.739171,
+    "ast_hash": "55b69ab1ddbeff98410aec694531b155",
+    "semantic_hash": "55b69ab1ddbeff98410aec694531b155"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/ui/DualCurrencyAmount.tsx": {
+    "mtime": 1778133784.0797842,
+    "ast_hash": "397b6a6ea2fdfe0afd38301171160ee2",
+    "semantic_hash": "397b6a6ea2fdfe0afd38301171160ee2"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/ui/dialog.tsx": {
+    "mtime": 1778230148.8655117,
+    "ast_hash": "fb9f11641233d305c6123144f876a7e2",
+    "semantic_hash": "fb9f11641233d305c6123144f876a7e2"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/ui/badge.tsx": {
+    "mtime": 1777995883.6161914,
+    "ast_hash": "f596489f97ddb567ad49decf746aed36",
+    "semantic_hash": "f596489f97ddb567ad49decf746aed36"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/ui/table.tsx": {
+    "mtime": 1776890887.6269486,
+    "ast_hash": "44f87727e60080863edb00fdd2fcd8da",
+    "semantic_hash": "44f87727e60080863edb00fdd2fcd8da"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/ui/separator.tsx": {
+    "mtime": 1776890887.4952676,
+    "ast_hash": "3de2dca3e47ab29c4b1f632671545628",
+    "semantic_hash": "3de2dca3e47ab29c4b1f632671545628"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/ui/button.tsx": {
+    "mtime": 1777995853.721291,
+    "ast_hash": "beaf7af9628d7db270f3b7cb13afa488",
+    "semantic_hash": "beaf7af9628d7db270f3b7cb13afa488"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/ui/collapsible.tsx": {
+    "mtime": 1776890887.4476812,
+    "ast_hash": "bc00817a4471ae1d76774aa4c50a7c31",
+    "semantic_hash": "bc00817a4471ae1d76774aa4c50a7c31"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/ui/dropdown-menu.tsx": {
+    "mtime": 1776890887.601097,
+    "ast_hash": "e6107cbb2088437e76a858f75b5a0280",
+    "semantic_hash": "e6107cbb2088437e76a858f75b5a0280"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/ui/select.tsx": {
+    "mtime": 1776890887.5369728,
+    "ast_hash": "ab95f478cb74d1906b07425c15b124cc",
+    "semantic_hash": "ab95f478cb74d1906b07425c15b124cc"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/ui/textarea.tsx": {
+    "mtime": 1776890887.6745665,
+    "ast_hash": "d448d2a90e48542e51b93a1189127bf2",
+    "semantic_hash": "d448d2a90e48542e51b93a1189127bf2"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/ui/input.tsx": {
+    "mtime": 1776890887.2503896,
+    "ast_hash": "0607b02d99a2e92f9509223f36ccc6ec",
+    "semantic_hash": "0607b02d99a2e92f9509223f36ccc6ec"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/ui/skeleton.tsx": {
+    "mtime": 1776890887.3972714,
+    "ast_hash": "0e6e825c43d858d98c9903f4da975382",
+    "semantic_hash": "0e6e825c43d858d98c9903f4da975382"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/settings/AISettings.tsx": {
+    "mtime": 1779354339.4510012,
+    "ast_hash": "2d1df5b0d4810becf758392ccdfacdad",
+    "semantic_hash": "2d1df5b0d4810becf758392ccdfacdad"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/settings/ScheduleTab.tsx": {
+    "mtime": 1778243038.097663,
+    "ast_hash": "0fd9f850c43b6cd5d5914a8f3c542c5c",
+    "semantic_hash": "0fd9f850c43b6cd5d5914a8f3c542c5c"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/settings/ModelTooltip.tsx": {
+    "mtime": 1778262752.9964216,
+    "ast_hash": "db3ec1bb30322b5d351b9a3dafe6bba7",
+    "semantic_hash": "db3ec1bb30322b5d351b9a3dafe6bba7"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/pipeline/StepList.tsx": {
+    "mtime": 1779349362.6763678,
+    "ast_hash": "bf9fb3b579585a9cf0bca51c1da96130",
+    "semantic_hash": "bf9fb3b579585a9cf0bca51c1da96130"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/pipeline/JobsTable.tsx": {
+    "mtime": 1778233523.5258112,
+    "ast_hash": "f02dbdab1c19050687048a9d5d9ac860",
+    "semantic_hash": "f02dbdab1c19050687048a9d5d9ac860"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/pipeline/TriggerButtons.tsx": {
+    "mtime": 1778233501.8079736,
+    "ast_hash": "00b133d582254f1f9485a0e23be9f7cd",
+    "semantic_hash": "00b133d582254f1f9485a0e23be9f7cd"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/llm/ChatCostBadge.tsx": {
+    "mtime": 1778312995.1443279,
+    "ast_hash": "b80f6de43902bcd9b470c78f7b721c8b",
+    "semantic_hash": "b80f6de43902bcd9b470c78f7b721c8b"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/llm/ConfirmLLMDialog.tsx": {
+    "mtime": 1778261216.6252654,
+    "ast_hash": "e10f27c485a471be1972cce1ced900cf",
+    "semantic_hash": "e10f27c485a471be1972cce1ced900cf"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/analysis/SwotGrid.tsx": {
+    "mtime": 1779177599.2094774,
+    "ast_hash": "3c85ce0a13b68b2596ddaf20149e5f37",
+    "semantic_hash": "3c85ce0a13b68b2596ddaf20149e5f37"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/analysis/CombinedVerdictCard.tsx": {
+    "mtime": 1779366267.1037252,
+    "ast_hash": "15b35a81a350be3d3cd2f58eede8bb41",
+    "semantic_hash": "15b35a81a350be3d3cd2f58eede8bb41"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/analysis/TickerSearchInput.tsx": {
+    "mtime": 1779697102.0953593,
+    "ast_hash": "1569b66e0cf610829da722b62efaf11e",
+    "semantic_hash": "1569b66e0cf610829da722b62efaf11e"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/analysis/VerdictCard.tsx": {
+    "mtime": 1779186225.4315739,
+    "ast_hash": "27b93d8dd8e9208f33e589cf5530142b",
+    "semantic_hash": "27b93d8dd8e9208f33e589cf5530142b"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/analysis/PeerComparisonCard.tsx": {
+    "mtime": 1779362773.967521,
+    "ast_hash": "61f66c2f8cbe4896a49ed292ba7420a2",
+    "semantic_hash": "61f66c2f8cbe4896a49ed292ba7420a2"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/analysis/PipelineFlow.tsx": {
+    "mtime": 1779188047.252701,
+    "ast_hash": "9d3a7bbf219adcdd7a9be0081bbde85b",
+    "semantic_hash": "9d3a7bbf219adcdd7a9be0081bbde85b"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/analysis/DeepDiveCard.tsx": {
+    "mtime": 1779362654.397196,
+    "ast_hash": "ac3e6c4a934dde629a2a9b047000001d",
+    "semantic_hash": "ac3e6c4a934dde629a2a9b047000001d"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/analysis/TopDownAnalysisCard.tsx": {
+    "mtime": 1779349370.917901,
+    "ast_hash": "07d5bfc38e24e1b29d7a806b0e2502a0",
+    "semantic_hash": "07d5bfc38e24e1b29d7a806b0e2502a0"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/analysis/DocumentsList.tsx": {
+    "mtime": 1779177653.8772826,
+    "ast_hash": "6708f8baa27c62be10cb697a076e3173",
+    "semantic_hash": "6708f8baa27c62be10cb697a076e3173"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/analysis/BearCaseCard.tsx": {
+    "mtime": 1779362706.9312625,
+    "ast_hash": "c0caf93111a3b8f062ab647b2daa986d",
+    "semantic_hash": "c0caf93111a3b8f062ab647b2daa986d"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/chat/SessionStrip.tsx": {
+    "mtime": 1779349441.7848344,
+    "ast_hash": "4804198b1e829835910d2eadd1492b30",
+    "semantic_hash": "4804198b1e829835910d2eadd1492b30"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/chat/ChatQuickActions.tsx": {
+    "mtime": 1780046008.752384,
+    "ast_hash": "1d99f1a3d5b701f83dea35ec2d096db7",
+    "semantic_hash": "1d99f1a3d5b701f83dea35ec2d096db7"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/layout/CommandPalette.tsx": {
+    "mtime": 1778235633.653464,
+    "ast_hash": "961d55142f1513fd64c39e400ea1642e",
+    "semantic_hash": "961d55142f1513fd64c39e400ea1642e"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/layout/PageHeader.tsx": {
+    "mtime": 1779444990.1738677,
+    "ast_hash": "33e351e893d6c282153495b07d119e49",
+    "semantic_hash": "33e351e893d6c282153495b07d119e49"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/layout/BottomTabBar.tsx": {
+    "mtime": 1778260896.3154547,
+    "ast_hash": "fc0cf39c6f6459356c7041bf61b75797",
+    "semantic_hash": "fc0cf39c6f6459356c7041bf61b75797"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/layout/Sidebar.tsx": {
+    "mtime": 1779443829.038227,
+    "ast_hash": "4c1df99567c7868e6c3bc5b3af5b335e",
+    "semantic_hash": "4c1df99567c7868e6c3bc5b3af5b335e"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/layout/TopNav.tsx": {
+    "mtime": 1779349289.247754,
+    "ast_hash": "e55ebe6b7dc0e6eeb6e12d71a2149060",
+    "semantic_hash": "e55ebe6b7dc0e6eeb6e12d71a2149060"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/portfolio/PlatformBreakdownCards.tsx": {
+    "mtime": 1778242009.245556,
+    "ast_hash": "444a97c066a85052dca6f3122598e890",
+    "semantic_hash": "444a97c066a85052dca6f3122598e890"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/portfolio/PriceChart.tsx": {
+    "mtime": 1779350149.546485,
+    "ast_hash": "03a973fa5466b46ce7f532754cc85bea",
+    "semantic_hash": "03a973fa5466b46ce7f532754cc85bea"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/portfolio/HoldingsTable.tsx": {
+    "mtime": 1779453809.1371813,
+    "ast_hash": "f3840220c0f951bc4ad362c2cfc4b5da",
+    "semantic_hash": "f3840220c0f951bc4ad362c2cfc4b5da"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/portfolio/UpdateCashBalanceDialog.tsx": {
+    "mtime": 1778226278.889992,
+    "ast_hash": "426a12fe395a8f444e5dc48c6e26df58",
+    "semantic_hash": "426a12fe395a8f444e5dc48c6e26df58"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/portfolio/BeeswarmView.tsx": {
+    "mtime": 1778246867.0733244,
+    "ast_hash": "4b0b522a10cf9b727329a729852a939f",
+    "semantic_hash": "4b0b522a10cf9b727329a729852a939f"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/portfolio/AddCashAccountDialog.tsx": {
+    "mtime": 1778082992.6849535,
+    "ast_hash": "69c6c680c51c3d395d1df43e39a4d133",
+    "semantic_hash": "69c6c680c51c3d395d1df43e39a4d133"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/portfolio/AddTransactionDialog.tsx": {
+    "mtime": 1778242849.537798,
+    "ast_hash": "78bfbfc24bf841dc47cbe50ce297c7b6",
+    "semantic_hash": "78bfbfc24bf841dc47cbe50ce297c7b6"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/portfolio/TreemapView.tsx": {
+    "mtime": 1778246848.1228945,
+    "ast_hash": "ef6949ccb8ee6d1000ed80b65664d615",
+    "semantic_hash": "ef6949ccb8ee6d1000ed80b65664d615"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/portfolio/EditHoldingDialog.tsx": {
+    "mtime": 1779349844.62436,
+    "ast_hash": "ee12ae262d1f97976f92f470e7c7f1ab",
+    "semantic_hash": "ee12ae262d1f97976f92f470e7c7f1ab"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/portfolio/PortfolioViewToggle.tsx": {
+    "mtime": 1778244868.239186,
+    "ast_hash": "87fdbb01a2257e3294d7cd6301bb4d7d",
+    "semantic_hash": "87fdbb01a2257e3294d7cd6301bb4d7d"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/portfolio/CirclepackView.tsx": {
+    "mtime": 1778246881.5863757,
+    "ast_hash": "0740848c7cb41607bef76d965fae4b9b",
+    "semantic_hash": "0740848c7cb41607bef76d965fae4b9b"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/portfolio/AddHoldingDialog.tsx": {
+    "mtime": 1778242852.0627987,
+    "ast_hash": "c4a272499fe0bd221c6546e5173dbf64",
+    "semantic_hash": "c4a272499fe0bd221c6546e5173dbf64"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/portfolio/EditCashAccountDialog.tsx": {
+    "mtime": 1778084223.441154,
+    "ast_hash": "40651b99da2edefb455ba35f8bfaf4f9",
+    "semantic_hash": "40651b99da2edefb455ba35f8bfaf4f9"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/portfolio/CashAccountsSection.tsx": {
+    "mtime": 1778242009.6129212,
+    "ast_hash": "9ad9fc08dc7883d1d3349d580ec58ab4",
+    "semantic_hash": "9ad9fc08dc7883d1d3349d580ec58ab4"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/overview/AIAnalysisCard.tsx": {
+    "mtime": 1778264408.743347,
+    "ast_hash": "afce926c6f87d6f7dab16d7252791253",
+    "semantic_hash": "afce926c6f87d6f7dab16d7252791253"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/overview/HoldingsSnapshot.tsx": {
+    "mtime": 1779443999.1251197,
+    "ast_hash": "97cdb6cd80e58c1802abf65889f2352c",
+    "semantic_hash": "97cdb6cd80e58c1802abf65889f2352c"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/overview/SummaryBar.tsx": {
+    "mtime": 1778132999.728519,
+    "ast_hash": "fe59d12244e44a83c82e48bf018315fc",
+    "semantic_hash": "fe59d12244e44a83c82e48bf018315fc"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/overview/KpiCards.tsx": {
+    "mtime": 1779444853.285599,
+    "ast_hash": "ce2f99f5d70ba877bc706c66e10c7ac3",
+    "semantic_hash": "ce2f99f5d70ba877bc706c66e10c7ac3"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/overview/AllocationDonut.tsx": {
+    "mtime": 1779443986.6385071,
+    "ast_hash": "19c97a0aff2d56d85f551538fc692ff6",
+    "semantic_hash": "19c97a0aff2d56d85f551538fc692ff6"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/overview/PerformanceChart.tsx": {
+    "mtime": 1779443977.9717233,
+    "ast_hash": "055547cb829d1a15b62b9bdc062b953d",
+    "semantic_hash": "055547cb829d1a15b62b9bdc062b953d"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/import/ReviewTable.tsx": {
+    "mtime": 1777987234.8916557,
+    "ast_hash": "dc6d18f9883fad6018cc777c654ad58f",
+    "semantic_hash": "dc6d18f9883fad6018cc777c654ad58f"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/allocation/AllocationDrillDonut.tsx": {
+    "mtime": 1779440615.462445,
+    "ast_hash": "9bdc80eae9562d47d4c1073cd068a9bb",
+    "semantic_hash": "9bdc80eae9562d47d4c1073cd068a9bb"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/components/allocation/AllocationTable.tsx": {
+    "mtime": 1779440621.4933386,
+    "ast_hash": "561731dd590aac13381f86346dbf94ea",
+    "semantic_hash": "561731dd590aac13381f86346dbf94ea"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/hooks/useAnalysisPolling.ts": {
+    "mtime": 1779364316.0891256,
+    "ast_hash": "35883ea5c971e9353e15499bc066d84a",
+    "semantic_hash": "35883ea5c971e9353e15499bc066d84a"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/hooks/useLLMCost.ts": {
+    "mtime": 1778261155.574077,
+    "ast_hash": "e76ab0ff5e1cef52acfd44c309d52eb8",
+    "semantic_hash": "e76ab0ff5e1cef52acfd44c309d52eb8"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/hooks/useResizeObserver.ts": {
+    "mtime": 1778244677.7542925,
+    "ast_hash": "04df93d7373c0b85524ab876479c799f",
+    "semantic_hash": "04df93d7373c0b85524ab876479c799f"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/hooks/useDualCurrency.ts": {
+    "mtime": 1778164984.020216,
+    "ast_hash": "4d361fdcf48e7b7fab316de34e675983",
+    "semantic_hash": "4d361fdcf48e7b7fab316de34e675983"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/hooks/useTableParams.ts": {
+    "mtime": 1778158916.1017528,
+    "ast_hash": "23f794469a83bc8e7899c6809e35db39",
+    "semantic_hash": "23f794469a83bc8e7899c6809e35db39"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/hooks/useCountUp.ts": {
+    "mtime": 1779444516.404717,
+    "ast_hash": "f3c2c163163187cc43162ed8e8401047",
+    "semantic_hash": "f3c2c163163187cc43162ed8e8401047"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/lib/llmPricing.ts": {
+    "mtime": 1778311458.5042756,
+    "ast_hash": "40ef2abc14f170b23d19984abce3618b",
+    "semantic_hash": "40ef2abc14f170b23d19984abce3618b"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/lib/modelRecommendations.ts": {
+    "mtime": 1779364705.8675103,
+    "ast_hash": "59854dcab3d1ef85e97a8fdf59f55708",
+    "semantic_hash": "59854dcab3d1ef85e97a8fdf59f55708"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/lib/utils.ts": {
+    "mtime": 1776890869.1367266,
+    "ast_hash": "5a6fd53fdcf2be529e9cc0b718fde352",
+    "semantic_hash": "5a6fd53fdcf2be529e9cc0b718fde352"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/lib/api.ts": {
+    "mtime": 1778311043.5095642,
+    "ast_hash": "c74c3dcbf631d5adf0738c091c3b19e2",
+    "semantic_hash": "c74c3dcbf631d5adf0738c091c3b19e2"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/lib/types.ts": {
+    "mtime": 1778158297.7535307,
+    "ast_hash": "f45a7efef6608445b39777d97cd0a00f",
+    "semantic_hash": "f45a7efef6608445b39777d97cd0a00f"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/lib/formatCompact.ts": {
+    "mtime": 1779440596.402058,
+    "ast_hash": "667f29427eda3366ae5d1d4e75347fa2",
+    "semantic_hash": "667f29427eda3366ae5d1d4e75347fa2"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/lib/auth.ts": {
+    "mtime": 1777969199.8780146,
+    "ast_hash": "fc19888a95ebbd7fe8fa6de25ec77c3b",
+    "semantic_hash": "fc19888a95ebbd7fe8fa6de25ec77c3b"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/lib/search/pages.ts": {
+    "mtime": 1778235643.7812088,
+    "ast_hash": "e876cbc4bbe69d7d98ee1e6d3bb5a1d2",
+    "semantic_hash": "e876cbc4bbe69d7d98ee1e6d3bb5a1d2"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/lib/visualizations/circlepack.ts": {
+    "mtime": 1778245341.852808,
+    "ast_hash": "b82b9a4f64695998e28b7777b00608e0",
+    "semantic_hash": "b82b9a4f64695998e28b7777b00608e0"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/lib/visualizations/types.ts": {
+    "mtime": 1779349787.939399,
+    "ast_hash": "f7b635aaf0c7dee52500ae97b5bea2a0",
+    "semantic_hash": "f7b635aaf0c7dee52500ae97b5bea2a0"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/lib/visualizations/treemap.ts": {
+    "mtime": 1778244723.7778597,
+    "ast_hash": "bfc4c6bf576761912d2b9ee88523235f",
+    "semantic_hash": "bfc4c6bf576761912d2b9ee88523235f"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/lib/visualizations/beeswarm.ts": {
+    "mtime": 1778245338.266608,
+    "ast_hash": "e0bbcc5c09aacee7e44e0aa0a0741168",
+    "semantic_hash": "e0bbcc5c09aacee7e44e0aa0a0741168"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/lib/services/portfolio.ts": {
+    "mtime": 1778180047.0329046,
+    "ast_hash": "91d00f9854c5e86324958060782926c6",
+    "semantic_hash": "91d00f9854c5e86324958060782926c6"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/lib/services/import-pipeline.ts": {
+    "mtime": 1777963836.4192739,
+    "ast_hash": "de215169d2fa612112fceec542d8aec6",
+    "semantic_hash": "de215169d2fa612112fceec542d8aec6"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/lib/services/schedule.ts": {
+    "mtime": 1778145877.9114554,
+    "ast_hash": "b3c4019339298c283b1f04a9e5d531d4",
+    "semantic_hash": "b3c4019339298c283b1f04a9e5d531d4"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/lib/services/settings.ts": {
+    "mtime": 1778066208.7400775,
+    "ast_hash": "4affc5abf9900c55a650c8ef2b06f2e4",
+    "semantic_hash": "4affc5abf9900c55a650c8ef2b06f2e4"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/lib/services/pipeline.ts": {
+    "mtime": 1778233520.1460505,
+    "ast_hash": "7c79516da364fafeae823efc9ede255f",
+    "semantic_hash": "7c79516da364fafeae823efc9ede255f"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/lib/services/assets.ts": {
+    "mtime": 1779788332.040015,
+    "ast_hash": "5d24ccfe9f115edba4cb0cf1bf132c30",
+    "semantic_hash": "5d24ccfe9f115edba4cb0cf1bf132c30"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/lib/services/provider-config.ts": {
+    "mtime": 1777632992.1319299,
+    "ast_hash": "33c328041a5aaee1c09135ba0c5e7e6e",
+    "semantic_hash": "33c328041a5aaee1c09135ba0c5e7e6e"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/lib/services/chat.ts": {
+    "mtime": 1779728695.026421,
+    "ast_hash": "8deb0356d44115173208394ee679beda",
+    "semantic_hash": "8deb0356d44115173208394ee679beda"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/lib/services/watchlist.ts": {
+    "mtime": 1779790525.7814984,
+    "ast_hash": "71e5cc70132c64284ecc2820ac3a78d1",
+    "semantic_hash": "71e5cc70132c64284ecc2820ac3a78d1"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/lib/services/overview.ts": {
+    "mtime": 1779440228.352564,
+    "ast_hash": "5dd9dbd526389039c283e967619fcac3",
+    "semantic_hash": "5dd9dbd526389039c283e967619fcac3"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/lib/services/cash-balance.ts": {
+    "mtime": 1778171305.5154288,
+    "ast_hash": "06ef1ddd5e810e72c8aabe9970208dc1",
+    "semantic_hash": "06ef1ddd5e810e72c8aabe9970208dc1"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/lib/services/events.ts": {
+    "mtime": 1778180039.067837,
+    "ast_hash": "fed1a82ee07e97983117d7ffb1fc0ee4",
+    "semantic_hash": "fed1a82ee07e97983117d7ffb1fc0ee4"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/lib/services/platform-configs.ts": {
+    "mtime": 1778224937.1656091,
+    "ast_hash": "84b96d9c211e2a9975028d22742bb341",
+    "semantic_hash": "84b96d9c211e2a9975028d22742bb341"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/lib/services/index.ts": {
+    "mtime": 1777895875.1939616,
+    "ast_hash": "6032bacc25d30aef10268185ce814375",
+    "semantic_hash": "6032bacc25d30aef10268185ce814375"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/lib/services/feature-llm-config.ts": {
+    "mtime": 1779354337.45341,
+    "ast_hash": "c033ecbf316d6094d425eaab2fa46e9e",
+    "semantic_hash": "c033ecbf316d6094d425eaab2fa46e9e"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/lib/services/analysis-ai.ts": {
+    "mtime": 1779366257.6520798,
+    "ast_hash": "3cdd4ddc94d228f2990a72bb345f480d",
+    "semantic_hash": "3cdd4ddc94d228f2990a72bb345f480d"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/lib/services/system.ts": {
+    "mtime": 1778052928.022187,
+    "ast_hash": "e67128cb0971c5bba644514b5aaea01d",
+    "semantic_hash": "e67128cb0971c5bba644514b5aaea01d"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/lib/services/auth.ts": {
+    "mtime": 1777979489.5096598,
+    "ast_hash": "46d944e59e5dccbbae2a483286b0605e",
+    "semantic_hash": "46d944e59e5dccbbae2a483286b0605e"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/lib/services/overview-analysis.ts": {
+    "mtime": 1778260538.9545498,
+    "ast_hash": "cad8b52d8a546ede12cb68894a2cab45",
+    "semantic_hash": "cad8b52d8a546ede12cb68894a2cab45"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/store/privacy.ts": {
+    "mtime": 1778048275.3273466,
+    "ast_hash": "7595c3527985d98a6c439738931c52e5",
+    "semantic_hash": "7595c3527985d98a6c439738931c52e5"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/store/palette.ts": {
+    "mtime": 1777185650.579487,
+    "ast_hash": "9efad78ca2375162e4e7ae70d1ca6149",
+    "semantic_hash": "9efad78ca2375162e4e7ae70d1ca6149"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/example/data/Streaming-Transaction.json": {
+    "mtime": 1777375177.3597803,
+    "ast_hash": "b3b9af8c1cc4fa9ae89d49ad1ad9d8e6",
+    "semantic_hash": "b3b9af8c1cc4fa9ae89d49ad1ad9d8e6"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/example/data/DIME-Transaction.json": {
+    "mtime": 1777370816.7182093,
+    "ast_hash": "4a4f1ba664e1bd9a511935c74b608107",
+    "semantic_hash": "4a4f1ba664e1bd9a511935c74b608107"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/.claude/settings.json": {
+    "mtime": 1778561095.944126,
+    "ast_hash": "d978a96682f648baaf28009861015af9",
+    "semantic_hash": "d978a96682f648baaf28009861015af9"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/.claude/settings.local.json": {
+    "mtime": 1779787682.2562413,
+    "ast_hash": "ecc2c0c8236aa1e522033fd7b233292d",
+    "semantic_hash": "ecc2c0c8236aa1e522033fd7b233292d"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/__init__.py": {
+    "mtime": 1776889800.1807275,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/main.py": {
+    "mtime": 1779361348.643331,
+    "ast_hash": "396f9a4baef54459459e8c38f6d0ce31",
+    "semantic_hash": "396f9a4baef54459459e8c38f6d0ce31"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/core/logging.py": {
+    "mtime": 1777087803.9678273,
+    "ast_hash": "e60a7a3fb41ba99f6f3c644b934cc3bb",
+    "semantic_hash": "e60a7a3fb41ba99f6f3c644b934cc3bb"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/core/encryption.py": {
+    "mtime": 1777206306.8946705,
+    "ast_hash": "fdf89f7091f4d7fae57b7c431f85e0f6",
+    "semantic_hash": "fdf89f7091f4d7fae57b7c431f85e0f6"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/core/config.py": {
+    "mtime": 1778139764.0405846,
+    "ast_hash": "28d0e32179b80d5ee66843fc7c081c35",
+    "semantic_hash": "28d0e32179b80d5ee66843fc7c081c35"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/core/llm_pricing.py": {
+    "mtime": 1778311337.5678165,
+    "ast_hash": "f3a1b6042e66bec443c4d53697922056",
+    "semantic_hash": "f3a1b6042e66bec443c4d53697922056"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/core/database.py": {
+    "mtime": 1778167956.110171,
+    "ast_hash": "b8fa3139c8b46502603b5b90909f36f1",
+    "semantic_hash": "b8fa3139c8b46502603b5b90909f36f1"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/core/security.py": {
+    "mtime": 1777297407.3892345,
+    "ast_hash": "bf5b1a9ff34d3d9dd1345df474fe9efc",
+    "semantic_hash": "bf5b1a9ff34d3d9dd1345df474fe9efc"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/core/constants.py": {
+    "mtime": 1779786114.1517487,
+    "ast_hash": "078b8a23fc8643f052887c6437382c9b",
+    "semantic_hash": "078b8a23fc8643f052887c6437382c9b"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/core/__init__.py": {
+    "mtime": 1776889800.6556659,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/core/canonical.py": {
+    "mtime": 1778079342.8667197,
+    "ast_hash": "4edb253a3ab08894de3af4da094942bb",
+    "semantic_hash": "4edb253a3ab08894de3af4da094942bb"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/models/ai_analysis.py": {
+    "mtime": 1778062325.2584882,
+    "ast_hash": "4a81d6ac6ad76dc66525b0299ec7d530",
+    "semantic_hash": "4a81d6ac6ad76dc66525b0299ec7d530"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/models/user.py": {
+    "mtime": 1778145643.7243948,
+    "ast_hash": "5061ffc5589798eeb903fedbb170c8f8",
+    "semantic_hash": "5061ffc5589798eeb903fedbb170c8f8"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/models/ipo_event.py": {
+    "mtime": 1778062256.1880698,
+    "ast_hash": "2505ff5a83b71f02b2c2a40d9241afc7",
+    "semantic_hash": "2505ff5a83b71f02b2c2a40d9241afc7"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/models/combined_verdict.py": {
+    "mtime": 1779366162.8905284,
+    "ast_hash": "66fa7c736eceff0cc046e196588ebce0",
+    "semantic_hash": "66fa7c736eceff0cc046e196588ebce0"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/models/benchmark.py": {
+    "mtime": 1777104023.127179,
+    "ast_hash": "2280bf5b9e278d1a95e25aaefe7edb99",
+    "semantic_hash": "2280bf5b9e278d1a95e25aaefe7edb99"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/models/feature_llm_config.py": {
+    "mtime": 1779354275.629175,
+    "ast_hash": "93204199b52431bbf5eef8a87fe13809",
+    "semantic_hash": "93204199b52431bbf5eef8a87fe13809"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/models/exchange_rate_cache.py": {
+    "mtime": 1777805653.4226007,
+    "ast_hash": "da9770e4e8d4b4441ea7e4a568f09e3d",
+    "semantic_hash": "da9770e4e8d4b4441ea7e4a568f09e3d"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/models/asset.py": {
+    "mtime": 1779435952.563354,
+    "ast_hash": "0fc46d22e1707e127888ff1135a220c6",
+    "semantic_hash": "0fc46d22e1707e127888ff1135a220c6"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/models/platform_config.py": {
+    "mtime": 1778223299.109307,
+    "ast_hash": "c9cf45c5610092c77ce247a84413c451",
+    "semantic_hash": "c9cf45c5610092c77ce247a84413c451"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/models/llm_settings.py": {
+    "mtime": 1777206388.4535477,
+    "ast_hash": "e9d47db19c93f804f8f8dc390365f9ec",
+    "semantic_hash": "e9d47db19c93f804f8f8dc390365f9ec"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/models/transaction.py": {
+    "mtime": 1777882153.6679132,
+    "ast_hash": "773f8f907dd538bc12ffea4247a5eceb",
+    "semantic_hash": "773f8f907dd538bc12ffea4247a5eceb"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/models/holding.py": {
+    "mtime": 1777973516.3024173,
+    "ast_hash": "9fc53138d22d31670132a8df9c0a4190",
+    "semantic_hash": "9fc53138d22d31670132a8df9c0a4190"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/models/__init__.py": {
+    "mtime": 1778223307.8587334,
+    "ast_hash": "5bea35b66260686b7884ea229135344a",
+    "semantic_hash": "5bea35b66260686b7884ea229135344a"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/models/chat_session.py": {
+    "mtime": 1779728543.9540474,
+    "ast_hash": "8e271d75973dfa30bbed2d78b760fe11",
+    "semantic_hash": "8e271d75973dfa30bbed2d78b760fe11"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/models/net_worth_snapshot.py": {
+    "mtime": 1777976391.4837954,
+    "ast_hash": "8d58e58394e1b6f5502522d401393d10",
+    "semantic_hash": "8d58e58394e1b6f5502522d401393d10"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/models/bear_case_analysis.py": {
+    "mtime": 1779364083.2856493,
+    "ast_hash": "7f350c82aade39c015b0123eb9f7dc43",
+    "semantic_hash": "7f350c82aade39c015b0123eb9f7dc43"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/models/llm_conversation.py": {
+    "mtime": 1777206397.3338406,
+    "ast_hash": "709328907d69f87ec01a507d6f3d8b4a",
+    "semantic_hash": "709328907d69f87ec01a507d6f3d8b4a"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/models/provider_config.py": {
+    "mtime": 1777631750.841151,
+    "ast_hash": "f84319ec939c96564777b9057ff4c599",
+    "semantic_hash": "f84319ec939c96564777b9057ff4c599"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/models/pipeline_log.py": {
+    "mtime": 1779186758.0415096,
+    "ast_hash": "4043dd0dea9479ef92cb02b5d3b775a0",
+    "semantic_hash": "4043dd0dea9479ef92cb02b5d3b775a0"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/models/cash_balance.py": {
+    "mtime": 1777631762.1922882,
+    "ast_hash": "268a796649c0094ebc1cf06c24e1c177",
+    "semantic_hash": "268a796649c0094ebc1cf06c24e1c177"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/models/peer_comparison_analysis.py": {
+    "mtime": 1779364086.6922517,
+    "ast_hash": "7d801222775acccaf74d231a176f4d67",
+    "semantic_hash": "7d801222775acccaf74d231a176f4d67"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/models/dividend_event.py": {
+    "mtime": 1778177162.7633412,
+    "ast_hash": "d00859c397b10539a4e0892c0eaf4922",
+    "semantic_hash": "d00859c397b10539a4e0892c0eaf4922"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/models/llm_call_log.py": {
+    "mtime": 1779780485.6450796,
+    "ast_hash": "21110f509bf2f3ac1f459a78e4504f5d",
+    "semantic_hash": "21110f509bf2f3ac1f459a78e4504f5d"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/models/top_down_analysis.py": {
+    "mtime": 1779184510.3625093,
+    "ast_hash": "2342e1e6dc8e599975a99154ae83b4ed",
+    "semantic_hash": "2342e1e6dc8e599975a99154ae83b4ed"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/models/document.py": {
+    "mtime": 1779344098.072476,
+    "ast_hash": "afe3dfacd25a9d40ad27729b1cd79843",
+    "semantic_hash": "afe3dfacd25a9d40ad27729b1cd79843"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/models/news_article.py": {
+    "mtime": 1778260977.0691922,
+    "ast_hash": "de77c3f82d0628afe3260b973cc93577",
+    "semantic_hash": "de77c3f82d0628afe3260b973cc93577"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/models/watchlist_item.py": {
+    "mtime": 1779785169.3358417,
+    "ast_hash": "676ce7acb09c798235134831479f0bbe",
+    "semantic_hash": "676ce7acb09c798235134831479f0bbe"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/models/deep_dive_analysis.py": {
+    "mtime": 1779364079.6989882,
+    "ast_hash": "4b70b10c5ea48ee3f16296a926f95d2a",
+    "semantic_hash": "4b70b10c5ea48ee3f16296a926f95d2a"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/models/watchlist_suggestion.py": {
+    "mtime": 1778009884.2851331,
+    "ast_hash": "692d071e2c25547cd09a82542ec0d92e",
+    "semantic_hash": "692d071e2c25547cd09a82542ec0d92e"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/models/price_schedule_config.py": {
+    "mtime": 1778145636.4006805,
+    "ast_hash": "3cea599e616790b970b6a5165184f238",
+    "semantic_hash": "3cea599e616790b970b6a5165184f238"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/models/pipeline_step.py": {
+    "mtime": 1778043107.4672508,
+    "ast_hash": "a43f67895d842cee14130f3095ac0ad1",
+    "semantic_hash": "a43f67895d842cee14130f3095ac0ad1"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/models/overview_analysis.py": {
+    "mtime": 1778260320.833463,
+    "ast_hash": "165312d60f251cc23a0a39694ca21990",
+    "semantic_hash": "165312d60f251cc23a0a39694ca21990"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/models/price.py": {
+    "mtime": 1777104014.7862134,
+    "ast_hash": "8e9ac3468799e4e7748c1e52a33d9112",
+    "semantic_hash": "8e9ac3468799e4e7748c1e52a33d9112"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/schemas/auth.py": {
+    "mtime": 1777979373.4078481,
+    "ast_hash": "53e3115074d21ab33398ec49b1889a88",
+    "semantic_hash": "53e3115074d21ab33398ec49b1889a88"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/schemas/feature_llm_config.py": {
+    "mtime": 1777726618.3250225,
+    "ast_hash": "98ffcc0c0133e98ec875da2888b95caa",
+    "semantic_hash": "98ffcc0c0133e98ec875da2888b95caa"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/schemas/import_pipeline.py": {
+    "mtime": 1777882169.279871,
+    "ast_hash": "5e662a6b0ec89aa17aa7b3db0eb3144a",
+    "semantic_hash": "5e662a6b0ec89aa17aa7b3db0eb3144a"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/schemas/asset.py": {
+    "mtime": 1778155175.3161924,
+    "ast_hash": "67559b21d501919740bca523531c4486",
+    "semantic_hash": "67559b21d501919740bca523531c4486"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/schemas/events.py": {
+    "mtime": 1778179603.2983623,
+    "ast_hash": "52d5ed6030f1a3bd341705ec4ff45a33",
+    "semantic_hash": "52d5ed6030f1a3bd341705ec4ff45a33"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/schemas/transaction.py": {
+    "mtime": 1778179589.7896578,
+    "ast_hash": "f78ce574d20694e48d44e4e4387980fa",
+    "semantic_hash": "f78ce574d20694e48d44e4e4387980fa"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/schemas/holding.py": {
+    "mtime": 1778179586.8259637,
+    "ast_hash": "685f06c391d364edd18bcf61fce4878f",
+    "semantic_hash": "685f06c391d364edd18bcf61fce4878f"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/schemas/__init__.py": {
+    "mtime": 1776890154.2906592,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/schemas/system_backup.py": {
+    "mtime": 1778223491.7365515,
+    "ast_hash": "585e175cc17b167bd263b89862f2107b",
+    "semantic_hash": "585e175cc17b167bd263b89862f2107b"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/schemas/provider_config.py": {
+    "mtime": 1777632355.2727418,
+    "ast_hash": "8f5b4e3b1c5a97fbd1f1e21d63e15be9",
+    "semantic_hash": "8f5b4e3b1c5a97fbd1f1e21d63e15be9"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/schemas/cash_balance.py": {
+    "mtime": 1777632576.5059175,
+    "ast_hash": "27a22c0b87105b94e61cb76d7d70a676",
+    "semantic_hash": "27a22c0b87105b94e61cb76d7d70a676"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/schemas/watchlist.py": {
+    "mtime": 1779785203.7287934,
+    "ast_hash": "4b421080bc279b1e8b6d10dc91edb6d2",
+    "semantic_hash": "4b421080bc279b1e8b6d10dc91edb6d2"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/schemas/overview.py": {
+    "mtime": 1779440071.467076,
+    "ast_hash": "f0d88d92de2d4919cef23ba440d32a83",
+    "semantic_hash": "f0d88d92de2d4919cef23ba440d32a83"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/schemas/common.py": {
+    "mtime": 1778157985.4210494,
+    "ast_hash": "c006685f08d8ac1bf0a6fc58f412688f",
+    "semantic_hash": "c006685f08d8ac1bf0a6fc58f412688f"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/schemas/dividend.py": {
+    "mtime": 1777990910.0907252,
+    "ast_hash": "ab97fae16e6785531c58225e0e96fec8",
+    "semantic_hash": "ab97fae16e6785531c58225e0e96fec8"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/schemas/pipeline.py": {
+    "mtime": 1779187028.5617642,
+    "ast_hash": "267c71d8bba16c1eaa2dbe8ce0f698f6",
+    "semantic_hash": "267c71d8bba16c1eaa2dbe8ce0f698f6"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/schemas/ipo.py": {
+    "mtime": 1778062660.0482972,
+    "ast_hash": "911f34c9ac84f809155ffd4449a9e768",
+    "semantic_hash": "911f34c9ac84f809155ffd4449a9e768"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/schemas/price_schedule_config.py": {
+    "mtime": 1778145650.7375948,
+    "ast_hash": "884e8e804d7fd7b1fb048ddecf635b03",
+    "semantic_hash": "884e8e804d7fd7b1fb048ddecf635b03"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/schemas/price.py": {
+    "mtime": 1777104146.847781,
+    "ast_hash": "c48852a18393353eeb41a223990dd55a",
+    "semantic_hash": "c48852a18393353eeb41a223990dd55a"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/api/auth.py": {
+    "mtime": 1776927717.9447043,
+    "ast_hash": "de210bd6d8e10b603e9df308a40094ff",
+    "semantic_hash": "de210bd6d8e10b603e9df308a40094ff"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/api/deps.py": {
+    "mtime": 1776890167.746939,
+    "ast_hash": "318af94f3d3b2e995618a281cacde33d",
+    "semantic_hash": "318af94f3d3b2e995618a281cacde33d"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/api/system.py": {
+    "mtime": 1778140034.819616,
+    "ast_hash": "332546a0006b47ea7ded498b4a068970",
+    "semantic_hash": "332546a0006b47ea7ded498b4a068970"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/api/combined_verdict.py": {
+    "mtime": 1779366183.171937,
+    "ast_hash": "0e1d2ff14c9e37ca0dbdf70189901c58",
+    "semantic_hash": "0e1d2ff14c9e37ca0dbdf70189901c58"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/api/analysis.py": {
+    "mtime": 1778315083.5896745,
+    "ast_hash": "c7f60c50ec235722c90716611dac0910",
+    "semantic_hash": "c7f60c50ec235722c90716611dac0910"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/api/feature_llm_config.py": {
+    "mtime": 1777632486.9760175,
+    "ast_hash": "db1c21eef6736f261cb800fd5db4633f",
+    "semantic_hash": "db1c21eef6736f261cb800fd5db4633f"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/api/platforms.py": {
+    "mtime": 1778223443.7793715,
+    "ast_hash": "5ea693b6c730b1b0bcac4f535582ae41",
+    "semantic_hash": "5ea693b6c730b1b0bcac4f535582ae41"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/api/import_pipeline.py": {
+    "mtime": 1778226616.4562883,
+    "ast_hash": "79c76ed915a24407316be160363bf53a",
+    "semantic_hash": "79c76ed915a24407316be160363bf53a"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/api/research.py": {
+    "mtime": 1778261074.049672,
+    "ast_hash": "8652468d5df8eee3391962d57a530cbc",
+    "semantic_hash": "8652468d5df8eee3391962d57a530cbc"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/api/llm_pricing.py": {
+    "mtime": 1778266147.0682917,
+    "ast_hash": "ed2aa5e4ebefe5d602a03cb711d6a657",
+    "semantic_hash": "ed2aa5e4ebefe5d602a03cb711d6a657"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/api/health.py": {
+    "mtime": 1776889809.6350176,
+    "ast_hash": "ed4ed4179d0b72bc8831785dfb71d1b0",
+    "semantic_hash": "ed4ed4179d0b72bc8831785dfb71d1b0"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/api/events.py": {
+    "mtime": 1778063079.4444342,
+    "ast_hash": "d1e4fc8b87058fbc23a12d9a0f920756",
+    "semantic_hash": "d1e4fc8b87058fbc23a12d9a0f920756"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/api/documents.py": {
+    "mtime": 1779344846.936389,
+    "ast_hash": "5c3a01f96fc3e99a5e56190b17b22668",
+    "semantic_hash": "5c3a01f96fc3e99a5e56190b17b22668"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/api/__init__.py": {
+    "mtime": 1776889801.5807607,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/api/ipos.py": {
+    "mtime": 1778175168.5332263,
+    "ast_hash": "221d34ac7aefe2eb1e5f96bd8031ae5a",
+    "semantic_hash": "221d34ac7aefe2eb1e5f96bd8031ae5a"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/api/bear_case_analysis.py": {
+    "mtime": 1779364247.030037,
+    "ast_hash": "8f5807267404d54ab36f76357dae9f94",
+    "semantic_hash": "8f5807267404d54ab36f76357dae9f94"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/api/provider_config.py": {
+    "mtime": 1777632371.0775874,
+    "ast_hash": "891efa2986d657917090d76690bee6f6",
+    "semantic_hash": "891efa2986d657917090d76690bee6f6"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/api/cash_balance.py": {
+    "mtime": 1778171297.6348484,
+    "ast_hash": "da649b9b86c69cd3718579c3c772200f",
+    "semantic_hash": "da649b9b86c69cd3718579c3c772200f"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/api/watchlist.py": {
+    "mtime": 1779790518.0341387,
+    "ast_hash": "d6bc5386ea6cfa748ccae01b4994ddb9",
+    "semantic_hash": "d6bc5386ea6cfa748ccae01b4994ddb9"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/api/overview.py": {
+    "mtime": 1779440090.8114698,
+    "ast_hash": "d103faa9c3eac5fed12ef854e8218d7c",
+    "semantic_hash": "d103faa9c3eac5fed12ef854e8218d7c"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/api/peer_comparison_analysis.py": {
+    "mtime": 1779364248.7145426,
+    "ast_hash": "f423b1ead07c3bd83641774efdde9cc0",
+    "semantic_hash": "f423b1ead07c3bd83641774efdde9cc0"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/api/chat.py": {
+    "mtime": 1779728610.9265869,
+    "ast_hash": "f618559a407ce4bf2736c7d8b9c31269",
+    "semantic_hash": "f618559a407ce4bf2736c7d8b9c31269"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/api/dividends.py": {
+    "mtime": 1777991962.1549647,
+    "ast_hash": "6f0a91e7139c2f3d445457d0863c6f04",
+    "semantic_hash": "6f0a91e7139c2f3d445457d0863c6f04"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/api/top_down_analysis.py": {
+    "mtime": 1779698489.3707848,
+    "ast_hash": "04e1ff32f57581fe6516d6bf51814f39",
+    "semantic_hash": "04e1ff32f57581fe6516d6bf51814f39"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/api/pipeline.py": {
+    "mtime": 1779187958.2871118,
+    "ast_hash": "79aaecf8dac87afc4c0e820322eb3a82",
+    "semantic_hash": "79aaecf8dac87afc4c0e820322eb3a82"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/api/assets.py": {
+    "mtime": 1779696756.726356,
+    "ast_hash": "486199a089df3befd1dd486fc5d8aa45",
+    "semantic_hash": "486199a089df3befd1dd486fc5d8aa45"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/api/settings.py": {
+    "mtime": 1778145756.3041108,
+    "ast_hash": "bbfee85da81fccae1469984548236079",
+    "semantic_hash": "bbfee85da81fccae1469984548236079"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/api/deep_dive_analysis.py": {
+    "mtime": 1779364245.5380588,
+    "ast_hash": "2c0a33d9f280ceeeab7ae835b1d6b1cf",
+    "semantic_hash": "2c0a33d9f280ceeeab7ae835b1d6b1cf"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/api/llm_usage.py": {
+    "mtime": 1779780876.4253721,
+    "ast_hash": "eb4a2bc74a73d78bded4de7d58e3dfea",
+    "semantic_hash": "eb4a2bc74a73d78bded4de7d58e3dfea"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/api/portfolio.py": {
+    "mtime": 1778158902.9076798,
+    "ast_hash": "fb60f5d03cf73e54e1d9b62a2acd1225",
+    "semantic_hash": "fb60f5d03cf73e54e1d9b62a2acd1225"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/auth.py": {
+    "mtime": 1777087372.4220846,
+    "ast_hash": "75994f6d89f698704e109032f8760716",
+    "semantic_hash": "75994f6d89f698704e109032f8760716"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/chat_tools.py": {
+    "mtime": 1779727330.347299,
+    "ast_hash": "30ea2a0f0b0744df077f5a365e3c34e0",
+    "semantic_hash": "30ea2a0f0b0744df077f5a365e3c34e0"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/combined_verdict.py": {
+    "mtime": 1779366178.618177,
+    "ast_hash": "4abd58fea807e2d5b88ba5649aa843b1",
+    "semantic_hash": "4abd58fea807e2d5b88ba5649aa843b1"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/user_context.py": {
+    "mtime": 1777985521.1494098,
+    "ast_hash": "6558aae1ac2c06c7ec4a7e84dd10384c",
+    "semantic_hash": "6558aae1ac2c06c7ec4a7e84dd10384c"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/import_pipeline.py": {
+    "mtime": 1778079186.1928287,
+    "ast_hash": "4fe19edbea33f4e3a38b67074019351d",
+    "semantic_hash": "4fe19edbea33f4e3a38b67074019351d"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/asset.py": {
+    "mtime": 1778084072.669768,
+    "ast_hash": "7f4173169f850192a32c2777cee45df8",
+    "semantic_hash": "7f4173169f850192a32c2777cee45df8"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/rag_service.py": {
+    "mtime": 1777206968.7411804,
+    "ast_hash": "a60202f18e70f7fece00600a980e6695",
+    "semantic_hash": "a60202f18e70f7fece00600a980e6695"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/telegram.py": {
+    "mtime": 1778006810.5132627,
+    "ast_hash": "d93b2494590cf7c02e89772e0dd29dee",
+    "semantic_hash": "d93b2494590cf7c02e89772e0dd29dee"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/price_feed.py": {
+    "mtime": 1779788858.1058743,
+    "ast_hash": "dad792f6351ffa7abb06f6bb8298ae4f",
+    "semantic_hash": "dad792f6351ffa7abb06f6bb8298ae4f"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/watchlist_alert.py": {
+    "mtime": 1779786122.545208,
+    "ast_hash": "898fdaf7ab463befec5beffad26a5b36",
+    "semantic_hash": "898fdaf7ab463befec5beffad26a5b36"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/__init__.py": {
+    "mtime": 1776890154.5979083,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/events_calendar.py": {
+    "mtime": 1778180025.1919575,
+    "ast_hash": "f21d7a4291b1ae4f94be8d2039d2c9a6",
+    "semantic_hash": "f21d7a4291b1ae4f94be8d2039d2c9a6"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/net_worth_snapshot.py": {
+    "mtime": 1778234002.5198934,
+    "ast_hash": "f450ea5053139df3a83da3a9f5139c8c",
+    "semantic_hash": "f450ea5053139df3a83da3a9f5139c8c"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/bear_case_analysis.py": {
+    "mtime": 1779354647.4289403,
+    "ast_hash": "71de377b7223bbb422e5eec1928bf1ae",
+    "semantic_hash": "71de377b7223bbb422e5eec1928bf1ae"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/dividend_alert.py": {
+    "mtime": 1778177497.3016515,
+    "ast_hash": "76b78f2d2e6bf83b42ccfb95be25d432",
+    "semantic_hash": "76b78f2d2e6bf83b42ccfb95be25d432"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/news_rag.py": {
+    "mtime": 1778261040.0313768,
+    "ast_hash": "c569f1f0bbb918ee5f411842053c6ee0",
+    "semantic_hash": "c569f1f0bbb918ee5f411842053c6ee0"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/system_backup.py": {
+    "mtime": 1778223524.6253,
+    "ast_hash": "153b1a95cf8da104a5c1a0f010ae95d0",
+    "semantic_hash": "153b1a95cf8da104a5c1a0f010ae95d0"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/logo.py": {
+    "mtime": 1778179319.6600835,
+    "ast_hash": "0ba1a280224460c9d4cc9b0c02041606",
+    "semantic_hash": "0ba1a280224460c9d4cc9b0c02041606"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/ipo_feed.py": {
+    "mtime": 1778174043.1516318,
+    "ast_hash": "dea8d53e885a84287ebd6937528f781e",
+    "semantic_hash": "dea8d53e885a84287ebd6937528f781e"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/llm_service.py": {
+    "mtime": 1779724941.795351,
+    "ast_hash": "6a00b85e60ab6b7b8bea374157be4fea",
+    "semantic_hash": "6a00b85e60ab6b7b8bea374157be4fea"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/cash_balance.py": {
+    "mtime": 1778171293.6250994,
+    "ast_hash": "a031de03b6d85937e9376b26f8583694",
+    "semantic_hash": "a031de03b6d85937e9376b26f8583694"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/llm_gateway.py": {
+    "mtime": 1780044774.385915,
+    "ast_hash": "6cbb668ae29ec3923ca845a3409d3ad8",
+    "semantic_hash": "6cbb668ae29ec3923ca845a3409d3ad8"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/overview.py": {
+    "mtime": 1779440082.4753728,
+    "ast_hash": "9fb04c9e5712df18969a7d764b8cda4c",
+    "semantic_hash": "9fb04c9e5712df18969a7d764b8cda4c"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/peer_comparison_analysis.py": {
+    "mtime": 1779360943.8088741,
+    "ast_hash": "6f528b63b9244fe5977c1eb6dab280f9",
+    "semantic_hash": "6f528b63b9244fe5977c1eb6dab280f9"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/dividend_feed.py": {
+    "mtime": 1778179641.5495372,
+    "ast_hash": "9e41807b2ecda04777c971758182c010",
+    "semantic_hash": "9e41807b2ecda04777c971758182c010"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/pipeline.py": {
+    "mtime": 1779187944.244392,
+    "ast_hash": "bc523b36ec617c7eb157df7a701c5b40",
+    "semantic_hash": "bc523b36ec617c7eb157df7a701c5b40"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/th_fund.py": {
+    "mtime": 1778864572.6493816,
+    "ast_hash": "6a76981b96c52aeca0eb163793ba7a58",
+    "semantic_hash": "6a76981b96c52aeca0eb163793ba7a58"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/hardware.py": {
+    "mtime": 1777087451.0721729,
+    "ast_hash": "6b3a73f851c815165631fe0bab38fc2e",
+    "semantic_hash": "6b3a73f851c815165631fe0bab38fc2e"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/deep_dive_analysis.py": {
+    "mtime": 1779354483.1513767,
+    "ast_hash": "0c0b11215147f41e8aa61c40bd436001",
+    "semantic_hash": "0c0b11215147f41e8aa61c40bd436001"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/exchange_rate.py": {
+    "mtime": 1779435030.409742,
+    "ast_hash": "2f51cb93a05b7c061032abe1904471a8",
+    "semantic_hash": "2f51cb93a05b7c061032abe1904471a8"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/document_fetcher.py": {
+    "mtime": 1779177104.3235807,
+    "ast_hash": "0635da156ae5bfa1fa2dd60a6edabae3",
+    "semantic_hash": "0635da156ae5bfa1fa2dd60a6edabae3"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/price_schedule_config.py": {
+    "mtime": 1778170941.5685437,
+    "ast_hash": "49cb5f99bb77bf0aa78efc6987e621c1",
+    "semantic_hash": "49cb5f99bb77bf0aa78efc6987e621c1"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/document_manager.py": {
+    "mtime": 1779344838.4044502,
+    "ast_hash": "09d6608b8c0e6d96b5ca82b9c47cb8bd",
+    "semantic_hash": "09d6608b8c0e6d96b5ca82b9c47cb8bd"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/portfolio.py": {
+    "mtime": 1778180018.6415803,
+    "ast_hash": "642fa142d79fd2d64fc428cecf69cc5c",
+    "semantic_hash": "642fa142d79fd2d64fc428cecf69cc5c"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/overview_analysis.py": {
+    "mtime": 1778261835.9774666,
+    "ast_hash": "2bec7070b6dbba20dce1ae7a5be85ec3",
+    "semantic_hash": "2bec7070b6dbba20dce1ae7a5be85ec3"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/app/services/asset_enrichment.py": {
+    "mtime": 1779436335.526219,
+    "ast_hash": "861ad1566aba7a66dac1eebdec1331ad",
+    "semantic_hash": "861ad1566aba7a66dac1eebdec1331ad"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_document_fetcher.py": {
+    "mtime": 1779176870.6423848,
+    "ast_hash": "85e55ebdb8ca30dcdcf64cf83584d449",
+    "semantic_hash": "85e55ebdb8ca30dcdcf64cf83584d449"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_upload_dedup.py": {
+    "mtime": 1779344909.9124143,
+    "ast_hash": "468de27a5bad82e34f73157ef445bc55",
+    "semantic_hash": "468de27a5bad82e34f73157ef445bc55"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_rag_service.py": {
+    "mtime": 1777206960.9639308,
+    "ast_hash": "9c1dc822fe0946803bd26f7e0c17533a",
+    "semantic_hash": "9c1dc822fe0946803bd26f7e0c17533a"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_security.py": {
+    "mtime": 1776890011.4745805,
+    "ast_hash": "9be2a415afd348090abb89bb4fe5db17",
+    "semantic_hash": "9be2a415afd348090abb89bb4fe5db17"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/conftest.py": {
+    "mtime": 1778155225.2337303,
+    "ast_hash": "40598509c5a163a4b8154f07862e29c8",
+    "semantic_hash": "40598509c5a163a4b8154f07862e29c8"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_document_manager.py": {
+    "mtime": 1779344916.6560342,
+    "ast_hash": "ef0253198a89bb22c953a5364ecfcd2f",
+    "semantic_hash": "ef0253198a89bb22c953a5364ecfcd2f"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_import_upload.py": {
+    "mtime": 1777894968.480465,
+    "ast_hash": "1b9b4cde4395d1d4ca668beb886a0c6d",
+    "semantic_hash": "1b9b4cde4395d1d4ca668beb886a0c6d"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_provider_config.py": {
+    "mtime": 1777632350.275361,
+    "ast_hash": "95b83858e8fcf89b7026a9792fe97b60",
+    "semantic_hash": "95b83858e8fcf89b7026a9792fe97b60"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_assets.py": {
+    "mtime": 1778154997.0190578,
+    "ast_hash": "651a41d6b2062834407c08c837f2a146",
+    "semantic_hash": "651a41d6b2062834407c08c837f2a146"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_run_top_down_analysis.py": {
+    "mtime": 1779177350.3186178,
+    "ast_hash": "36bf3a1ff5bb296659dbfccd72b4aeff",
+    "semantic_hash": "36bf3a1ff5bb296659dbfccd72b4aeff"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_watchlist.py": {
+    "mtime": 1778158269.2166092,
+    "ast_hash": "cabc062d713ad384998afc03ad3db6cd",
+    "semantic_hash": "cabc062d713ad384998afc03ad3db6cd"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_user_age_context.py": {
+    "mtime": 1777985572.7797174,
+    "ast_hash": "9e4a16a972f44feef160827b1d08e14a",
+    "semantic_hash": "9e4a16a972f44feef160827b1d08e14a"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_auth.py": {
+    "mtime": 1777086166.258433,
+    "ast_hash": "946e8096dee2cdd6ac1e344b20f09774",
+    "semantic_hash": "946e8096dee2cdd6ac1e344b20f09774"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_schedule_api.py": {
+    "mtime": 1778144275.0694375,
+    "ast_hash": "1b8f4ddfa0a2b9e46592ecfe9308b1f6",
+    "semantic_hash": "1b8f4ddfa0a2b9e46592ecfe9308b1f6"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_top_down_manual_trigger.py": {
+    "mtime": 1779697474.325256,
+    "ast_hash": "4b8f0687e6cc4973e19368ccd3ad1542",
+    "semantic_hash": "4b8f0687e6cc4973e19368ccd3ad1542"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_portfolio.py": {
+    "mtime": 1778158184.433518,
+    "ast_hash": "ddb862d27acc8ddc5e96bcc1ee16ec2f",
+    "semantic_hash": "ddb862d27acc8ddc5e96bcc1ee16ec2f"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_deep_dive.py": {
+    "mtime": 1779354514.669158,
+    "ast_hash": "00b44d45c98c61a5ba668cedb84f7f79",
+    "semantic_hash": "00b44d45c98c61a5ba668cedb84f7f79"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_cash_balance.py": {
+    "mtime": 1777632572.1156137,
+    "ast_hash": "c59d1706f2751738e80a5d0859924dfa",
+    "semantic_hash": "c59d1706f2751738e80a5d0859924dfa"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_analysis.py": {
+    "mtime": 1777270304.3197277,
+    "ast_hash": "9b7e74bbc74287667627945980dcb380",
+    "semantic_hash": "9b7e74bbc74287667627945980dcb380"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/__init__.py": {
+    "mtime": 1777805470.919012,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_llm_pricing.py": {
+    "mtime": 1778265863.7317495,
+    "ast_hash": "6afe085a25715a213dd5cd34627ddfc0",
+    "semantic_hash": "6afe085a25715a213dd5cd34627ddfc0"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_platforms.py": {
+    "mtime": 1778223356.3403397,
+    "ast_hash": "661b3683a50ed3fe2e78013c662a4e21",
+    "semantic_hash": "661b3683a50ed3fe2e78013c662a4e21"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_llm_settings.py": {
+    "mtime": 1777206550.0188885,
+    "ast_hash": "999f025d3d1b269c1749e4fa23496321",
+    "semantic_hash": "999f025d3d1b269c1749e4fa23496321"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_peer_comparison.py": {
+    "mtime": 1779360980.1390033,
+    "ast_hash": "1f85259393b08a0ab8714de580378025",
+    "semantic_hash": "1f85259393b08a0ab8714de580378025"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_import_pipeline.py": {
+    "mtime": 1777807321.205848,
+    "ast_hash": "8806a1a6bcd9410306e6dbbb92bf5145",
+    "semantic_hash": "8806a1a6bcd9410306e6dbbb92bf5145"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_import_api.py": {
+    "mtime": 1777835117.8941603,
+    "ast_hash": "51fd64988337a38ee199c04fc48d6775",
+    "semantic_hash": "51fd64988337a38ee199c04fc48d6775"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_update_holding.py": {
+    "mtime": 1777974041.9144785,
+    "ast_hash": "72d5a933406d3cf1bb1cede02d1698c9",
+    "semantic_hash": "72d5a933406d3cf1bb1cede02d1698c9"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_net_worth_snapshot.py": {
+    "mtime": 1778233162.5255492,
+    "ast_hash": "4e1d7609bb3c29b50f30613e91c5939d",
+    "semantic_hash": "4e1d7609bb3c29b50f30613e91c5939d"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_system_backup.py": {
+    "mtime": 1778144412.8091571,
+    "ast_hash": "c40523213d0e21cb38632257e5065975",
+    "semantic_hash": "c40523213d0e21cb38632257e5065975"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_market_search.py": {
+    "mtime": 1779697482.026561,
+    "ast_hash": "e9b1548d2cc76e1082c8dbcaa415294f",
+    "semantic_hash": "e9b1548d2cc76e1082c8dbcaa415294f"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_overview.py": {
+    "mtime": 1779440099.7641697,
+    "ast_hash": "243d256c2550b46da2173f76b118f776",
+    "semantic_hash": "243d256c2550b46da2173f76b118f776"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_health.py": {
+    "mtime": 1776889776.0671542,
+    "ast_hash": "3101aa313c59d04f847ee480ff7398aa",
+    "semantic_hash": "3101aa313c59d04f847ee480ff7398aa"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_llm_service.py": {
+    "mtime": 1778266069.671316,
+    "ast_hash": "d90c5a7f9c69be285e746a69c76ede23",
+    "semantic_hash": "d90c5a7f9c69be285e746a69c76ede23"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_llm_gateway.py": {
+    "mtime": 1779728401.522322,
+    "ast_hash": "9435c5afea21bbe92376d7d357db8eb8",
+    "semantic_hash": "9435c5afea21bbe92376d7d357db8eb8"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_chat_tools.py": {
+    "mtime": 1779727369.7431865,
+    "ast_hash": "6c73d4ff0dc0048546b7fbbfcdb388f8",
+    "semantic_hash": "6c73d4ff0dc0048546b7fbbfcdb388f8"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_combined_verdict.py": {
+    "mtime": 1779361263.0580573,
+    "ast_hash": "6635fc575db498b93b143c92b81c5dae",
+    "semantic_hash": "6635fc575db498b93b143c92b81c5dae"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_dividends_api.py": {
+    "mtime": 1777991356.8145473,
+    "ast_hash": "a5c0815a965858623cf58b178969051a",
+    "semantic_hash": "a5c0815a965858623cf58b178969051a"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_documents.py": {
+    "mtime": 1777207138.9988883,
+    "ast_hash": "485860fb1a8c07a611b885dffdd79335",
+    "semantic_hash": "485860fb1a8c07a611b885dffdd79335"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_feature_llm_config.py": {
+    "mtime": 1777632468.3457422,
+    "ast_hash": "d1de234fb39bf453420f7238a3846926",
+    "semantic_hash": "d1de234fb39bf453420f7238a3846926"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_llm_tool_rounds.py": {
+    "mtime": 1779780864.438511,
+    "ast_hash": "98afa4b796b83c5cf6f105ffb74d2740",
+    "semantic_hash": "98afa4b796b83c5cf6f105ffb74d2740"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_llm_pricing_api.py": {
+    "mtime": 1778266136.2599447,
+    "ast_hash": "099902b95863fd93bd3c178e4a67b66a",
+    "semantic_hash": "099902b95863fd93bd3c178e4a67b66a"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_pipeline.py": {
+    "mtime": 1778043131.7661548,
+    "ast_hash": "4c6e370ee8a530632fcd23d4f575144a",
+    "semantic_hash": "4c6e370ee8a530632fcd23d4f575144a"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_bear_case.py": {
+    "mtime": 1779360591.4476676,
+    "ast_hash": "11016233992bd7d16b86d2bff391cdd3",
+    "semantic_hash": "11016233992bd7d16b86d2bff391cdd3"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_chat_sessions.py": {
+    "mtime": 1778313269.4783595,
+    "ast_hash": "d6384362db223dcbed5470401aaebca0",
+    "semantic_hash": "d6384362db223dcbed5470401aaebca0"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_encryption.py": {
+    "mtime": 1777205677.3272295,
+    "ast_hash": "8ba6bed5bebbfb500fe0e44a0ab4450f",
+    "semantic_hash": "8ba6bed5bebbfb500fe0e44a0ab4450f"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/test_hardware.py": {
+    "mtime": 1777010497.8545086,
+    "ast_hash": "9b352b5700e8d265a1386f011961e8a4",
+    "semantic_hash": "9b352b5700e8d265a1386f011961e8a4"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/unit/conftest.py": {
+    "mtime": 1779787289.3873491,
+    "ast_hash": "f6c14b39ac72bfb1512be3f8b59cf499",
+    "semantic_hash": "f6c14b39ac72bfb1512be3f8b59cf499"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/unit/test_watchlist_scan.py": {
+    "mtime": 1779787894.5443594,
+    "ast_hash": "12c4dc8765c56fd7c4b1b1f0f3001683",
+    "semantic_hash": "12c4dc8765c56fd7c4b1b1f0f3001683"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/core/test_canonical.py": {
+    "mtime": 1777805501.2583358,
+    "ast_hash": "1e1d03ebd20eaa124c6056df36e5d114",
+    "semantic_hash": "1e1d03ebd20eaa124c6056df36e5d114"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/core/conftest.py": {
+    "mtime": 1777805575.9184258,
+    "ast_hash": "6755a84c093cffc3260b614d50fe99b6",
+    "semantic_hash": "6755a84c093cffc3260b614d50fe99b6"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/core/__init__.py": {
+    "mtime": 1777805470.919255,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/api/test_ipos.py": {
+    "mtime": 1778063194.7609565,
+    "ast_hash": "601a6f16c710bad504b39375bcb17ed4",
+    "semantic_hash": "601a6f16c710bad504b39375bcb17ed4"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/api/test_events.py": {
+    "mtime": 1778063004.3698163,
+    "ast_hash": "33d0b2825aadc9db7f9858dda14b8b7d",
+    "semantic_hash": "33d0b2825aadc9db7f9858dda14b8b7d"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/services/conftest.py": {
+    "mtime": 1777806758.0250335,
+    "ast_hash": "fe49fd3bc34ed05d946ff98991bd4639",
+    "semantic_hash": "fe49fd3bc34ed05d946ff98991bd4639"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/services/__init__.py": {
+    "mtime": 1777805470.9193387,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/services/test_dividend_alert.py": {
+    "mtime": 1778177510.2692847,
+    "ast_hash": "b4aac89c776b9ea7bcda4fc2e70a537a",
+    "semantic_hash": "b4aac89c776b9ea7bcda4fc2e70a537a"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/services/test_dividend_feed.py": {
+    "mtime": 1777991024.2194064,
+    "ast_hash": "d1b5f422ff3c7ccd70e74f43f0f12d5f",
+    "semantic_hash": "d1b5f422ff3c7ccd70e74f43f0f12d5f"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/services/test_llm_gateway.py": {
+    "mtime": 1777806955.23473,
+    "ast_hash": "ac389f281102b6c56aef92cf25f2e3ca",
+    "semantic_hash": "ac389f281102b6c56aef92cf25f2e3ca"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/services/test_ipo_feed.py": {
+    "mtime": 1778062868.4036438,
+    "ast_hash": "f70f88c510c67e4bed0ec9350e25b29c",
+    "semantic_hash": "f70f88c510c67e4bed0ec9350e25b29c"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/services/test_exchange_rate.py": {
+    "mtime": 1777806685.1128235,
+    "ast_hash": "d78511063911c39aa1d606f97655ca7a",
+    "semantic_hash": "d78511063911c39aa1d606f97655ca7a"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/tests/services/test_watchlist_alert.py": {
+    "mtime": 1779786170.6641736,
+    "ast_hash": "6eb4c9257c457efba6ae1c62423ae6f1",
+    "semantic_hash": "6eb4c9257c457efba6ae1c62423ae6f1"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/pyrsa-sign": {
+    "mtime": 1778154665.4229023,
+    "ast_hash": "3df54f57afa4c1b0c6887dfdc3d85602",
+    "semantic_hash": "3df54f57afa4c1b0c6887dfdc3d85602"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/onnxruntime_test": {
+    "mtime": 1779344613.8932788,
+    "ast_hash": "42e7f4c319c84dd24453c4f6f9663be9",
+    "semantic_hash": "42e7f4c319c84dd24453c4f6f9663be9"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/activate.ps1": {
+    "mtime": 1778154652.33422,
+    "ast_hash": "cb709b114fd0587654781a9cfa1692e1",
+    "semantic_hash": "cb709b114fd0587654781a9cfa1692e1"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/chroma": {
+    "mtime": 1779344614.0950599,
+    "ast_hash": "29099fe44da42e7d224ac307607efd30",
+    "semantic_hash": "29099fe44da42e7d224ac307607efd30"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/dotenv": {
+    "mtime": 1778154665.3800552,
+    "ast_hash": "21194ead1e6c0a7c1e85f67f8536649a",
+    "semantic_hash": "21194ead1e6c0a7c1e85f67f8536649a"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/pyrsa-priv2pub": {
+    "mtime": 1778154665.4241645,
+    "ast_hash": "8750260d1bfd8beac32df695458f7216",
+    "semantic_hash": "8750260d1bfd8beac32df695458f7216"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/pytest": {
+    "mtime": 1778154665.4214406,
+    "ast_hash": "e8fd823d7c8fdc542c2171e7cb4ab733",
+    "semantic_hash": "e8fd823d7c8fdc542c2171e7cb4ab733"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/typer": {
+    "mtime": 1779344613.9234264,
+    "ast_hash": "a7f190539415111ac6e5e0588f99ecce",
+    "semantic_hash": "a7f190539415111ac6e5e0588f99ecce"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/coverage3": {
+    "mtime": 1778154665.4209561,
+    "ast_hash": "330a672f84a73051ad71ea40a37b6627",
+    "semantic_hash": "330a672f84a73051ad71ea40a37b6627"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/distro": {
+    "mtime": 1779344585.9002001,
+    "ast_hash": "be9520970fd991a09b5f4ec11160e4ce",
+    "semantic_hash": "be9520970fd991a09b5f4ec11160e4ce"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/tiny-agents": {
+    "mtime": 1779344614.0663354,
+    "ast_hash": "f6f575accfac58947787f425f8fc6b88",
+    "semantic_hash": "f6f575accfac58947787f425f8fc6b88"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/mako-render": {
+    "mtime": 1779344585.9001985,
+    "ast_hash": "be923bb4eef8119bb868be76e269a4db",
+    "semantic_hash": "be923bb4eef8119bb868be76e269a4db"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/websockets": {
+    "mtime": 1779344585.9946094,
+    "ast_hash": "3c402d14ce6c1eb2e36eceab19c9cfdd",
+    "semantic_hash": "3c402d14ce6c1eb2e36eceab19c9cfdd"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/pyproject-build": {
+    "mtime": 1779344613.9903588,
+    "ast_hash": "d441c43c4cb4b046ffe989a0986ea5be",
+    "semantic_hash": "d441c43c4cb4b046ffe989a0986ea5be"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/activate_this.py": {
+    "mtime": 1778154652.3344727,
+    "ast_hash": "6ab3faa27d927423a55559d71659bcd4",
+    "semantic_hash": "6ab3faa27d927423a55559d71659bcd4"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/pyrsa-keygen": {
+    "mtime": 1778154665.4147117,
+    "ast_hash": "e0828c80b75bb4cbce87709720f7d55e",
+    "semantic_hash": "e0828c80b75bb4cbce87709720f7d55e"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/f2py": {
+    "mtime": 1779344613.8689816,
+    "ast_hash": "e611fc8efd68b9489d5f1e1cabe92889",
+    "semantic_hash": "e611fc8efd68b9489d5f1e1cabe92889"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/httpx": {
+    "mtime": 1778154665.3656838,
+    "ast_hash": "801a78d2b38509b0b612a70b61be2ec2",
+    "semantic_hash": "801a78d2b38509b0b612a70b61be2ec2"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/jsonschema": {
+    "mtime": 1779344614.0227442,
+    "ast_hash": "5e6f4ff781ecd9080798859b18eda5e1",
+    "semantic_hash": "5e6f4ff781ecd9080798859b18eda5e1"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/pyrsa-decrypt": {
+    "mtime": 1778154665.4210517,
+    "ast_hash": "511d4ef77f3dbb1026448741b5af09c8",
+    "semantic_hash": "511d4ef77f3dbb1026448741b5af09c8"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/wsdump": {
+    "mtime": 1779344614.0316381,
+    "ast_hash": "acb5c887182b4c5f297de600d657c5d2",
+    "semantic_hash": "acb5c887182b4c5f297de600d657c5d2"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/pybase64": {
+    "mtime": 1779344614.0661056,
+    "ast_hash": "08081e1d26e88fb3bca8bd8c8776bffb",
+    "semantic_hash": "08081e1d26e88fb3bca8bd8c8776bffb"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/tqdm": {
+    "mtime": 1779344585.9088178,
+    "ast_hash": "21ea2317ce38a527486ef369f5b05710",
+    "semantic_hash": "21ea2317ce38a527486ef369f5b05710"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/markdown-it": {
+    "mtime": 1779344614.00958,
+    "ast_hash": "f07d074d3e6591e45ad49346ae30fb37",
+    "semantic_hash": "f07d074d3e6591e45ad49346ae30fb37"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/huggingface-cli": {
+    "mtime": 1779344614.0660245,
+    "ast_hash": "2d3a213e4262a7a3672f09a50c474701",
+    "semantic_hash": "2d3a213e4262a7a3672f09a50c474701"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/fastapi": {
+    "mtime": 1778154665.4355593,
+    "ast_hash": "209cd2f5719c2db4ac98eb112dcc52bf",
+    "semantic_hash": "209cd2f5719c2db4ac98eb112dcc52bf"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/pygmentize": {
+    "mtime": 1778154665.4120984,
+    "ast_hash": "c79c55ae4cc977f027fc24a879584b38",
+    "semantic_hash": "c79c55ae4cc977f027fc24a879584b38"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/hf": {
+    "mtime": 1779344614.0698166,
+    "ast_hash": "443baaec027476ab206b90be73c737bc",
+    "semantic_hash": "443baaec027476ab206b90be73c737bc"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/sample": {
+    "mtime": 1779344613.9788303,
+    "ast_hash": "0f5f1749d714e60dc59bdc4111a9e8ad",
+    "semantic_hash": "0f5f1749d714e60dc59bdc4111a9e8ad"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/pyrsa-encrypt": {
+    "mtime": 1778154665.4237604,
+    "ast_hash": "9201f84b13832a794dfbd6da12899fcd",
+    "semantic_hash": "9201f84b13832a794dfbd6da12899fcd"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/uvicorn": {
+    "mtime": 1779344585.9119208,
+    "ast_hash": "f2decc46bc70257f7ace1888598a7f2e",
+    "semantic_hash": "f2decc46bc70257f7ace1888598a7f2e"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/alembic": {
+    "mtime": 1779344585.9027953,
+    "ast_hash": "3fe2cbe1358a5d41929f1c0a3d4b2e59",
+    "semantic_hash": "3fe2cbe1358a5d41929f1c0a3d4b2e59"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/curl-cffi": {
+    "mtime": 1779344614.0260408,
+    "ast_hash": "9e6fe27933ab7acdf20ce4e5ec9bbb5b",
+    "semantic_hash": "9e6fe27933ab7acdf20ce4e5ec9bbb5b"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/normalizer": {
+    "mtime": 1779344614.0693805,
+    "ast_hash": "2afd9d820a88965c16590e80a9a55a29",
+    "semantic_hash": "2afd9d820a88965c16590e80a9a55a29"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/numpy-config": {
+    "mtime": 1779344613.8840926,
+    "ast_hash": "1571bb0f84688bcc6958bc784cd797ba",
+    "semantic_hash": "1571bb0f84688bcc6958bc784cd797ba"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/arq": {
+    "mtime": 1779344585.9106903,
+    "ast_hash": "0056717e68bc908e9732d085e242041a",
+    "semantic_hash": "0056717e68bc908e9732d085e242041a"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/pwiz": {
+    "mtime": 1779344614.0211673,
+    "ast_hash": "eae1e48391e1fcb9c9a1833e41402cce",
+    "semantic_hash": "eae1e48391e1fcb9c9a1833e41402cce"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/pyrsa-verify": {
+    "mtime": 1778154665.4224336,
+    "ast_hash": "1822127c83b6d1c0bc95c9e78cb8f1ee",
+    "semantic_hash": "1822127c83b6d1c0bc95c9e78cb8f1ee"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/coverage": {
+    "mtime": 1778154665.3707552,
+    "ast_hash": "a72474cf74032170e8d727b2a2cf2ce2",
+    "semantic_hash": "a72474cf74032170e8d727b2a2cf2ce2"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/bin/watchfiles": {
+    "mtime": 1779344585.9106932,
+    "ast_hash": "5e9619d03b51c645a79fef991fe48d95",
+    "semantic_hash": "5e9619d03b51c645a79fef991fe48d95"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/.venv-local/include/site/python3.12/greenlet/greenlet.h": {
+    "mtime": 1779344554.0394926,
+    "ast_hash": "6c9c3b83ecae50dcd2ea5ce90fb157cb",
+    "semantic_hash": "6c9c3b83ecae50dcd2ea5ce90fb157cb"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/env.py": {
+    "mtime": 1778312838.331972,
+    "ast_hash": "100b7cd15262a31ae49bcf360f87c3c8",
+    "semantic_hash": "100b7cd15262a31ae49bcf360f87c3c8"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/__init__.py": {
+    "mtime": 1776889912.2640538,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/025_add_interval_and_timezone.py": {
+    "mtime": 1778145623.9263043,
+    "ast_hash": "f2bc1d1237dcc49c2fc68a5ea5b41c82",
+    "semantic_hash": "f2bc1d1237dcc49c2fc68a5ea5b41c82"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/020_add_privacy_mode_to_users.py": {
+    "mtime": 1778047531.6476874,
+    "ast_hash": "619ad4655472e10728e9e97f46173a18",
+    "semantic_hash": "619ad4655472e10728e9e97f46173a18"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/012_backfill_holding_platform_purchased_at.py": {
+    "mtime": 1777988274.9053042,
+    "ast_hash": "cf4e32704ed36a594a9c068b67f20fae",
+    "semantic_hash": "cf4e32704ed36a594a9c068b67f20fae"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/010_net_worth_snapshot.py": {
+    "mtime": 1777976406.2615786,
+    "ast_hash": "f50b31544bd5a9e7359c05d8a2b32876",
+    "semantic_hash": "f50b31544bd5a9e7359c05d8a2b32876"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/029_add_dividend_notified_at.py": {
+    "mtime": 1778177156.8867931,
+    "ast_hash": "d8b90719ecf94872e9eeaf717e1aff55",
+    "semantic_hash": "d8b90719ecf94872e9eeaf717e1aff55"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/022_add_sec_api_key_to_users.py": {
+    "mtime": 1778139757.430489,
+    "ast_hash": "c7dd846ce94c5e6636409a00c262e50d",
+    "semantic_hash": "c7dd846ce94c5e6636409a00c262e50d"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/011_user_age_planning.py": {
+    "mtime": 1777979067.7815194,
+    "ast_hash": "3f7ea7b11a8543800a8a284eed238357",
+    "semantic_hash": "3f7ea7b11a8543800a8a284eed238357"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/002_portfolio_schema.py": {
+    "mtime": 1777086759.0545301,
+    "ast_hash": "fa5785ad1874396c366633a54637292e",
+    "semantic_hash": "fa5785ad1874396c366633a54637292e"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/001_initial_schema.py": {
+    "mtime": 1776889922.7363086,
+    "ast_hash": "c4f75446fca9095900c0377cd6d4ea2f",
+    "semantic_hash": "c4f75446fca9095900c0377cd6d4ea2f"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/031_add_platform_configs.py": {
+    "mtime": 1778223301.8796911,
+    "ast_hash": "f1333cf7909b72cf5525f64465f899b2",
+    "semantic_hash": "f1333cf7909b72cf5525f64465f899b2"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/026_add_missing_job_type_enum_values.py": {
+    "mtime": 1778146722.707228,
+    "ast_hash": "495af48ce417a3add7667ca6738399c6",
+    "semantic_hash": "495af48ce417a3add7667ca6738399c6"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/040_add_content_hash.py": {
+    "mtime": 1779344000.800029,
+    "ast_hash": "f56ab4457866ed8a57682ebe3fdbfa26",
+    "semantic_hash": "f56ab4457866ed8a57682ebe3fdbfa26"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/034_add_news_articles.py": {
+    "mtime": 1778260987.182274,
+    "ast_hash": "a552f9ed683bfa556bb1b8bcccb629d9",
+    "semantic_hash": "a552f9ed683bfa556bb1b8bcccb629d9"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/019_pipeline_steps.py": {
+    "mtime": 1778042990.9044087,
+    "ast_hash": "62b2e9dff15fa098426d145e1cb440d3",
+    "semantic_hash": "62b2e9dff15fa098426d145e1cb440d3"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/046_add_tool_rounds_to_llm_call_log.py": {
+    "mtime": 1779780489.2204776,
+    "ast_hash": "dfd8f1ffd63e6ebf672c6440fea68124",
+    "semantic_hash": "dfd8f1ffd63e6ebf672c6440fea68124"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/008_rename_feature_key_import_translator.py": {
+    "mtime": 1777963861.347611,
+    "ast_hash": "e22d000d5a0c99ad23b9b515b135da90",
+    "semantic_hash": "e22d000d5a0c99ad23b9b515b135da90"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/017_watchlist_suggestion.py": {
+    "mtime": 1778011327.889777,
+    "ast_hash": "c4bbb9311a72c667f1f3574478debded",
+    "semantic_hash": "c4bbb9311a72c667f1f3574478debded"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/032_add_backfill_job_type.py": {
+    "mtime": 1778233041.2711139,
+    "ast_hash": "83081d735ecdf013f1e6dc22e497c2bc",
+    "semantic_hash": "83081d735ecdf013f1e6dc22e497c2bc"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/006_universal_import_llm_logging.py": {
+    "mtime": 1777806590.9644923,
+    "ast_hash": "745a53011f662e92876c3fdcc31abbf6",
+    "semantic_hash": "745a53011f662e92876c3fdcc31abbf6"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/039_add_top_down_job_types.py": {
+    "mtime": 1779185502.1083858,
+    "ast_hash": "a05a35a00143d4dbe423303ffda81c28",
+    "semantic_hash": "a05a35a00143d4dbe423303ffda81c28"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/014_watchlist.py": {
+    "mtime": 1778006680.793362,
+    "ast_hash": "e9b4fcfee180651d032030289d6460bf",
+    "semantic_hash": "e9b4fcfee180651d032030289d6460bf"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/037_top_down_analysis.py": {
+    "mtime": 1779176637.8406646,
+    "ast_hash": "7678121930f36b7c75f16d51e7e0f253",
+    "semantic_hash": "7678121930f36b7c75f16d51e7e0f253"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/003_price_pipeline_schema.py": {
+    "mtime": 1777104869.1324177,
+    "ast_hash": "47b8b5c7fb712dad16044386991fa937",
+    "semantic_hash": "47b8b5c7fb712dad16044386991fa937"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/018_watchlist_job_types.py": {
+    "mtime": 1778011839.7612865,
+    "ast_hash": "c52b580d5b5d1b665635476e48c98f19",
+    "semantic_hash": "c52b580d5b5d1b665635476e48c98f19"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/023_add_thai_dr_asset_type.py": {
+    "mtime": 1778140811.4476666,
+    "ast_hash": "e3d73d72610ccdd4bfd274e9712d1d10",
+    "semantic_hash": "e3d73d72610ccdd4bfd274e9712d1d10"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/030_add_dividend_alert_job_type.py": {
+    "mtime": 1778177158.3411326,
+    "ast_hash": "54b089a9addda1b3170b64c6d942e091",
+    "semantic_hash": "54b089a9addda1b3170b64c6d942e091"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/007_simplify_import_remove_platforms.py": {
+    "mtime": 1777882062.0180929,
+    "ast_hash": "eb368021eddaf09031b443fde7b93e48",
+    "semantic_hash": "eb368021eddaf09031b443fde7b93e48"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/038_add_ath_drop_pct.py": {
+    "mtime": 1779184448.7863028,
+    "ast_hash": "596fa314e3375b83fa59c3e7ba7850dc",
+    "semantic_hash": "596fa314e3375b83fa59c3e7ba7850dc"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/004_phase6_ai_schema.py": {
+    "mtime": 1777206409.3251874,
+    "ast_hash": "8856708c69da4c32e6879e58e70ba406",
+    "semantic_hash": "8856708c69da4c32e6879e58e70ba406"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/024_add_price_schedule_config.py": {
+    "mtime": 1778143875.0289476,
+    "ast_hash": "26c6828eefa28f677ab1035fa378cda5",
+    "semantic_hash": "26c6828eefa28f677ab1035fa378cda5"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/015_telegram_config.py": {
+    "mtime": 1778006685.994053,
+    "ast_hash": "b87f70becaf0f0288786ec32fdb01e43",
+    "semantic_hash": "b87f70becaf0f0288786ec32fdb01e43"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/016_watchlist_unique_constraint.py": {
+    "mtime": 1778007537.0303056,
+    "ast_hash": "5f19b975b1f7350877bc119eccde092c",
+    "semantic_hash": "5f19b975b1f7350877bc119eccde092c"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/041_add_analysis_ai_features.py": {
+    "mtime": 1779354358.5835822,
+    "ast_hash": "073daf466799a02e1db53a1b0d2e0dc4",
+    "semantic_hash": "073daf466799a02e1db53a1b0d2e0dc4"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/028_add_ipo_fetch_job_type.py": {
+    "mtime": 1778175143.343099,
+    "ast_hash": "234b32d044425ec701b9c79ff45984ea",
+    "semantic_hash": "234b32d044425ec701b9c79ff45984ea"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/043_add_price_targets_to_combined_verdict.py": {
+    "mtime": 1779366158.0614307,
+    "ast_hash": "ad0c5d66663cc9c6ee6941f5e59e6409",
+    "semantic_hash": "ad0c5d66663cc9c6ee6941f5e59e6409"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/042_add_job_status_error_message.py": {
+    "mtime": 1779364075.0607822,
+    "ast_hash": "6b095bc0e09a2170773095082109801e",
+    "semantic_hash": "6b095bc0e09a2170773095082109801e"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/005_smart_import_llm_cash.py": {
+    "mtime": 1777976913.2896805,
+    "ast_hash": "59af64216d0d7b35cf5126cd3c5e4e3b",
+    "semantic_hash": "59af64216d0d7b35cf5126cd3c5e4e3b"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/035_add_chat_sessions.py": {
+    "mtime": 1778312833.547552,
+    "ast_hash": "195f87b97103160d6079d9fe993a0443",
+    "semantic_hash": "195f87b97103160d6079d9fe993a0443"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/047_add_ath_alert_to_watchlist.py": {
+    "mtime": 1779785125.5316432,
+    "ast_hash": "2ff2e7485c5733a2546a8650530ecfa0",
+    "semantic_hash": "2ff2e7485c5733a2546a8650530ecfa0"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/013_dividend_events.py": {
+    "mtime": 1777990849.3385582,
+    "ast_hash": "bb6bd1e29ec7e301a9656ad2fec67226",
+    "semantic_hash": "bb6bd1e29ec7e301a9656ad2fec67226"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/044_add_sector_to_assets.py": {
+    "mtime": 1779435948.412201,
+    "ast_hash": "43460266677135cf3d62c0b1dff88fc6",
+    "semantic_hash": "43460266677135cf3d62c0b1dff88fc6"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/021_ipo_events_and_ai_analysis_update.py": {
+    "mtime": 1778062610.2520206,
+    "ast_hash": "42467f46a8c9ed80c611a08a011f2849",
+    "semantic_hash": "42467f46a8c9ed80c611a08a011f2849"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/033_add_overview_analyses.py": {
+    "mtime": 1778260341.4457772,
+    "ast_hash": "09f944f50298f2cca393e3833f381fe6",
+    "semantic_hash": "09f944f50298f2cca393e3833f381fe6"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/045_add_tool_calls_to_chat_session_messages.py": {
+    "mtime": 1779728548.5436206,
+    "ast_hash": "2739c3e70b24227345ff0b03d5513252",
+    "semantic_hash": "2739c3e70b24227345ff0b03d5513252"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/027_add_dividend_fetch_job_type.py": {
+    "mtime": 1778174320.6280298,
+    "ast_hash": "c6c3cfe0f3844fdc7c2768c3e63f655b",
+    "semantic_hash": "c6c3cfe0f3844fdc7c2768c3e63f655b"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/036_add_watchlist_alert_job_type.py": {
+    "mtime": 1778863626.7435265,
+    "ast_hash": "8ed6224bc50958f72566e95a6256a29d",
+    "semantic_hash": "8ed6224bc50958f72566e95a6256a29d"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/alembic/versions/009_add_platform_to_holding.py": {
+    "mtime": 1777973520.8429863,
+    "ast_hash": "5decd8cf410bdf45c1bac06cff1fdfbd",
+    "semantic_hash": "5decd8cf410bdf45c1bac06cff1fdfbd"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/worker/__init__.py": {
+    "mtime": 1776890691.7767036,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/worker/main.py": {
+    "mtime": 1779361356.186096,
+    "ast_hash": "d2a01197e8583aa6a776b6a289424f2d",
+    "semantic_hash": "d2a01197e8583aa6a776b6a289424f2d"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/worker/jobs/run_combined_verdict.py": {
+    "mtime": 1779364190.1632633,
+    "ast_hash": "bd2239642689846dc81832cae0efeac9",
+    "semantic_hash": "bd2239642689846dc81832cae0efeac9"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/worker/jobs/_base.py": {
+    "mtime": 1779364162.133131,
+    "ast_hash": "a52d2db7e567310b55fbb4cde613b484",
+    "semantic_hash": "a52d2db7e567310b55fbb4cde613b484"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/worker/jobs/run_analysis.py": {
+    "mtime": 1779724952.38112,
+    "ast_hash": "8ee7f8838a4dad5b6513a845a70db8e9",
+    "semantic_hash": "8ee7f8838a4dad5b6513a845a70db8e9"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/worker/jobs/ipo_fetch.py": {
+    "mtime": 1778175139.4429219,
+    "ast_hash": "729a2a83937b167a1edc0ffa94e2ee21",
+    "semantic_hash": "729a2a83937b167a1edc0ffa94e2ee21"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/worker/jobs/price_fetch.py": {
+    "mtime": 1778234294.4070597,
+    "ast_hash": "26ca14210b83b500275054d024ce7ebe",
+    "semantic_hash": "26ca14210b83b500275054d024ce7ebe"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/worker/jobs/watchlist_alert.py": {
+    "mtime": 1778007207.110282,
+    "ast_hash": "092a7174ba321d53f8c402688f33177c",
+    "semantic_hash": "092a7174ba321d53f8c402688f33177c"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/worker/jobs/run_bear_case.py": {
+    "mtime": 1779364176.1902385,
+    "ast_hash": "7b88e3fe98afafb8407eb647f86e0791",
+    "semantic_hash": "7b88e3fe98afafb8407eb647f86e0791"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/worker/jobs/__init__.py": {
+    "mtime": 1777104270.664914,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/worker/jobs/net_worth_snapshot.py": {
+    "mtime": 1778231069.5420167,
+    "ast_hash": "778e395a25b97f482a25086f1866e9d1",
+    "semantic_hash": "778e395a25b97f482a25086f1866e9d1"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/worker/jobs/ingest_document.py": {
+    "mtime": 1778043817.8000362,
+    "ast_hash": "eb27005a17e2cb5a06953a1af2abc098",
+    "semantic_hash": "eb27005a17e2cb5a06953a1af2abc098"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/worker/jobs/dividend_alert.py": {
+    "mtime": 1778177339.409868,
+    "ast_hash": "7bf4a93bdcb8ff3fa4992833f5c1c996",
+    "semantic_hash": "7bf4a93bdcb8ff3fa4992833f5c1c996"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/worker/jobs/discover_top_down.py": {
+    "mtime": 1779348316.224173,
+    "ast_hash": "aee4d7d62106be91be5664c63a62de80",
+    "semantic_hash": "aee4d7d62106be91be5664c63a62de80"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/worker/jobs/dividend_fetch.py": {
+    "mtime": 1777991265.574387,
+    "ast_hash": "d0b829cc023a407e18f59923eef43ca9",
+    "semantic_hash": "d0b829cc023a407e18f59923eef43ca9"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/worker/jobs/watchlist_discover.py": {
+    "mtime": 1778043434.397563,
+    "ast_hash": "b8513817893f10930896fd612a68ba01",
+    "semantic_hash": "b8513817893f10930896fd612a68ba01"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/worker/jobs/run_deep_dive.py": {
+    "mtime": 1779364170.2322638,
+    "ast_hash": "5cbde2281b158753f9efc0cf0fb35f87",
+    "semantic_hash": "5cbde2281b158753f9efc0cf0fb35f87"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/worker/jobs/run_top_down_analysis.py": {
+    "mtime": 1779724945.7118309,
+    "ast_hash": "6aa83161b6c54959e3a27ee8f1b19d80",
+    "semantic_hash": "6aa83161b6c54959e3a27ee8f1b19d80"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/worker/jobs/run_peer_comparison.py": {
+    "mtime": 1779364183.1088617,
+    "ast_hash": "22a329ccb375ff103d3db6a450d1afeb",
+    "semantic_hash": "22a329ccb375ff103d3db6a450d1afeb"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/backend/worker/jobs/watchlist_scan.py": {
+    "mtime": 1779813500.9811485,
+    "ast_hash": "1c81703a334f777fdd6a0d10a0f7282d",
+    "semantic_hash": "1c81703a334f777fdd6a0d10a0f7282d"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/scripts/restore.sh": {
+    "mtime": 1776927524.2293239,
+    "ast_hash": "769b8c1a438ddfa624a86a69d95b6978",
+    "semantic_hash": "769b8c1a438ddfa624a86a69d95b6978"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/scripts/backup.sh": {
+    "mtime": 1776927518.580226,
+    "ast_hash": "98c6f9e5e3a7d9da0df990e552b0e1a0",
+    "semantic_hash": "98c6f9e5e3a7d9da0df990e552b0e1a0"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/PRODUCT.md": {
+    "mtime": 1777993542.8633792,
+    "ast_hash": "dd812190b5c5bfc01996780ff38a7359",
+    "semantic_hash": "dd812190b5c5bfc01996780ff38a7359"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docker-compose.override.yml": {
+    "mtime": 1778010795.8413856,
+    "ast_hash": "d96c99a73a0bc001be7cbaf7d427d388",
+    "semantic_hash": "d96c99a73a0bc001be7cbaf7d427d388"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/README.md": {
+    "mtime": 1776928793.6414912,
+    "ast_hash": "063405681ad1f42d6600a2c5e48d9f34",
+    "semantic_hash": "063405681ad1f42d6600a2c5e48d9f34"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docker-compose.yml": {
+    "mtime": 1778315451.8546972,
+    "ast_hash": "8d058839bab566d568e9de8c35348377",
+    "semantic_hash": "8d058839bab566d568e9de8c35348377"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/GEMINI.md": {
+    "mtime": 1776891168.4041858,
+    "ast_hash": "85785109b1c3db1926f650ef5d7ded5f",
+    "semantic_hash": "85785109b1c3db1926f650ef5d7ded5f"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/DESIGN.md": {
+    "mtime": 1778243344.3211708,
+    "ast_hash": "178933a8a6b723162b05eef49e98e947",
+    "semantic_hash": "178933a8a6b723162b05eef49e98e947"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/AGENTS.md": {
+    "mtime": 1776891168.403387,
+    "ast_hash": "85785109b1c3db1926f650ef5d7ded5f",
+    "semantic_hash": "85785109b1c3db1926f650ef5d7ded5f"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/CLAUDE.md": {
+    "mtime": 1779342435.2525728,
+    "ast_hash": "0a92af9b4558e565d2a1bae112c74104",
+    "semantic_hash": "0a92af9b4558e565d2a1bae112c74104"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/README.md": {
+    "mtime": 1776890757.4969559,
+    "ast_hash": "f15aaa42d5d299d091b1171097ea56ad",
+    "semantic_hash": "f15aaa42d5d299d091b1171097ea56ad"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/AGENTS.md": {
+    "mtime": 1776890800.4724298,
+    "ast_hash": "9e09241799026ac05be315a2f0b50055",
+    "semantic_hash": "9e09241799026ac05be315a2f0b50055"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/CLAUDE.md": {
+    "mtime": 1776890800.4725325,
+    "ast_hash": "5c27369b226fcf2be8a6cfe52224e767",
+    "semantic_hash": "5c27369b226fcf2be8a6cfe52224e767"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/.serena/project.yml": {
+    "mtime": 1778044819.6253555,
+    "ast_hash": "f3f8c545ac12e88a9daebbf3aa7f403c",
+    "semantic_hash": "f3f8c545ac12e88a9daebbf3aa7f403c"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/.serena/project.local.yml": {
+    "mtime": 1778044819.6256838,
+    "ast_hash": "f136e7d47205d9a758913615074760e5",
+    "semantic_hash": "f136e7d47205d9a758913615074760e5"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/.claude/commands/plan.md": {
+    "mtime": 1778561847.1031852,
+    "ast_hash": "a06c728ce82a25a9e485f66c366fed89",
+    "semantic_hash": "a06c728ce82a25a9e485f66c366fed89"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/.claude/skills/explore-codebase.md": {
+    "mtime": 1776891163.3868773,
+    "ast_hash": "72bcdd4382c8389e22970964cbdf73e3",
+    "semantic_hash": "72bcdd4382c8389e22970964cbdf73e3"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/.claude/skills/review-changes.md": {
+    "mtime": 1776891163.3869545,
+    "ast_hash": "255133a497797178b42746808b2fadc9",
+    "semantic_hash": "255133a497797178b42746808b2fadc9"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/.claude/skills/debug-issue.md": {
+    "mtime": 1776891163.3870218,
+    "ast_hash": "f6ca42b7fce135a9dbe1b01f651e35a4",
+    "semantic_hash": "f6ca42b7fce135a9dbe1b01f651e35a4"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/.claude/skills/refactor-safely.md": {
+    "mtime": 1776891163.387085,
+    "ast_hash": "48b6d7fd4e9a3dcef923e9e32f8a75d0",
+    "semantic_hash": "48b6d7fd4e9a3dcef923e9e32f8a75d0"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-21-analysis-ai-features-part2-frontend.md": {
+    "mtime": 1779353975.1143682,
+    "ast_hash": "156985d047116677cbd3f42e9cf3edf9",
+    "semantic_hash": "156985d047116677cbd3f42e9cf3edf9"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-04-28-smart-import-cash-llm.md": {
+    "mtime": 1777445659.9091976,
+    "ast_hash": "ce138aad4670e5684232dbb8ced5ce76",
+    "semantic_hash": "ce138aad4670e5684232dbb8ced5ce76"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-26-llm-tool-round-tracking.md": {
+    "mtime": 1779780359.1382976,
+    "ast_hash": "face00f9f48dcf21015477653296a831",
+    "semantic_hash": "face00f9f48dcf21015477653296a831"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-08-llm-gateway-prompts.md": {
+    "mtime": 1778250085.604036,
+    "ast_hash": "8206fa940003121c9734b75f1a073ec5",
+    "semantic_hash": "8206fa940003121c9734b75f1a073ec5"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-22-uxui-glassmorphism-emil-upgrade.md": {
+    "mtime": 1779443421.3873806,
+    "ast_hash": "4c931c54af3f8b74d67fadd954b142cb",
+    "semantic_hash": "4c931c54af3f8b74d67fadd954b142cb"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-25-chat-tool-call-auditability.md": {
+    "mtime": 1779728108.0922182,
+    "ast_hash": "7ef5cb239fccec576ca53e5230da44c1",
+    "semantic_hash": "7ef5cb239fccec576ca53e5230da44c1"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-02-import-ux-file-first.md": {
+    "mtime": 1777706716.592164,
+    "ast_hash": "aef654d84b4763f17690b17f2dfd50ff",
+    "semantic_hash": "aef654d84b4763f17690b17f2dfd50ff"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-22-allocation-page.md": {
+    "mtime": 1779439676.412654,
+    "ast_hash": "1ccb4fe5ab2d74c7388dd7b76e0d4663",
+    "semantic_hash": "1ccb4fe5ab2d74c7388dd7b76e0d4663"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-07-server-side-search-filter.md": {
+    "mtime": 1778157868.2637763,
+    "ast_hash": "bada28a0b6e553ae015b5232768eaba3",
+    "semantic_hash": "bada28a0b6e553ae015b5232768eaba3"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-04-llm-fixes-import-bugs.md": {
+    "mtime": 1777834209.7869205,
+    "ast_hash": "c62e3f7537783e79ab08aaaaf0cc1114",
+    "semantic_hash": "c62e3f7537783e79ab08aaaaf0cc1114"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-06-settings-telegram-privacy.md": {
+    "mtime": 1778047260.5841765,
+    "ast_hash": "3e132d6fe895b8ad946cbf5aea245a55",
+    "semantic_hash": "3e132d6fe895b8ad946cbf5aea245a55"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-04-25-phase5-market-overview.md": {
+    "mtime": 1777129543.1188493,
+    "ast_hash": "3499f7ac77582da86b02e5949029661f",
+    "semantic_hash": "3499f7ac77582da86b02e5949029661f"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-08-overview-ai-analysis.md": {
+    "mtime": 1778250160.4660687,
+    "ast_hash": "91263ec41c6caa7866ee557387c9fce3",
+    "semantic_hash": "91263ec41c6caa7866ee557387c9fce3"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-07-price-schedule-config.md": {
+    "mtime": 1778143686.459878,
+    "ast_hash": "a383ebb4276a4c1048a48fca7a72394c",
+    "semantic_hash": "a383ebb4276a4c1048a48fca7a72394c"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-22-sector-industry-allocation.md": {
+    "mtime": 1779435772.3966105,
+    "ast_hash": "b1449cc5078560248ab423de014551d5",
+    "semantic_hash": "b1449cc5078560248ab423de014551d5"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-08-platform-badge.md": {
+    "mtime": 1778223126.9887726,
+    "ast_hash": "cf7e11fdc08ec989af2750944b6a7b65",
+    "semantic_hash": "cf7e11fdc08ec989af2750944b6a7b65"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-05-net-worth-timeline.md": {
+    "mtime": 1777976219.8585393,
+    "ast_hash": "7b5ba99c588fd750fa877a2070d18d66",
+    "semantic_hash": "7b5ba99c588fd750fa877a2070d18d66"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-06-events-calendar.md": {
+    "mtime": 1778062015.5203815,
+    "ast_hash": "2ebad2feda611f9b0f93603b33a21688",
+    "semantic_hash": "2ebad2feda611f9b0f93603b33a21688"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-07-edit-asset-ticker.md": {
+    "mtime": 1778130683.8658912,
+    "ast_hash": "f796badaee22e12a1f91d26019870930",
+    "semantic_hash": "f796badaee22e12a1f91d26019870930"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-06-system-import-export.md": {
+    "mtime": 1778051425.691203,
+    "ast_hash": "49a01a47d8830d97105759658693ff54",
+    "semantic_hash": "49a01a47d8830d97105759658693ff54"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-21-document-deduplication.md": {
+    "mtime": 1779343777.085818,
+    "ast_hash": "49fb9a6f9773c60b39639906a0bf9230",
+    "semantic_hash": "49fb9a6f9773c60b39639906a0bf9230"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-22-responsive-mobile.md": {
+    "mtime": 1779445962.901153,
+    "ast_hash": "643692156f7f237ad12e3f5c49b7e19b",
+    "semantic_hash": "643692156f7f237ad12e3f5c49b7e19b"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-05-dividend-cluster.md": {
+    "mtime": 1777990697.1101205,
+    "ast_hash": "c0a090f6cc7f3a87149b71ddcb25f793",
+    "semantic_hash": "c0a090f6cc7f3a87149b71ddcb25f793"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-06-layout-redesign.md": {
+    "mtime": 1778069199.654697,
+    "ast_hash": "793b52a9796c82e5a8d7183a200c2663",
+    "semantic_hash": "793b52a9796c82e5a8d7183a200c2663"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-07-currency-display-privacy.md": {
+    "mtime": 1778088874.20121,
+    "ast_hash": "8d17f966442437f578c7b1f23a0b54b7",
+    "semantic_hash": "8d17f966442437f578c7b1f23a0b54b7"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-06-cash-account-edit-delete.md": {
+    "mtime": 1778083758.8738613,
+    "ast_hash": "75ff831451efbb010c8675e881873930",
+    "semantic_hash": "75ff831451efbb010c8675e881873930"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-06-watchlist-crud-telegram-alerts.md": {
+    "mtime": 1778006409.61487,
+    "ast_hash": "87e4002346f3242815ac4238178c134e",
+    "semantic_hash": "87e4002346f3242815ac4238178c134e"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-04-25-phase4-price-feeds-pipeline.md": {
+    "mtime": 1777103724.9770389,
+    "ast_hash": "9dd6644e25baae876f4040340c4d8d0a",
+    "semantic_hash": "9dd6644e25baae876f4040340c4d8d0a"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-06-pipeline-step-breakdown.md": {
+    "mtime": 1778042714.796581,
+    "ast_hash": "9d28a8fc9707e9eaba3ea8b41620ff95",
+    "semantic_hash": "9d28a8fc9707e9eaba3ea8b41620ff95"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-04-23-phase3-portfolio-core.md": {
+    "mtime": 1776948873.8292897,
+    "ast_hash": "980c3e60c69f57234ec7d8698c35e18e",
+    "semantic_hash": "980c3e60c69f57234ec7d8698c35e18e"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-26-watchlist-scan-ai-price-autofill.md": {
+    "mtime": 1779787059.870573,
+    "ast_hash": "ca98b1aac01ddf34311ac49765e1bc2b",
+    "semantic_hash": "ca98b1aac01ddf34311ac49765e1bc2b"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-04-22-phase1-2-foundation-auth.md": {
+    "mtime": 1776948940.1040137,
+    "ast_hash": "615c8e3779812e5cbf5c55d7b1d459a3",
+    "semantic_hash": "615c8e3779812e5cbf5c55d7b1d459a3"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-08-ui-revamp-borderless-cards.md": {
+    "mtime": 1778240708.0937,
+    "ast_hash": "9a4dc4f6e2f6ef4d4764eb721ae51bbe",
+    "semantic_hash": "9a4dc4f6e2f6ef4d4764eb721ae51bbe"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-29-chat-quick-actions.md": {
+    "mtime": 1780045486.2279403,
+    "ast_hash": "d6aa0797aa9b4a683d339bae1072685c",
+    "semantic_hash": "d6aa0797aa9b4a683d339bae1072685c"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-04-import-portfolio-redesign.md": {
+    "mtime": 1777881568.970121,
+    "ast_hash": "4b615ca205656de9c142330256906fd8",
+    "semantic_hash": "4b615ca205656de9c142330256906fd8"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-06-overview-redesign.md": {
+    "mtime": 1778066030.0121698,
+    "ast_hash": "88d008d39028671cec0580cda0c99fef",
+    "semantic_hash": "88d008d39028671cec0580cda0c99fef"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-25-chat-symbol-analysis-tool.md": {
+    "mtime": 1779725988.8887088,
+    "ast_hash": "b9d24a24c28a15df0691781ed8e99a8c",
+    "semantic_hash": "b9d24a24c28a15df0691781ed8e99a8c"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-08-cost-ux.md": {
+    "mtime": 1778250359.227816,
+    "ast_hash": "a74cb7cb3a08d7e519df8327666a2c86",
+    "semantic_hash": "a74cb7cb3a08d7e519df8327666a2c86"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-04-26-phase6-ai-llm-analysis.md": {
+    "mtime": 1777292308.624646,
+    "ast_hash": "5abd0ced17ae178d94ef6bdb756fece5",
+    "semantic_hash": "5abd0ced17ae178d94ef6bdb756fece5"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-09-llm-pricing-currency-display.md": {
+    "mtime": 1778265770.450437,
+    "ast_hash": "dcb55a90f689eddd9892208cadde7402",
+    "semantic_hash": "dcb55a90f689eddd9892208cadde7402"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-06-watchlist-scan-page.md": {
+    "mtime": 1778009639.6614158,
+    "ast_hash": "d7590dd650ce92868ca0b66c766189d7",
+    "semantic_hash": "d7590dd650ce92868ca0b66c766189d7"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-21-analysis-ai-features-part1-backend.md": {
+    "mtime": 1779353959.1280236,
+    "ast_hash": "5927c632d0406f519f955994006bff2d",
+    "semantic_hash": "5927c632d0406f519f955994006bff2d"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-05-portfolio-holdings-cash-redesign.md": {
+    "mtime": 1777973393.2499835,
+    "ast_hash": "182c16fdc4abd597d30ddb6591733ef9",
+    "semantic_hash": "182c16fdc4abd597d30ddb6591733ef9"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-08-search-and-tab-routing.md": {
+    "mtime": 1778229224.9701087,
+    "ast_hash": "1a9f95476607e31f82e17f782da89982",
+    "semantic_hash": "1a9f95476607e31f82e17f782da89982"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-08-search-news-rag.md": {
+    "mtime": 1778250386.227121,
+    "ast_hash": "34a95d568bd4e527c043bf701bff3845",
+    "semantic_hash": "34a95d568bd4e527c043bf701bff3845"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-03-universal-import-llm-logging.md": {
+    "mtime": 1777790087.020364,
+    "ast_hash": "7fe48a962aac06fa2e79e7d83b7c456b",
+    "semantic_hash": "7fe48a962aac06fa2e79e7d83b7c456b"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-25-analysis-manual-ticker.md": {
+    "mtime": 1779696570.1986055,
+    "ast_hash": "8afdaf4112b98143e860caf4eb9c46e7",
+    "semantic_hash": "8afdaf4112b98143e860caf4eb9c46e7"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-08-logo-ticker.md": {
+    "mtime": 1778179193.490613,
+    "ast_hash": "697ee1e598be8aec62572f9e1ab93509",
+    "semantic_hash": "697ee1e598be8aec62572f9e1ab93509"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-08-historical-net-worth-backfill.md": {
+    "mtime": 1778232950.2795396,
+    "ast_hash": "43bc7179ff242171e98a88965dcccf81",
+    "semantic_hash": "43bc7179ff242171e98a88965dcccf81"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-08-portfolio-visualizations.md": {
+    "mtime": 1778244543.0642471,
+    "ast_hash": "785aa331b34a271e3c1d422855c28e5b",
+    "semantic_hash": "785aa331b34a271e3c1d422855c28e5b"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-08-chat-tool-calling.md": {
+    "mtime": 1778250245.1385167,
+    "ast_hash": "8440665f5a783ca66751929d482a1a45",
+    "semantic_hash": "8440665f5a783ca66751929d482a1a45"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-19-top-down-analysis.md": {
+    "mtime": 1779176077.0039926,
+    "ast_hash": "bb5993a18301f637ab8dc9dfcd9276a3",
+    "semantic_hash": "bb5993a18301f637ab8dc9dfcd9276a3"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-26-watchlist-ath-drop-column.md": {
+    "mtime": 1779784885.1733387,
+    "ast_hash": "3aae3b6abef0325a73fe2ae51903fa0a",
+    "semantic_hash": "3aae3b6abef0325a73fe2ae51903fa0a"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-08-dividend-telegram-alert.md": {
+    "mtime": 1778176971.432162,
+    "ast_hash": "34e14c9c4920329e5de7e903eac227c0",
+    "semantic_hash": "34e14c9c4920329e5de7e903eac227c0"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-07-crypto-holdings.md": {
+    "mtime": 1778153771.7544625,
+    "ast_hash": "7ecb30d8f875b3a5fcee2e94c42410b4",
+    "semantic_hash": "7ecb30d8f875b3a5fcee2e94c42410b4"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-07-portfolio-platform-breakdown.md": {
+    "mtime": 1778150352.7879424,
+    "ast_hash": "fcbf169e3b4b49500f46741a0b4381a3",
+    "semantic_hash": "fcbf169e3b4b49500f46741a0b4381a3"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-05-user-age-planning-horizon.md": {
+    "mtime": 1777978885.1426356,
+    "ast_hash": "303fd5fe1b1526bd6736d5dc275df788",
+    "semantic_hash": "303fd5fe1b1526bd6736d5dc275df788"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-09-chat-sessions.md": {
+    "mtime": 1778312675.361518,
+    "ast_hash": "2922c809b2ac6536044944454687dd51",
+    "semantic_hash": "2922c809b2ac6536044944454687dd51"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/plans/2026-05-06-theme-toggle-circular-reveal.md": {
+    "mtime": 1778004896.6117911,
+    "ast_hash": "7180d21b173b7f196483885dd3e48acd",
+    "semantic_hash": "7180d21b173b7f196483885dd3e48acd"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-04-28-smart-import-cash-asset-type-design.md": {
+    "mtime": 1777443638.1026835,
+    "ast_hash": "d2579e4cef64871662de310474fe068a",
+    "semantic_hash": "d2579e4cef64871662de310474fe068a"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-09-llm-pricing-currency-display-design.md": {
+    "mtime": 1778265317.0430956,
+    "ast_hash": "f7b7b083dd1c1e8b0e7eb5e7356fbc90",
+    "semantic_hash": "f7b7b083dd1c1e8b0e7eb5e7356fbc90"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-07-price-schedule-config-design.md": {
+    "mtime": 1778143208.0371828,
+    "ast_hash": "74902440ec9d43158293802cc72fd97a",
+    "semantic_hash": "74902440ec9d43158293802cc72fd97a"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-26-llm-tool-round-tracking-design.md": {
+    "mtime": 1779778033.9351728,
+    "ast_hash": "4966b57e7c80646382e655213c832280",
+    "semantic_hash": "4966b57e7c80646382e655213c832280"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-08-portfolio-visualizations-design.md": {
+    "mtime": 1778244250.3667,
+    "ast_hash": "df791184879c651c53b1e93826db1fe9",
+    "semantic_hash": "df791184879c651c53b1e93826db1fe9"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-08-llm-prompt-engineering-design.md": {
+    "mtime": 1778249658.2296975,
+    "ast_hash": "e56c9b27b3e97552e3934e02545aa394",
+    "semantic_hash": "e56c9b27b3e97552e3934e02545aa394"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-05-user-age-planning-horizon-design.md": {
+    "mtime": 1777978742.5626476,
+    "ast_hash": "06ba2a8b688548b0722b6bc4751293bd",
+    "semantic_hash": "06ba2a8b688548b0722b6bc4751293bd"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-06-theme-toggle-circular-reveal-design.md": {
+    "mtime": 1778004799.8360074,
+    "ast_hash": "929293650d0e179fdf16f1ed9e0bfe79",
+    "semantic_hash": "929293650d0e179fdf16f1ed9e0bfe79"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-26-watchlist-ath-drop-column-design.md": {
+    "mtime": 1779784681.6079752,
+    "ast_hash": "625a6fc00fc387b22c98dbfbd38f4e39",
+    "semantic_hash": "625a6fc00fc387b22c98dbfbd38f4e39"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-06-watchlist-scan-page-design.md": {
+    "mtime": 1778008562.3045015,
+    "ast_hash": "3f6bc9a80134fb57dcef73107d9176d5",
+    "semantic_hash": "3f6bc9a80134fb57dcef73107d9176d5"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-03-universal-import-llm-logging-design.md": {
+    "mtime": 1777789436.8564034,
+    "ast_hash": "fc2a1c0b9ff8e84970cdc6727cb337fc",
+    "semantic_hash": "fc2a1c0b9ff8e84970cdc6727cb337fc"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-07-currency-display-privacy-design.md": {
+    "mtime": 1778088385.621676,
+    "ast_hash": "47138eb3d4d6abcdcd4a1933c5db0661",
+    "semantic_hash": "47138eb3d4d6abcdcd4a1933c5db0661"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-06-watchlist-crud-telegram-alerts-design.md": {
+    "mtime": 1778006048.1223516,
+    "ast_hash": "7eaa6077732955eb4a56014f8ea6794b",
+    "semantic_hash": "7eaa6077732955eb4a56014f8ea6794b"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-07-portfolio-platform-breakdown-design.md": {
+    "mtime": 1778149627.9001644,
+    "ast_hash": "17d83d8bdfd128ef809b518e13a7e74c",
+    "semantic_hash": "17d83d8bdfd128ef809b518e13a7e74c"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-21-document-deduplication-design.md": {
+    "mtime": 1779343333.9935436,
+    "ast_hash": "ca61714135758cb8d4dc0a58d995f497",
+    "semantic_hash": "ca61714135758cb8d4dc0a58d995f497"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-21-analysis-ai-features-design.md": {
+    "mtime": 1779351581.5735633,
+    "ast_hash": "95903a2ba3d1f0de15e420b80fad60f1",
+    "semantic_hash": "95903a2ba3d1f0de15e420b80fad60f1"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-06-system-import-export-design.md": {
+    "mtime": 1778051150.77401,
+    "ast_hash": "53eb9396705c2585c478eb6cf5376437",
+    "semantic_hash": "53eb9396705c2585c478eb6cf5376437"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-19-top-down-analysis-design.md": {
+    "mtime": 1779175688.0675275,
+    "ast_hash": "2123b6a1301a60235d9bf336cb7017d2",
+    "semantic_hash": "2123b6a1301a60235d9bf336cb7017d2"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-25-analysis-manual-ticker-design.md": {
+    "mtime": 1779696349.8624744,
+    "ast_hash": "9e9b205e9bf9b951e818263e79457f3e",
+    "semantic_hash": "9e9b205e9bf9b951e818263e79457f3e"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-29-chat-quick-actions-design.md": {
+    "mtime": 1780045429.5849922,
+    "ast_hash": "7d293348ffdf8053d56b82090a375cd1",
+    "semantic_hash": "7d293348ffdf8053d56b82090a375cd1"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-26-watchlist-scan-ai-price-autofill-design.md": {
+    "mtime": 1779786857.5291739,
+    "ast_hash": "8fbd24162dc1018d3dfa1caaa6bbf0fb",
+    "semantic_hash": "8fbd24162dc1018d3dfa1caaa6bbf0fb"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-08-ui-revamp-borderless-cards-design.md": {
+    "mtime": 1778240138.425763,
+    "ast_hash": "22db415f686b0737e74f6a594ebdf3ed",
+    "semantic_hash": "22db415f686b0737e74f6a594ebdf3ed"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-06-events-calendar-design.md": {
+    "mtime": 1778061698.9274209,
+    "ast_hash": "e55030077dcc650921c1cb1483ab9287",
+    "semantic_hash": "e55030077dcc650921c1cb1483ab9287"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-09-chat-sessions-design.md": {
+    "mtime": 1778312465.1400263,
+    "ast_hash": "56eb8287dc9657b8ea75380f71bd5291",
+    "semantic_hash": "56eb8287dc9657b8ea75380f71bd5291"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-22-uxui-glassmorphism-emil-upgrade-design.md": {
+    "mtime": 1779443118.9616375,
+    "ast_hash": "14fbd2219ef6a858b8907916b7ac54e4",
+    "semantic_hash": "14fbd2219ef6a858b8907916b7ac54e4"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-08-platform-badge-design.md": {
+    "mtime": 1778222925.4088275,
+    "ast_hash": "ea08ef286dc0effee714047db76c08f7",
+    "semantic_hash": "ea08ef286dc0effee714047db76c08f7"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-06-pipeline-step-breakdown-design.md": {
+    "mtime": 1778042350.2523046,
+    "ast_hash": "bb6d434a99a25991b3e1c3cbf74a439d",
+    "semantic_hash": "bb6d434a99a25991b3e1c3cbf74a439d"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-06-overview-redesign-design.md": {
+    "mtime": 1778065851.2192338,
+    "ast_hash": "22116cc5f6fec451f595d4c780b17928",
+    "semantic_hash": "22116cc5f6fec451f595d4c780b17928"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-06-settings-page-telegram-privacy-design.md": {
+    "mtime": 1778047096.585052,
+    "ast_hash": "cea1aaba3c532f99c764b9703052eaa3",
+    "semantic_hash": "cea1aaba3c532f99c764b9703052eaa3"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-05-net-worth-timeline-design.md": {
+    "mtime": 1777975921.3804262,
+    "ast_hash": "ca9fa574c83626ea33c0b1f29ab0ae00",
+    "semantic_hash": "ca9fa574c83626ea33c0b1f29ab0ae00"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-08-dividend-telegram-alert-design.md": {
+    "mtime": 1778176806.3628242,
+    "ast_hash": "19c6bcfa4b3c3c8ac1de641a4c52510d",
+    "semantic_hash": "19c6bcfa4b3c3c8ac1de641a4c52510d"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-07-server-side-search-filter-design.md": {
+    "mtime": 1778157292.6996236,
+    "ast_hash": "16c31f1baf5248be405593903019fd1b",
+    "semantic_hash": "16c31f1baf5248be405593903019fd1b"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-04-26-phase6-ai-llm-analysis-design.md": {
+    "mtime": 1777190540.4735763,
+    "ast_hash": "0650c19a67e511de98053b9d32a9eee5",
+    "semantic_hash": "0650c19a67e511de98053b9d32a9eee5"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-08-search-and-tab-routing-design.md": {
+    "mtime": 1778228854.5191095,
+    "ast_hash": "36ba32e36e56722260acdd96298edaae",
+    "semantic_hash": "36ba32e36e56722260acdd96298edaae"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-25-chat-symbol-analysis-tool-design.md": {
+    "mtime": 1779725767.0014768,
+    "ast_hash": "12e2f490080107e66d210af23c580193",
+    "semantic_hash": "12e2f490080107e66d210af23c580193"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-07-crypto-holdings-design.md": {
+    "mtime": 1778153552.9964538,
+    "ast_hash": "706486d31ebc4fed700455643e97dba1",
+    "semantic_hash": "706486d31ebc4fed700455643e97dba1"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-25-chat-tool-call-auditability-design.md": {
+    "mtime": 1779727913.7645683,
+    "ast_hash": "8cf37a6df13b35f5ede99c0a09533be9",
+    "semantic_hash": "8cf37a6df13b35f5ede99c0a09533be9"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-05-dividend-cluster-design.md": {
+    "mtime": 1777990313.8908062,
+    "ast_hash": "f3b2e4f49efde1f389ee3e6622af3bbf",
+    "semantic_hash": "f3b2e4f49efde1f389ee3e6622af3bbf"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-04-import-portfolio-redesign.md": {
+    "mtime": 1777880103.5383651,
+    "ast_hash": "3b8b4e185576833673ae1aca19618bae",
+    "semantic_hash": "3b8b4e185576833673ae1aca19618bae"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-02-import-ux-file-first-design.md": {
+    "mtime": 1777706375.3545516,
+    "ast_hash": "f4ec63cd8e1f7840f118a592c46625ed",
+    "semantic_hash": "f4ec63cd8e1f7840f118a592c46625ed"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-07-edit-asset-ticker-design.md": {
+    "mtime": 1778130618.095266,
+    "ast_hash": "b2ef2ec344debb3a20a18660d6c9a329",
+    "semantic_hash": "b2ef2ec344debb3a20a18660d6c9a329"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-22-responsive-mobile-design.md": {
+    "mtime": 1779445806.6685092,
+    "ast_hash": "aca42822e9dc98de491fdf069338919a",
+    "semantic_hash": "aca42822e9dc98de491fdf069338919a"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-08-logo-ticker-design.md": {
+    "mtime": 1778178897.4651842,
+    "ast_hash": "7059c97146f9f660fc017013a43681a8",
+    "semantic_hash": "7059c97146f9f660fc017013a43681a8"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-05-portfolio-holdings-cash-redesign.md": {
+    "mtime": 1777973075.3038268,
+    "ast_hash": "2d3765d26da792fb4368338ef00b6ef1",
+    "semantic_hash": "2d3765d26da792fb4368338ef00b6ef1"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-04-25-phase5-design.md": {
+    "mtime": 1777128855.328774,
+    "ast_hash": "99ca9d2ac4dd66d2a207310f56352df8",
+    "semantic_hash": "99ca9d2ac4dd66d2a207310f56352df8"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-06-cash-account-edit-delete-design.md": {
+    "mtime": 1778083561.3972218,
+    "ast_hash": "99d18856467934ecd3a71b98d88f862e",
+    "semantic_hash": "99d18856467934ecd3a71b98d88f862e"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-22-allocation-page-design.md": {
+    "mtime": 1779439338.472771,
+    "ast_hash": "87cb00959f666e438b172d6b7c913915",
+    "semantic_hash": "87cb00959f666e438b172d6b7c913915"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-04-22-zentri-design.md": {
+    "mtime": 1776856138.4527025,
+    "ast_hash": "21be463d9ac0cd088e9cbdaa198f439d",
+    "semantic_hash": "21be463d9ac0cd088e9cbdaa198f439d"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-06-layout-redesign-design.md": {
+    "mtime": 1778068997.6896899,
+    "ast_hash": "3a90c5d52f5d1cb0d0d4fe6567fccc1c",
+    "semantic_hash": "3a90c5d52f5d1cb0d0d4fe6567fccc1c"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/docs/superpowers/specs/2026-05-08-historical-net-worth-backfill-design.md": {
+    "mtime": 1778232627.5398476,
+    "ast_hash": "3ff29067e7e79a9eeaf13c4921d68282",
+    "semantic_hash": "3ff29067e7e79a9eeaf13c4921d68282"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/.kiro/steering/code-review-graph.md": {
+    "mtime": 1776891168.4078732,
+    "ast_hash": "85785109b1c3db1926f650ef5d7ded5f",
+    "semantic_hash": "85785109b1c3db1926f650ef5d7ded5f"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/public/file.svg": {
+    "mtime": 1776890757.4975655,
+    "ast_hash": "d09f95206c3fa0bb9bd9fefabfd0ea71",
+    "semantic_hash": "d09f95206c3fa0bb9bd9fefabfd0ea71"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/public/vercel.svg": {
+    "mtime": 1776890757.4973824,
+    "ast_hash": "c0af2f507b369b085b35ef4bbe3bcf1e",
+    "semantic_hash": "c0af2f507b369b085b35ef4bbe3bcf1e"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/public/next.svg": {
+    "mtime": 1776890757.4975724,
+    "ast_hash": "8e061864f388b47f33a1c3780831193e",
+    "semantic_hash": "8e061864f388b47f33a1c3780831193e"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/public/globe.svg": {
+    "mtime": 1776890757.4975076,
+    "ast_hash": "2aaafa6a49b6563925fe440891e32717",
+    "semantic_hash": "2aaafa6a49b6563925fe440891e32717"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/frontend/public/window.svg": {
+    "mtime": 1776890757.4974961,
+    "ast_hash": "a2760511c65806022ad20adf74370ff3",
+    "semantic_hash": "a2760511c65806022ad20adf74370ff3"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/example/design/deep-drive-ui-output.png": {
+    "mtime": 1779347222.5488229,
+    "ast_hash": "75579499f4d96853f1ffa7d0a1a544fd",
+    "semantic_hash": "75579499f4d96853f1ffa7d0a1a544fd"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/example/design/bear-case-ui-output.png": {
+    "mtime": 1779347425.807335,
+    "ast_hash": "e24ef8d6fa73cc9e561a0d3e0e28e907",
+    "semantic_hash": "e24ef8d6fa73cc9e561a0d3e0e28e907"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/example/design/example-web-3.webp": {
+    "mtime": 1778066247.8684664,
+    "ast_hash": "c42d53cff83d22ca584c4165aa42fd64",
+    "semantic_hash": "c42d53cff83d22ca584c4165aa42fd64"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/example/design/example-dashboard-1.webp": {
+    "mtime": 1778066182.6380181,
+    "ast_hash": "749979a674efae30d6bcf002ac98ff68",
+    "semantic_hash": "749979a674efae30d6bcf002ac98ff68"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/example/design/example-web-2.webp": {
+    "mtime": 1778066216.338253,
+    "ast_hash": "54669ea4cac2ec4eb27ed938ec8e3507",
+    "semantic_hash": "54669ea4cac2ec4eb27ed938ec8e3507"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/example/design/peer-comparsion-ui-output.png": {
+    "mtime": 1779347350.7205818,
+    "ast_hash": "84f8fbee9baaa3983936e64930e3216f",
+    "semantic_hash": "84f8fbee9baaa3983936e64930e3216f"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/example/design/example-web-5.webp": {
+    "mtime": 1778066318.1327114,
+    "ast_hash": "8ba6e6edf2a5e699458f62afb13e1fd1",
+    "semantic_hash": "8ba6e6edf2a5e699458f62afb13e1fd1"
+  },
+  "/Users/tharitthaveekittikul/Documents/03_Projects/Zentri/example/design/example-web-4.webp": {
+    "mtime": 1778066261.7881742,
+    "ast_hash": "db7ee7b79e8e1485f49919a0739335a0",
+    "semantic_hash": "db7ee7b79e8e1485f49919a0739335a0"
+  }
+}
